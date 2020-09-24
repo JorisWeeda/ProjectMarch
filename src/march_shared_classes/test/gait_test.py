@@ -13,6 +13,7 @@ from march_shared_classes.gait.subgait import Subgait
 class GaitTest(unittest.TestCase):
     def setUp(self):
         self.gait_name = 'walk'
+        self.gait_type = 'test_type'
         self.resources_folder = rospkg.RosPack().get_path('march_shared_classes') + '/test/resources'
         self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
 
@@ -26,6 +27,9 @@ class GaitTest(unittest.TestCase):
     # Gait.from_file tests
     def test_from_file_valid_path(self):
         self.assertIsInstance(self.gait, Gait)
+
+    def test_from_file_gait_type(self):
+        self.assertEqual(self.gait.gait_type, self.gait_type)
 
     def test_from_file_invalid_path(self):
         with self.assertRaises(FileNotFoundError):

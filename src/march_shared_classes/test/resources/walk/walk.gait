@@ -1,4 +1,5 @@
 name: walk
+gait_type: 'test_type'
 subgaits:
   start:
     to: right_open

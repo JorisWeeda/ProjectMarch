@@ -8,11 +8,11 @@ from march_shared_classes.gait.subgait import Subgait
 
 class TransitionSubgait(Subgait):
     def __init__(self, joints, duration,
-                 gait_type='walk_like', gait_name='Transition',
+                 gait_name='Transition',
                  subgait_name='Transition_subgait', version='Default',
                  description='The subgait used to transition between two subgaits'):
 
-        super(TransitionSubgait, self).__init__(joints, duration, gait_type, gait_name,
+        super(TransitionSubgait, self).__init__(joints, duration, gait_name,
                                                 subgait_name, version, description)
 
     @classmethod

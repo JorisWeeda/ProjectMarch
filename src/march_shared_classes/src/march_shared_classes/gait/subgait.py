@@ -20,11 +20,10 @@ class Subgait(object):
 
     joint_class = JointTrajectory
 
-    def __init__(self, joints, duration, gait_type='walk_like', gait_name='Walk', subgait_name='right_open',
+    def __init__(self, joints, duration, gait_name='Walk', subgait_name='right_open',
                  version='First try', description='Just a simple gait'):
 
         self.joints = joints
-        self.gait_type = gait_type
         self.gait_name = gait_name
 
         self.subgait_name = subgait_name
@@ -133,10 +132,9 @@ class Subgait(object):
                 continue
             limits = Limits.from_urdf_joint(urdf_joint)
             joint_list.append(cls.joint_class.from_setpoints(name, limits, points, duration, *args))
-        subgait_type = subgait_dict['gait_type'] if subgait_dict.get('gait_type') else ''
         subgait_description = subgait_dict['description'] if subgait_dict.get('description') else ''
 
-        return cls(joint_list, duration, subgait_type, gait_name, subgait_name, version, subgait_description)
+        return cls(joint_list, duration, gait_name, subgait_name, version, subgait_description)
 
     # endregion
 
@@ -273,10 +271,9 @@ class Subgait(object):
             base_subgait.version, other_subgait.version, parameter)
 
         duration = base_subgait.duration * parameter + (1 - parameter) * other_subgait.duration
-        gait_type = base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
         version = '{0}{1}_({2})_({3})'.format(PARAMETRIC_GAITS_PREFIX, parameter, base_subgait.version,
                                               other_subgait.version)
-        return Subgait(joints, duration, gait_type, base_subgait.gait_name, base_subgait.subgait_name, version,
+        return Subgait(joints, duration, base_subgait.gait_name, base_subgait.subgait_name, version,
                        description)
     # endregion
 

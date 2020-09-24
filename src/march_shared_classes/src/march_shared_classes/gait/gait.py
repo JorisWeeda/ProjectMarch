@@ -12,7 +12,7 @@ from .subgait_graph import SubgaitGraph
 class Gait(object):
     """base class for a generated gait."""
 
-    def __init__(self, gait_name, subgaits, graph):
+    def __init__(self, gait_name, subgaits, graph, gait_type = 'walk_like'):
         """Initializes and verifies the gait.
 
         :param str gait_name: Name of the gait
@@ -22,6 +22,7 @@ class Gait(object):
         self.gait_name = gait_name
         self.subgaits = subgaits
         self.graph = graph
+        self.gait_type = gait_type
 
         self._validate_trajectory_transition()
 
@@ -66,12 +67,13 @@ class Gait(object):
         """
         gait_name = gait_dictionary['name']
         subgaits = gait_dictionary['subgaits']
+        gait_type = gait_dictionary['gait_type'] if gait_dictionary.get('gait_type') else ''
 
         graph = SubgaitGraph(subgaits)
         subgaits = dict([(name, cls.load_subgait(robot, gait_directory, gait_name, name, gait_version_map))
                          for name in subgaits if name not in ('start', 'end')])
 
-        return cls(gait_name, subgaits, graph)
+        return cls(gait_name, subgaits, graph, gait_type)
 
     @staticmethod
     def load_subgait(robot, gait_directory, gait_name, subgait_name, gait_version_map):
