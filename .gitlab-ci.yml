@@ -21,7 +21,7 @@ colcon build:
       - install/
       - log/
   script:
-    - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE_TESTING=ON" --event-handlers console_direct+
+    - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" "-DENABLE_COVERAGE_TESTING=ON" "-DCMAKE_BUILD_TYPE=Debug" --event-handlers console_direct+
 
 colcon test:
   stage: test
@@ -30,7 +30,7 @@ colcon test:
   script:
     - source install/setup.bash && colcon test --event-handlers console_direct+
     - colcon test-result --verbose
-    - gcovr -r . --exclude 'src/march_imu_manager/lib/' --exclude 'src/.*/test/' --exclude 'install/'
+    - gcovr --exclude 'src/march_imu_manager/lib/' --exclude 'src/.*/test/' --exclude 'install/'
 
 catkin_lint:
   stage: lint
