@@ -39,6 +39,12 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/ContainsGait.srv"
   "srv/PossibleGaits.srv"
   "srv/SetGaitVersion.srv"
+  "srv/RequestParamList.srv"
+  "srv/RequestParamString.srv"
+  "srv/RequestParamBool.srv"
+  "srv/RequestParamInt.srv"
+  "srv/RequestParamFloat.srv"
+  "srv/SetParamFloat.srv"
   DEPENDENCIES std_msgs builtin_interfaces
  )
 

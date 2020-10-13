@@ -32,6 +32,12 @@ add_service_files(
     ContainsGait.srv
     PossibleGaits.srv
     SetGaitVersion.srv
+    RequestParamString.srv
+    RequestParamList.srv
+    RequestParamInt.srv
+    RequestParamFloat.srv
+    RequestParamBool.srv
+    SetParamFloat.srv
 )
 
 generate_messages(
