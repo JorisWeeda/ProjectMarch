@@ -1,7 +1,10 @@
 import rospy
-from march_shared_resources.srv import RequestParamString, RequestParamList, \
-     RequestParamStringResponse, RequestParamListResponse, RequestParamInt, RequestParamIntResponse, \
-     RequestParamFloat, RequestParamFloatResponse, RequestParamBool, RequestParamBoolResponse, SetParamFloat
+from march_shared_resources.srv import GetParamString, GetParamStringList, \
+     GetParamStringResponse, GetParamStringListResponse, GetParamInt, GetParamIntResponse, \
+     GetParamFloat, GetParamFloatResponse, GetParamBool, GetParamBoolResponse, \
+     SetParamFloat, SetParamFloatResponse, SetParamString, SetParamStringResponse, \
+     SetParamStringList, SetParamStringListResponse, SetParamBool, SetParamBoolResponse, \
+    SetParamInt, SetParamIntResponse
 
 
 class ParameterServer:
@@ -14,21 +17,32 @@ class ParameterServer:
         """
         Construct a service for each parameter type
         """
-        rospy.Service('march/parameter_server/request_param_string', RequestParamString,
-                      lambda req: self.request_callback(req, RequestParamStringResponse))
-        rospy.Service('march/parameter_server/request_param_list', RequestParamList,
-                      lambda req: self.request_callback(req, RequestParamListResponse))
-        rospy.Service('march/parameter_server/request_param_bool', RequestParamBool,
-                      lambda req: self.request_callback(req, RequestParamBoolResponse))
-        rospy.Service('march/parameter_server/request_param_float', RequestParamFloat,
-                      lambda req: self.request_callback(req, RequestParamFloatResponse))
-        rospy.Service('march/parameter_server/request_param_int', RequestParamInt,
-                      lambda req: self.request_callback(req, RequestParamIntResponse))
+        # Get services
+        rospy.Service('march/parameter_server/get_param_string', GetParamString,
+                      lambda req: self.get_callback(req, GetParamStringResponse))
+        rospy.Service('march/parameter_server/get_param_string_list', GetParamStringList,
+                      lambda req: self.get_callback(req, GetParamStringListResponse))
+        rospy.Service('march/parameter_server/get_param_bool', GetParamBool,
+                      lambda req: self.get_callback(req, GetParamBoolResponse))
+        rospy.Service('march/parameter_server/get_param_float', GetParamFloat,
+                      lambda req: self.get_callback(req, GetParamFloatResponse))
+        rospy.Service('march/parameter_server/get_param_int', GetParamInt,
+                      lambda req: self.get_callback(req, GetParamIntResponse))
+        
+        # Set services
+        rospy.Service('march/parameter_server/set_param_string', SetParamString,
+                      lambda req: self.set_callback(req, SetParamStringResponse))
+        rospy.Service('march/parameter_server/set_param_string_list', SetParamStringList,
+                      lambda req: self.set_callback(req, SetParamStringListResponse))
+        rospy.Service('march/parameter_server/set_param_bool', SetParamBool,
+                      lambda req: self.set_callback(req, SetParamBoolResponse))
         rospy.Service('march/parameter_server/set_param_float', SetParamFloat,
-                      lambda req: self.set_callback(req))
+                      lambda req: self.set_callback(req, SetParamFloatResponse))
+        rospy.Service('march/parameter_server/set_param_int', SetParamInt,
+                      lambda req: self.set_callback(req, SetParamIntResponse))
 
     @staticmethod
-    def request_callback(req, type):
+    def get_callback(req, type):
         """
         Look into the ROS1 parameter server and return the value of a parameter
 
@@ -42,9 +56,13 @@ class ParameterServer:
         raise InvalidParamName(req.name)
 
     @staticmethod
-    def set_callback(req):
-        rospy.loginfo("Setting param with name " + req.name + " to value: " + str(req.name))
-        rospy.set_param(req.name, req.value)
+    def set_callback(req, type):
+        rospy.loginfo("Setting param with name " + req.name + " to value: " + str(req.value))
+
+        if req.name in rospy.get_param_names():
+            rospy.set_param(req.name, req.value)
+            return type(rospy.get_param(req.name))
+        raise InvalidParamName(req.name)
 
 
 class InvalidParamName(Exception):

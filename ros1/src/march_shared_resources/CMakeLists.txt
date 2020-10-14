@@ -32,11 +32,15 @@ add_service_files(
     ContainsGait.srv
     PossibleGaits.srv
     SetGaitVersion.srv
-    RequestParamString.srv
-    RequestParamList.srv
-    RequestParamInt.srv
-    RequestParamFloat.srv
-    RequestParamBool.srv
+    GetParamStringList.srv
+    GetParamString.srv
+    GetParamBool.srv
+    GetParamInt.srv
+    GetParamFloat.srv
+    SetParamStringList.srv
+    SetParamString.srv
+    SetParamBool.srv
+    SetParamInt.srv
     SetParamFloat.srv
 )
 
