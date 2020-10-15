@@ -52,7 +52,12 @@ class ParameterServer:
         rospy.loginfo('Retrieving param with name: ' + req.name)
 
         if req.name in rospy.get_param_names():
-            return type(rospy.get_param(req.name))
+            response = type(rospy.get_param(req.name))
+
+            rospy.loginfo('Returning response')
+            rospy.loginfo(str(response))
+
+            return response
         raise InvalidParamName(req.name)
 
     @staticmethod

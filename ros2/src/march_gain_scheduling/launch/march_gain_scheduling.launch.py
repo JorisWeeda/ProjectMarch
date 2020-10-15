@@ -1,4 +1,7 @@
+import os
+
 import launch
+from ament_index_python import get_package_share_directory
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -6,10 +9,10 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     ld = launch.LaunchDescription([
-        # DeclareLaunchArgument(
-        #     name='configuration',
-        #     description='Tuning configuration to use. Must be name of file in config/ directory.'
-        # ),
+        DeclareLaunchArgument(
+            name='configuration',
+            description='Tuning configuration to use. Must be name of file in config/ directory.'
+        ),
         DeclareLaunchArgument(
             name='linear',
             default_value='true',
@@ -26,12 +29,10 @@ def generate_launch_description():
             name='gain_scheduling_node',
             output='screen',
             parameters=[{'linearize_gain_scheduling': LaunchConfiguration('linear')},
-                        {'linear_slope': LaunchConfiguration('slope')}]
-                # LaunchConfiguration('configuration')
+                        {'linear_slope': LaunchConfiguration('slope')},
+                         LaunchConfiguration('configuration')
+                        ]
         )
     ])
     return ld
 
-
-if __name__ == '__main__':
-    generate_launch_description()
