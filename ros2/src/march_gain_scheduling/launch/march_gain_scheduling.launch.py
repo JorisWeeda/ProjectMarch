@@ -1,13 +1,11 @@
-import os
-
 import launch
 from ament_index_python import get_package_share_directory
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 
 
-def generate_launch_description():
+def generate_launch_description() -> launch.LaunchDescription:
     ld = launch.LaunchDescription([
         DeclareLaunchArgument(
             name='configuration',
@@ -29,7 +27,13 @@ def generate_launch_description():
             name='gain_scheduling_node',
             output='screen',
             parameters=[{'linearize_gain_scheduling': LaunchConfiguration('linear')},
-                        {'linear_slope': LaunchConfiguration('slope')}, LaunchConfiguration('configuration')]
+                        {'linear_slope': LaunchConfiguration('slope')},
+                        # Putting the path to the file and the string '.yaml' in a list makes sure the strings get
+                        # concatenated after substitution.
+                        # See: https://answers.ros.org/question/358655/ros2-concatenate-string-to-launchargument/
+                        [PathJoinSubstitution([get_package_share_directory('march_gain_scheduling'), 'config',
+                                               LaunchConfiguration('configuration')]), '.yaml']
+                        ]
         )
     ])
     return ld
