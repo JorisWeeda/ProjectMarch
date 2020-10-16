@@ -42,7 +42,7 @@ class DynamicPIDReconfigurer(Node):
 
         self.load_current_gaits_event = Event()
         # # For debug
-        self.load_current_gains()
+        # self.load_current_gains()
         # needed_gains = [[12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34],
         #                 [12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34]]
         # self.client_update(needed_gains)
