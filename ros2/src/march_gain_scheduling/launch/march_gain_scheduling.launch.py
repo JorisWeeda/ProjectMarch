@@ -29,9 +29,7 @@ def generate_launch_description():
             name='gain_scheduling_node',
             output='screen',
             parameters=[{'linearize_gain_scheduling': LaunchConfiguration('linear')},
-                        {'linear_slope': LaunchConfiguration('slope')},
-                         LaunchConfiguration('configuration')
-                        ]
+                        {'linear_slope': LaunchConfiguration('slope')}, LaunchConfiguration('configuration')]
         )
     ])
     return ld

@@ -21,10 +21,30 @@ def generate_launch_description():
             'use_sim_time',
             default_value='True',
             description='Whether to use simulation time'),
-        launch.actions.DeclareLaunchArgument(
+        DeclareLaunchArgument(
             name='rqt_input',
             default_value='True',
             description='Launches the rqt input device.'),
+        DeclareLaunchArgument(
+            name='gain_scheduling',
+            default_value='True',
+            description='Launches the gain scheduling node.'),
+        DeclareLaunchArgument(
+            name='configuration',
+            default_value='groundgait',
+            description='Tuning configuration to use. Must be name of file in config/ directory.'
+        ),
+        DeclareLaunchArgument(
+            name='linear',
+            default_value='true',
+            description='Whether to linearize the change in PID values'
+        ),
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('march_gain_scheduling'), 'launch', 'march_gain_scheduling.launch.py')),
+            launch_arguments=[('linear', LaunchConfiguration('linear')),
+                              ('configuration', LaunchConfiguration('configuration')),
+                              ('use_sim_time', LaunchConfiguration('use_sim_time'))],
+            condition=IfCondition(LaunchConfiguration('gain_scheduling'))),
         # Launch rqt input device if not rqt_input:=false is given as argument
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_rqt_input_device'), 'launch', 'input_device.launch.py')),

@@ -1,12 +1,12 @@
 # from dynamic_reconfigure.client import Client
-# import rospy
-from threading import Thread
+from threading import Thread, Event
 from typing import List
 
 import rclpy
 
 from march_shared_msgs.srv import GetParamStringList, GetParamFloat, SetParamFloat
 from march_shared_msgs.msg import CurrentGait
+from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import Executor, SingleThreadedExecutor, MultiThreadedExecutor
 from rclpy.node import Node
 from .one_step_linear_interpolation import interpolate
@@ -26,11 +26,12 @@ class DynamicPIDReconfigurer(Node):
         joint_list_ci.destroy()
 
         self._last_update_times = []
-        # self.current_gains =[]
         self.current_gains = {joint: {gain: None for gain in ['p', 'i', 'd']} for joint in self._joint_list}
 
+        self.callback_group = ReentrantCallbackGroup()
         self.create_subscription(msg_type=CurrentGait, topic='/march/gait_selection/current_gait',
-                                 callback=self.gait_selection_callback, qos_profile=10)
+                                 callback=self.gait_selection_callback, callback_group=self.callback_group,
+                                 qos_profile=10)
 
         self._linearize = self.get_parameter('linearize_gain_scheduling').get_parameter_value().bool_value
         self._gradient = self.get_parameter('linear_slope').get_parameter_value().double_value
@@ -39,8 +40,9 @@ class DynamicPIDReconfigurer(Node):
         self.float_getter_client = self.create_client(GetParamFloat, 'march/parameter_server/get_param_float')
         self.float_setter_client = self.create_client(SetParamFloat, 'march/parameter_server/set_param_float')
 
+        self.load_current_gaits_event = Event()
         # # For debug
-        # self.load_current_gains()
+        self.load_current_gains()
         # needed_gains = [[12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34],
         #                 [12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34]]
         # self.client_update(needed_gains)
@@ -59,6 +61,7 @@ class DynamicPIDReconfigurer(Node):
         self._gait_type = new_gait_type
         self.load_current_gains()
         needed_gains = [self.look_up_table(i) for i in range(len(self._joint_list))]
+        self.get_logger().info(f'The loaded gains are: {self.current_gains}')
 
         # if not self.is_interpolation_done(needed_gains):
         #     rate = self.create_rate(10)
@@ -119,19 +122,17 @@ class DynamicPIDReconfigurer(Node):
         for joint_name in self._joint_list:
             # gains =[]
             for gain in ['p', 'i', 'd']:
+                self.load_current_gaits_event.clear()
                 future = self.float_getter_client.call_async(GetParamFloat.Request(
                     name='/march/controller/trajectory/gains/{joint}/{gain}'.format(joint=joint_name, gain=gain)))
 
-                # rclpy.spin_until_future_complete(self, future)
                 future.add_done_callback(lambda future_done: self.future_cb(future_done, joint_name, gain))
-
-
-            # self.get_logger().info(str(gains))
-            # self.current_gains.append(gains)
+                self.load_current_gaits_event.wait()
 
     def future_cb(self, future_done, joint, gain):
         self.get_logger().info(str(future_done))
         self.current_gains[joint][gain] = future_done.result().value
+        self.load_current_gaits_event.set()
 
     def look_up_table(self, joint_index: int) -> List[int]:
         """
