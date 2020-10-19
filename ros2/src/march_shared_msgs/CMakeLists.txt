@@ -36,6 +36,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LowVoltageNet.msg"
   "msg/PowerDistributionBoardState.msg"
   "msg/PressureSole.msg"
+  "msg/GainValues.msg"
   "srv/ContainsGait.srv"
   "srv/PossibleGaits.srv"
   "srv/SetGaitVersion.srv"
@@ -49,6 +50,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SetParamBool.srv"
   "srv/SetParamInt.srv"
   "srv/SetParamFloat.srv"
+  "srv/GetGainValues.srv"
+  "srv/GetGainValuesList.srv"
   DEPENDENCIES std_msgs builtin_interfaces
  )
 

@@ -24,6 +24,7 @@ add_message_files(
     LowVoltageNet.msg
     PowerDistributionBoardState.msg
     PressureSole.msg
+    GainValues.msg
 )
 
 add_service_files(
@@ -42,6 +43,8 @@ add_service_files(
     SetParamBool.srv
     SetParamInt.srv
     SetParamFloat.srv
+    GetGainValues.srv
+    GetGainValuesList.srv
 )
 
 generate_messages(

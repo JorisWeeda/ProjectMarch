@@ -1,0 +1,5 @@
+string joint
+#string[] joint_list
+---
+#GainValues[] gain_values
+float64[] gains

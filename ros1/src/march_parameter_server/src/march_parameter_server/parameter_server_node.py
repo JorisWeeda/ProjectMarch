@@ -1,10 +1,11 @@
 import rospy
+from march_shared_resources.msg import GainValues
 from march_shared_resources.srv import GetParamString, GetParamStringList, \
      GetParamStringResponse, GetParamStringListResponse, GetParamInt, GetParamIntResponse, \
      GetParamFloat, GetParamFloatResponse, GetParamBool, GetParamBoolResponse, \
      SetParamFloat, SetParamFloatResponse, SetParamString, SetParamStringResponse, \
      SetParamStringList, SetParamStringListResponse, SetParamBool, SetParamBoolResponse, \
-    SetParamInt, SetParamIntResponse
+    SetParamInt, SetParamIntResponse, GetGainValues, GetGainValuesResponse
 
 
 class ParameterServer:
@@ -28,6 +29,7 @@ class ParameterServer:
                       lambda req: self.get_callback(req, GetParamFloatResponse))
         rospy.Service('march/parameter_server/get_param_int', GetParamInt,
                       lambda req: self.get_callback(req, GetParamIntResponse))
+        rospy.Service('march/parameter_server/get_gain_values', GetGainValues, self.get_gain_values_callback)
         
         # Set services
         rospy.Service('march/parameter_server/set_param_string', SetParamString,
@@ -49,14 +51,10 @@ class ParameterServer:
         :req request of the client
         :type type of request response
         """
-        rospy.loginfo('Retrieving param with name: ' + req.name)
+        # rospy.loginfo('Retrieving param with name: ' + req.name)
 
         if req.name in rospy.get_param_names():
             response = type(rospy.get_param(req.name))
-
-            rospy.loginfo('Returning response')
-            rospy.loginfo(str(response))
-
             return response
         raise InvalidParamName(req.name)
 
@@ -68,6 +66,13 @@ class ParameterServer:
             rospy.set_param(req.name, req.value)
             return type(rospy.get_param(req.name))
         raise InvalidParamName(req.name)
+
+    @staticmethod
+    def get_gain_values_callback(req):
+        rospy.loginfo(req.joint)
+        gain_values = [rospy.get_param('/march/controller/trajectory/gains/{joint}/{gain}'.
+                                       format(joint=req.joint, gain=gain)) for gain in ['p', 'i', 'd']]
+        return GetGainValuesResponse(gain_values)
 
 
 class InvalidParamName(Exception):

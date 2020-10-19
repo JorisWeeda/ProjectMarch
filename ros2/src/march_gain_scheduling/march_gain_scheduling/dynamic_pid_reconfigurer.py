@@ -4,7 +4,7 @@ from typing import List
 
 import rclpy
 
-from march_shared_msgs.srv import GetParamStringList, GetParamFloat, SetParamFloat
+from march_shared_msgs.srv import GetParamStringList, GetParamFloat, SetParamFloat, GetGainValues
 from march_shared_msgs.msg import CurrentGait
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import Executor, SingleThreadedExecutor, MultiThreadedExecutor
@@ -26,7 +26,7 @@ class DynamicPIDReconfigurer(Node):
         joint_list_ci.destroy()
 
         self._last_update_times = []
-        self.current_gains = {joint: {gain: None for gain in ['p', 'i', 'd']} for joint in self._joint_list}
+        self.current_gains = []
 
         self.callback_group = ReentrantCallbackGroup()
         self.create_subscription(msg_type=CurrentGait, topic='/march/gait_selection/current_gait',
@@ -37,11 +37,13 @@ class DynamicPIDReconfigurer(Node):
         self._gradient = self.get_parameter('linear_slope').get_parameter_value().double_value
 
         # Getter and setter clients to interact with the ROS1 parameter server
-        self.float_getter_client = self.create_client(GetParamFloat, 'march/parameter_server/get_param_float')
+        self.gains_getter_client = self.create_client(GetGainValues, 'march/parameter_server/get_gain_values')
         self.float_setter_client = self.create_client(SetParamFloat, 'march/parameter_server/set_param_float')
 
-        self.load_current_gaits_event = Event()
-        # # For debug
+        self.load_current_gains_event = Event()
+        self.set_current_gains_event = Event()
+
+        # ## For debug
         # self.load_current_gains()
         # needed_gains = [[12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34],
         #                 [12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34], [12.34, 12.34, 12.34]]
@@ -63,16 +65,16 @@ class DynamicPIDReconfigurer(Node):
         needed_gains = [self.look_up_table(i) for i in range(len(self._joint_list))]
         self.get_logger().info(f'The loaded gains are: {self.current_gains}')
 
-        # if not self.is_interpolation_done(needed_gains):
-        #     rate = self.create_rate(10)
-        #
-        #     self.get_logger().info('Beginning PID interpolation for gait type: {0}'.format(self._gait_type))
-        #     begin_time = self.get_clock().now()
-        #     self._last_update_times = len(self._joint_list) * [begin_time]
-        #     while not self.is_interpolation_done(needed_gains):
-        #         self.client_update(needed_gains)
-        #         rate.sleep()
-        #     self.get_logger().info('PID interpolation finished in {0}s'.format(self.get_clock().now() - begin_time))
+        if not self.is_interpolation_done(needed_gains):
+            rate = self.create_rate(10)
+
+            self.get_logger().info('Beginning PID interpolation for gait type: {0}'.format(self._gait_type))
+            begin_time = self.get_clock().now()
+            self._last_update_times = len(self._joint_list) * [begin_time]
+            while not self.is_interpolation_done(needed_gains):
+                self.client_update(needed_gains)
+                rate.sleep()
+            self.get_logger().info('PID interpolation finished in {0}s'.format(self.get_clock().now() - begin_time))
 
     def client_update(self, needed_gains: List[List[float]]):
         """
@@ -104,35 +106,35 @@ class DynamicPIDReconfigurer(Node):
         :param gains Gain values to set in the ROS1 parameter server
         """
         for gain, value in zip(['p', 'i', 'd'], gains):
+            self.get_logger().info('Calling update gains')
+            self.set_current_gains_event.clear()
             future = self.float_setter_client.call_async(
                 SetParamFloat.Request(name='/march/controller/trajectory/gains/{joint}/{gain}'.
                                       format(joint=joint, gain=gain), value=value))
-            rclpy.spin_until_future_complete(self, future)
 
-            if value != future.result().value:
-                raise RuntimeError('Setting pid value error')
+            future.add_done_callback(self.set_future_cb)
+            self.set_current_gains_event.wait()
+
+    def set_future_cb(self, future_done):
+        self.get_logger().info(str(future_done))
+        self.set_current_gains_event.set()
 
     def load_current_gains(self):
         """
         Load the current gains from the ROS1 parameter server, and put them in self.current_gains.
         Calls the 'march/parameter_server/get_param_float' 24 times (8 joints * 3 pid values)
         """
-        # self.current_gains = []
-        self.current_gains = {joint: {gain: None for gain in ['p', 'i', 'd']} for joint in self._joint_list}
+        self.current_gains = []
         for joint_name in self._joint_list:
-            # gains =[]
-            for gain in ['p', 'i', 'd']:
-                self.load_current_gaits_event.clear()
-                future = self.float_getter_client.call_async(GetParamFloat.Request(
-                    name='/march/controller/trajectory/gains/{joint}/{gain}'.format(joint=joint_name, gain=gain)))
+            self.load_current_gains_event.clear()
+            future = self.gains_getter_client.call_async(GetGainValues.Request(joint=joint_name))
 
-                future.add_done_callback(lambda future_done: self.future_cb(future_done, joint_name, gain))
-                self.load_current_gaits_event.wait()
+            future.add_done_callback(self.get_future_cb)
+            self.load_current_gains_event.wait()
 
-    def future_cb(self, future_done, joint, gain):
-        self.get_logger().info(str(future_done))
-        self.current_gains[joint][gain] = future_done.result().value
-        self.load_current_gaits_event.set()
+    def get_future_cb(self, future_done):
+        self.current_gains.append(future_done.result().gains)
+        self.load_current_gains_event.set()
 
     def look_up_table(self, joint_index: int) -> List[int]:
         """
@@ -156,5 +158,4 @@ class DynamicPIDReconfigurer(Node):
         for i in range(len(self._joint_list)):
             if self.current_gains[i] != needed_gains[i]:
                 done = False
-        self.get_logger().info('Interpolation done: ' + str(done))
         return done
