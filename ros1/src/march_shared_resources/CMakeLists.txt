@@ -46,9 +46,8 @@ add_service_files(
     SetParamFloat.srv
     GetGainValues.srv
     GetGainValuesList.srv
-    GetGainValues2.srv
     SetGainValues.srv
-    GetGainValues3.srv
+    SetGainValuesList.srv
 )
 
 generate_messages(

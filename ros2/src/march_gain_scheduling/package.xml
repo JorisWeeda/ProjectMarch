@@ -7,8 +7,8 @@
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO: License declaration</license>
 
-  <depend>std_msgs</depend>
   <depend>march_shared_msgs</depend>
+  <depend>march_shared_classes</depend>
   <depend>builtin_interfaces</depend>
 
   <exec_depend>rclpy</exec_depend>
