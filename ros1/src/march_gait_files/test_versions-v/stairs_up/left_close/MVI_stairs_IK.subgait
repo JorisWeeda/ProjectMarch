@@ -1,4 +1,4 @@
-description: left swing stairs gait made with IK
+description: right close of the stairs gait, made with IK
 duration: {nsecs: 0, secs: 3}
 gait_type: stairs_like
 joints:
@@ -6,8 +6,8 @@ joints:
   - position: 0.1396
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: -0.2216
-    time_from_start: {nsecs: 453000000, secs: 1}
+  - position: 0.1474
+    time_from_start: {nsecs: 415200000, secs: 2}
     velocity: 0.0
   - position: 0.0436
     time_from_start: {nsecs: 0, secs: 3}
@@ -23,42 +23,39 @@ joints:
   - position: 0.1981
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: -0.1915
-    time_from_start: {nsecs: 800000000, secs: 0}
+  - position: -0.0026
+    time_from_start: {nsecs: 0, secs: 1}
     velocity: 0.0
-  - position: 0.2161
-    time_from_start: {nsecs: 800000000, secs: 1}
+  - position: -0.2211
+    time_from_start: {nsecs: 456499999, secs: 1}
     velocity: 0.0
-  - position: 1.2479
-    time_from_start: {nsecs: 600000000, secs: 2}
+  - position: 0.2007
+    time_from_start: {nsecs: 166799999, secs: 2}
     velocity: 0.0
-  - position: 1.1289
+  - position: -0.0873
     time_from_start: {nsecs: 0, secs: 3}
     velocity: 0.0
   left_knee:
   - position: 0.672
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 0.2855
-    time_from_start: {nsecs: 800000000, secs: 0}
+  - position: 0.3946
+    time_from_start: {nsecs: 0, secs: 1}
     velocity: 0.0
-  - position: 1.2589
-    time_from_start: {nsecs: 800000000, secs: 1}
+  - position: 0.7277
+    time_from_start: {nsecs: 999900000, secs: 1}
     velocity: 0.0
-  - position: 1.6909
-    time_from_start: {nsecs: 600000000, secs: 2}
-    velocity: 0.0
-  - position: 1.5237
+  - position: 0.0
     time_from_start: {nsecs: 0, secs: 3}
     velocity: 0.0
   right_ankle:
   - position: 0.0436
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 0.1418
-    time_from_start: {nsecs: 36000000, secs: 1}
+  - position: 0.1291
+    time_from_start: {nsecs: 927200000, secs: 0}
     velocity: 0.0
-  - position: 0.1396
+  - position: 0.0436
     time_from_start: {nsecs: 0, secs: 3}
     velocity: 0.0
   right_hip_aa:
@@ -72,33 +69,27 @@ joints:
   - position: 1.1289
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 0.921
-    time_from_start: {nsecs: 800000000, secs: 0}
+  - position: 0.9328
+    time_from_start: {nsecs: 0, secs: 1}
     velocity: 0.0
-  - position: 0.3623
-    time_from_start: {nsecs: 800000000, secs: 1}
+  - position: 0.1613
+    time_from_start: {nsecs: 0, secs: 2}
     velocity: 0.0
-  - position: 0.2866
-    time_from_start: {nsecs: 600000000, secs: 2}
-    velocity: 0.0
-  - position: 0.1981
+  - position: -0.0873
     time_from_start: {nsecs: 0, secs: 3}
     velocity: 0.0
   right_knee:
   - position: 1.5237
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 1.6502
-    time_from_start: {nsecs: 800000000, secs: 0}
+  - position: 1.4172
+    time_from_start: {nsecs: 0, secs: 1}
     velocity: 0.0
-  - position: 0.7247
-    time_from_start: {nsecs: 800000000, secs: 1}
+  - position: 0.2908
+    time_from_start: {nsecs: 7200000, secs: 2}
     velocity: 0.0
-  - position: 0.6981
-    time_from_start: {nsecs: 600000000, secs: 2}
-    velocity: 0.0
-  - position: 0.672
+  - position: 0.0
     time_from_start: {nsecs: 0, secs: 3}
     velocity: 0.0
-name: left_swing
+name: left_close
 version: MVI_stairs_IK

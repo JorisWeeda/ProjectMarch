@@ -20,14 +20,14 @@ joints:
   - position: -0.0873
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 0.2367
+  - position: 0.1981
     time_from_start: {nsecs: 0, secs: 3}
     velocity: 0.0
   left_knee:
   - position: 0.0
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 0.5543
+  - position: 0.672
     time_from_start: {nsecs: 0, secs: 3}
     velocity: 0.0
   right_ankle:
@@ -54,10 +54,10 @@ joints:
   - position: 0.7178
     time_from_start: {nsecs: 0, secs: 1}
     velocity: 0.0
-  - position: 1.0722
+  - position: 1.1659
     time_from_start: {nsecs: 250000000, secs: 2}
     velocity: 0.0
-  - position: 1.0428
+  - position: 1.1289
     time_from_start: {nsecs: 0, secs: 3}
     velocity: 0.0
   right_knee:
@@ -67,10 +67,10 @@ joints:
   - position: 1.4356
     time_from_start: {nsecs: 0, secs: 1}
     velocity: 0.0
-  - position: 1.5827
+  - position: 1.85
     time_from_start: {nsecs: 250000000, secs: 2}
     velocity: 0.0
-  - position: 1.259
+  - position: 1.5237
     time_from_start: {nsecs: 0, secs: 3}
     velocity: 0.0
 name: right_open
