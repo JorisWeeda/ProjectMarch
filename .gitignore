@@ -205,3 +205,6 @@ venv/
 .idea/*
 */cmake-build-debug/**
 .vscode/settings.json
+
+start_ros1.sh
+start_ros2.sh

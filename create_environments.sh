@@ -8,7 +8,12 @@ function print_error ()
 
 function print_info ()
 {
-    echo -e "\033[1;32m$1\033[0;0m"
+    echo -e "\033[0;93m[MARCH] $1\033[0;0m"
+}
+
+function print_info_bold ()
+{
+    echo -e "\033[1;32m[MARCH] $1\033[0;0m"
 }
 
 function check_error ()
@@ -16,7 +21,7 @@ function check_error ()
     ERROR_CODE=$?
     if [ $ERROR_CODE -ne 0 ]
     then
-        print_error "Installation failed! Exit code: $ERROR_CODE"
+        print_error "[MARCH] Installation failed! Exit code: $ERROR_CODE"
     fi
 }
 
@@ -50,13 +55,12 @@ echo -e "\033[1;34m
 USERNAME=$(whoami)
 WORKSPACE_PATH=$(dirname "$(readlink -f "$0")")
 
-
 # Install debootstrap and schroot
 print_info "Installing required packages 'debootstrap' and 'schroot'..."
 print_info "Requesting root permissions..."
-sudo apt update
-sudo apt install -y debootstrap schroot
-
+#sudo apt update
+check_error
+#sudo apt install -y debootstrap schroot
 check_error
 
 ################################
@@ -92,8 +96,7 @@ check_error
 
 # Define which files should be copied over to the chroot jail
 sudo tee <<EOF $SCHROOT_ROS1/copyfiles >/dev/null
-/etc/hostsmkdir: cannot create directory '/etc/schroot/ros1': File exists
-
+/etc/hosts
 /etc/resolv.conf
 /etc/localtime
 /etc/locale.gen
@@ -143,6 +146,7 @@ check_error
 ###############################
 # CREATION OF SCHROOT CONFIGS #
 ###############################
+print_info "Creating schroot configs..."
 cd /etc/schroot/chroot.d
 check_error
 
@@ -178,6 +182,29 @@ check_error
 sudo chmod 600 ros2.conf
 check_error
 
-print_info "Installation succesful!"
+################################
+# CREATION OF STARTING SCRIPTS #
+################################
+print_info "Creating startup scripts..."
+cd $WORKSPACE_PATH
 
+# Create the startup script and copy it to start_ros2.sh
+tee <<EOF /tmp/.start_ros1.sh >/dev/null
+xhost +local:
+schroot --automatic-session -c ros1
+EOF
+
+chmod +x /tmp/.start_ros1.sh
+cp /tmp/.start_ros1.sh /tmp/.start_ros2.sh
+sed -i 's/ros1/ros2/g' /tmp/.start_ros2.sh
+
+###########################################
+# CREATING UBUNTU DISTRIBUTIONS IN CHROOT #
+###########################################
+
+# Setup has been succesful, unhide the startup scripts
+mv /tmp/.start_ros1.sh start_ros1.sh
+mv /tmp/.start_ros2.sh start_ros2.sh
+
+print_info_bold "Installation succesful!"
 exit 0
