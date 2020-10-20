@@ -25,6 +25,7 @@ add_message_files(
     PowerDistributionBoardState.msg
     PressureSole.msg
     GainValues.msg
+    GainValuesList.msg
 )
 
 add_service_files(
@@ -45,6 +46,9 @@ add_service_files(
     SetParamFloat.srv
     GetGainValues.srv
     GetGainValuesList.srv
+    GetGainValues2.srv
+    SetGainValues.srv
+    GetGainValues3.srv
 )
 
 generate_messages(

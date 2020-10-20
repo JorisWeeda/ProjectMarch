@@ -38,6 +38,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/PowerDistributionBoardState.msg"
   "msg/PressureSole.msg"
   "msg/GainValues.msg"
+  "msg/GainValuesList.msg"
   "srv/ContainsGait.srv"
   "srv/PossibleGaits.srv"
   "srv/SetGaitVersion.srv"
@@ -54,9 +55,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetGainValues.srv"
   "srv/GetGainValuesList.srv"
   "srv/CapturePointPose.srv"
-  "srv/ContainsGait.srv"
-  "srv/PossibleGaits.srv"
-  "srv/SetGaitVersion.srv"
+  "srv/GetGainValues2.srv"
+  "srv/SetGainValues.srv"
+  "srv/GetGainValues3.srv"
   DEPENDENCIES std_msgs builtin_interfaces geometry_msgs
  )
 
