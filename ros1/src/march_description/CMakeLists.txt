@@ -12,6 +12,7 @@ set(XACRO_FILES
     urdf/march4.xacro
     urdf/test_joint_linear.xacro
     urdf/test_joint_rotational.xacro
+    urdf/march4_chain.xacro
 )
 build_and_install_xacro_files(${XACRO_FILES})
 
