@@ -2,8 +2,7 @@
 
 function print_error ()
 {
-    echo -e "\033[1;91m$1"
-    exit 1
+    echo -e "\033[1;91m$1\033[0;0m"
 }
 
 function print_info ()
@@ -22,6 +21,7 @@ function check_error ()
     if [ $ERROR_CODE -ne 0 ]
     then
         print_error "[MARCH] Installation failed! Exit code: $ERROR_CODE"
+        exit 1
     fi
 }
 
@@ -54,6 +54,17 @@ echo -e "\033[1;34m
 # User configuation
 USERNAME=$(whoami)
 WORKSPACE_PATH=$(dirname "$(readlink -f "$0")")
+
+if [ "$(lsb_release -si)" != "Ubuntu" ]
+then
+    print_error "This script is intended to run on Ubuntu machines. This is $(lsb_release -is). Are you sure you want to continue? (y/N)"
+    read SURE_CONTINUE
+    if [ $SURE_CONTINUE != "y" ]
+    then
+        print_error "[MARCH] Installation failed!"
+        exit 1
+    fi
+fi
 
 # Install debootstrap and schroot
 print_info "Installing required packages 'debootstrap' and 'schroot'..."
