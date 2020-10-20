@@ -1,3 +1,3 @@
 string[] joint_list
 ---
-GainValues[] gain_values
+march_shared_msgs/GainValues[] gain_values
