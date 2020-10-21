@@ -69,10 +69,11 @@ fi
 # Install debootstrap and schroot
 print_info "Installing required packages 'debootstrap' and 'schroot'..."
 print_info "Requesting root permissions..."
+# TODO REMOVE COMMENTS
 #sudo apt update
-check_error
+#check_error
 #sudo apt install -y debootstrap schroot
-check_error
+#check_error
 
 ################################
 # CREATION OF SCHROOT PROFILES #
@@ -118,6 +119,9 @@ sudo tee <<EOF $SCHROOT_ROS1/copyfiles >/dev/null
 /etc/resolv.conf
 /etc/localtime
 /etc/locale.gen
+/etc/passwd
+/etc/shadow
+/etc/group
 EOF
 
 # Create an empty nssdatabases file
@@ -200,32 +204,13 @@ check_error
 sudo chmod 600 ros2.conf
 check_error
 
-################################
-# CREATION OF STARTING SCRIPTS #
-################################
-print_info "Creating startup scripts..."
-cd $WORKSPACE_PATH
-
-# Create the startup script and copy it to start_ros2.sh
-tee <<EOF /tmp/.start_ros1.sh >/dev/null
-xhost +local:
-schroot --automatic-session -c ros1
-EOF
-check_error
-
-chmod +x /tmp/.start_ros1.sh
-check_error
-cp /tmp/.start_ros1.sh /tmp/.start_ros2.sh
-check_error
-sed -i 's/ros1/ros2/g' /tmp/.start_ros2.sh
-check_error
-
 ##############################################
 # DOWNLOADING UBUNTU DISTRIBUTIONS IN CHROOT #
 ##############################################
 
+# TODO UNCOMMENT THIS
 # Download the files for Ubuntu Bionic in the ROS 1 chroot
-#sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
+# sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 # Download the files for Ubuntu Focal in the ROS 2 chroot
 #sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
@@ -241,41 +226,88 @@ deb http://archive.ubuntu.com/ubuntu bionic main
 deb http://archive.ubuntu.com/ubuntu bionic universe
 deb http://archive.ubuntu.com/ubuntu bionic restricted
 deb http://archive.ubuntu.com/ubuntu bionic multiverse
-deb http://packages.ros.org/ros/ubuntu bionic main
 EOF
 check_error
 
 # Add a non-root user with sudo privilege
-sudo schroot --automatic-session -c ros1 -- bash -c "if id -u $USERNAME; then useradd $USERNAME && usermod -a -G sudo; fi; chown -R $USERNAME:$USERNAME /home/$USERNAME"
+print_info "Creating user in Ubuntu Bionic..."
+sudo schroot --automatic-session -c ros1 -- bash -c "mkdir -p /home/$USERNAME/march; chown -R $USERNAME:$USERNAME /home/$USERNAME" 
 check_error
 
 # Install required packages
-sudo schroot --automatic-session -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg"
+print_info "Install basic packages..."
+sudo schroot --automatic-session -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh"
 check_error
 
-# Add key from ROS 1 and install ROS melodic
-sudo schroot --automatic-session -c ros1 -- bash -c "apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 && apt update && apt install ros-melodic-desktop-full"
+# Add key from ROS 1 
+print_info "Add ROS 1 signing key..."
+sudo schroot --automatic-session -c ros1 -- zsh -c "apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"
+check_error
+
+# Add ROS 1 to package locations
+sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
+deb http://archive.ubuntu.com/ubuntu bionic main
+deb http://archive.ubuntu.com/ubuntu bionic universe
+deb http://archive.ubuntu.com/ubuntu bionic restricted
+deb http://archive.ubuntu.com/ubuntu bionic multiverse
+deb http://packages.ros.org/ros/ubuntu bionic main
+EOF
+check_error
+
+# Install ROS Melodic
+print_info "Install ROS 1 Melodic"
+sudo schroot --automatic-session -c ros1 -- zsh -c "apt update && apt install -y ros-melodic-desktop-full"
 check_error
 
 # Add automatic sourcing to the .bashrc file of the user
-sudo schroot --automatic-session -c ros1 -- bash -c "echo 'source /opt/ros/melodic/setup.bash' > /home/$USERNAME/.bashrc"
+sudo schroot --automatic-session -c ros1 -- zsh -c "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc"
 check_error
 
 # Install dependencies for building ROS 1 packages
-sudo schroot --automatic-session -c ros1 -- bash -c "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions"
+print_info "Install ROS 1 building dependencies..."
+sudo schroot --automatic-session -c ros1 -- zsh -c "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions"
 check_error
-sudo schroot --automatic-session -c ros1 -- bash -c "rosdep init"
+sudo schroot --automatic-session -c ros1 -- zsh -c "rosdep init"
 
 # Install March specific ROS 1 dependencies
-schroot --automatic-session -c ros1 -- bash -c "rosdep update"
+print_info "Update ROS dependencies list..."
+schroot --automatic-session -c ros1 -- zsh -c "rosdep update"
 check_error
-schroot --automatic-session -c ros1 -- bash -c "rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
+print_info "Install March specific ROS 1 dependencies..."
+schroot --automatic-session -c ros1 -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
 check_error
 
-# Setup has been succesful, unhide the startup scripts
-mv /tmp/.start_ros1.sh start_ros1.sh
+# Add the build and run commands of ROS 1
+print_info "Add aliases to ROS 1 chroot environment..."
+sudo schroot --automatic-session -c ros1 -- zsh -c "echo \"alias march_build_ros1='source /opt/ros/melodic/setup.zsh;
+cd /home/$USERNAME/march/ros1;
+catkin_make_isolated --install'
+
+alias march_run_ros1='
+source /opt/ros/melodic/setup.bash;
+cd <your-march-folder-location>/ros1;
+source install_isolated/setup.bash;
+roslaunch march_launch march_ros2_simulation.launch'
+'\" > /home/$USERNAME/.zshrc"
+
+################################
+# CREATION OF STARTING SCRIPTS #
+################################
+print_info "Creating startup scripts..."
+cd $WORKSPACE_PATH
+
+# Create the startup script and copy it to start_ros2.sh
+tee <<EOF start_ros1.sh >/dev/null
+xhost +local:
+schroot --automatic-session -c ros1
+EOF
 check_error
-mv /tmp/.start_ros2.sh start_ros2.sh
+
+chmod +x start_ros1.sh
+check_error
+cp start_ros1.sh start_ros2.sh
+check_error
+sed -i 's/ros1/ros2/g' /tmp/.start_ros2.sh
 check_error
 
 print_info_bold "Installation succesful!"
