@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# These functions are often used to print text in a certain color
 function print_error ()
 {
     echo -e "\033[1;91m$1\033[0;0m"
@@ -15,6 +16,8 @@ function print_info_bold ()
     echo -e "\033[1;32m[MARCH] $1\033[0;0m"
 }
 
+# Check if the exit code is not 0. If it is not, quit the installer and print
+# the related exit code.
 function check_error ()
 {
     ERROR_CODE=$?
@@ -211,17 +214,27 @@ check_error
 # Go to the workspace
 cd $WORKSPACE_PATH
 
+# Create symbolic link if focal is not yet recognized
+print_info "Creating focal symlink for debootstrap..."
+sudo ln -s gutsy /usr/share/debootstrap/scripts/focal
+
 # TODO UNCOMMENT THIS
+print_info "Installing minimal version of Ubuntu Bionic..."
 # Download the files for Ubuntu Bionic in the ROS 1 chroot
 # sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
+
+print_info "Installing minimal version of Ubuntu Focal..."
 # Download the files for Ubuntu Focal in the ROS 2 chroot
-sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
+# sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 
 #####################################
 # INSTALLING ROS 1 ON UBUNTU BIONIC #
 #####################################
+
+if [ 1 -eq 0 ]
+then
 
 # Define package locations
 sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
@@ -296,12 +309,14 @@ export precmd_functions='';
 export PS1='ROS 1> ' \" > /home/$USERNAME/.zshrc"
 check_error
 
+fi
+
 #####################################
 # INSTALLING ROS 2 ON UBUNTU FOCAL #
 #####################################
 
 # Define package locations
-sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
+sudo tee <<EOF $ROS2_LOCATION/etc/apt/sources.list >/dev/null
 deb http://archive.ubuntu.com/ubuntu focal main
 deb http://archive.ubuntu.com/ubuntu focal universe
 deb http://archive.ubuntu.com/ubuntu focal restricted
@@ -316,7 +331,7 @@ check_error
 
 # Install required packages
 print_info "Installing basic packages of Ubuntu Focal..."
-sudo schroot --automatic-session -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg2 zsh python3-pip && chmod +s \$(which sudo) && pip3 install -U argcomplete"
+sudo schroot --automatic-session -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg zsh python3-pip && chmod +s \$(which sudo) && pip3 install -U argcomplete"
 check_error
 
 # Add key from ROS 2
@@ -326,11 +341,11 @@ check_error
 
 # Add ROS 2 to package locations
 sudo tee <<EOF $ROS2_LOCATION/etc/apt/sources.list >/dev/null
-deb http://archive.ubuntu.com/ubuntu bionic main
-deb http://archive.ubuntu.com/ubuntu bionic universe
-deb http://archive.ubuntu.com/ubuntu bionic restricted
-deb http://archive.ubuntu.com/ubuntu bionic multiverse
-deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu focal
+deb http://archive.ubuntu.com/ubuntu focal main
+deb http://archive.ubuntu.com/ubuntu focal universe
+deb http://archive.ubuntu.com/ubuntu focal restricted
+deb http://archive.ubuntu.com/ubuntu focal multiverse
+deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu focal main
 EOF
 check_error
 
@@ -345,7 +360,8 @@ check_error
 
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
-sudo schroot --automatic-session -c ros2 -- zsh -c "apt install -y python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential python3-colcon-common-extensions"
+sudo schroot --automatic-session -c ros2 -- zsh -c "apt install -y build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest"
+sudo schroot --automatic-session -c ros2 -- zsh -c "sudo apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 check_error
 sudo schroot --automatic-session -c ros2 -- zsh -c "rosdep init"
 
@@ -355,6 +371,14 @@ schroot --automatic-session -c ros2 -- zsh -c "rosdep update"
 check_error
 print_info "Install March specific ROS 2 dependencies..."
 schroot --automatic-session -c ros2 -- zsh -c "source /opt/ros/foxy/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros2/src --ignore-src"
+check_error
+
+print_info "Install the source files from ROS 2 in order to install the bridge..."
+schroot --automatic-session -c ros2 -- zsh -c "mkdir -p /home/$USERNAME/march/.ros_bridge/src && cd /home/$USERNAME/march/.ros_bridge && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos && vcs import src < ros2.repos"
+check_error
+
+print_info "Install ROS 2 source dependencies..."
+schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.rosbridge && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
 check_error
 
 # Add the build and run commands of ROS 2
@@ -367,6 +391,22 @@ source /opt/ros/foxy/setup.zsh;
 cd /home/$USERNAME/march/ros2;
 source install/setup.zsh;
 ros2 launch march_launch march_ros2_simulation.launch.py'
+
+alias march_build_bridge='
+source /opt/ros/melodic/setup.zsh;
+source /opt/ros/foxy/setup.zsh;
+source /home/$USERNAME/march/ros1/install_isolated/setup.zsh;
+source /home/$USERNAME/march/ros2/install/local_setup.zsh;
+cd /home/$USERNAME/march/.ros_bridge;
+colcon build --symlink-install --packages-select ros1_bridge --cmake-force-configure;
+cd /home/$USERNAME/march'
+
+alias march_run_bridge='
+source /opt/ros/melodic/setup.zsh;
+source /opt/ros/foxy/setup.zsh;
+source /home/$USERNAME/march/.ros_bridge/install/setup.zsh;
+export ROS_MASTER_URI=http://localhost:11311;
+ros2 run ros1_bridge dynamic_bridge --bridge-all-topics --print-pairs'
 
 export precmd_functions='';
 export PS1='ROS 2> ' \" > /home/$USERNAME/.zshrc"
@@ -385,6 +425,7 @@ schroot --automatic-session -c ros1 -- zsh
 EOF
 check_error
 
+# Give the scripts execute permissions
 chmod +x start_ros1.sh
 check_error
 cp start_ros1.sh start_ros2.sh
