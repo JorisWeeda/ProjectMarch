@@ -22,7 +22,7 @@ setup(
     maintainer_email='software@projectmarch.nl',
     description='A feature package that implements gain scheduling control',
     license='TODO: License declaration',
-    tests_require=['nosetests'],
+    tests_require=['pytest', 'unittest'],
     entry_points={
         'console_scripts': [
             'gain_scheduling_node = march_gain_scheduling.gain_scheduling_node:main'

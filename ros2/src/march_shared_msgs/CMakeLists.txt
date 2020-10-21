@@ -53,9 +53,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SetParamInt.srv"
   "srv/SetParamFloat.srv"
   "srv/CapturePointPose.srv"
-  "srv/GetGainValues.srv"
   "srv/GetGainValuesList.srv"
-  "srv/SetGainValues.srv"
   "srv/SetGainValuesList.srv"
   DEPENDENCIES std_msgs builtin_interfaces geometry_msgs
  )

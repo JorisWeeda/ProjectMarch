@@ -1,4 +1,4 @@
 string[] joints
-march_shared_msgs/GainValuesList gain_values
+GainValuesList gain_values_list
 ---
 bool success

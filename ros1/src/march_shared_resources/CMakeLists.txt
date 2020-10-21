@@ -44,9 +44,7 @@ add_service_files(
     SetParamBool.srv
     SetParamInt.srv
     SetParamFloat.srv
-    GetGainValues.srv
     GetGainValuesList.srv
-    SetGainValues.srv
     SetGainValuesList.srv
 )
 

@@ -27,7 +27,7 @@ def generate_launch_description():
             description='Launches the rqt input device.'),
         DeclareLaunchArgument(
             name='gain_scheduling',
-            default_value='True',
+            default_value='False',
             description='Launches the gain scheduling node.'),
         DeclareLaunchArgument(
             name='configuration',

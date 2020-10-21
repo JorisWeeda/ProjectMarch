@@ -53,8 +53,6 @@ class ParameterServer:
                 The success variable of the response is set to true if the parameter could be read from the ROS1
                 parameter server, otherwise it is set to false.
         """
-        rospy.loginfo('Retrieving parameter with name: ' + req.name)
-
         try:
             return response_type(rospy.get_param(req.name), True)
         except KeyError:
@@ -70,28 +68,39 @@ class ParameterServer:
 
         :return Returns a Response of 'response_type' with the success variable set to true
         """
-        rospy.loginfo('Setting parameter with name ' + req.name + ' to value: ' + str(req.value))
-
         rospy.set_param(req.name, req.value)
         return response_type(True)
 
     @staticmethod
     def get_gain_values_callback(req):
-        rospy.loginfo('Getting gains for joints:' + str(req.joints))
+        """
+        Get gain values from the ROS1 parameter server.
 
-        gain_values_list = GainValuesList([GainValues([
-            rospy.get_param('/march/controller/trajectory/gains/{joint}/{gain}'.format(joint=joint, gain=gain))
-            for gain in ['p', 'i', 'd']])
-                       for joint in req.joints])
+        :param req Request containing the joints to get gain values of.
 
-        return GetGainValuesListResponse(gain_values_list, True)
+        :return Returns a GetGainValuesListResponse containing a list of GainValues if all joint names are available
+        in the parameter server. Otherwise an empty response with success is False is returned.
+        """
+        try:
+            gain_values_list = GainValuesList([GainValues([
+                rospy.get_param('/march/controller/trajectory/gains/{joint}/{gain}'.format(joint=joint, gain=gain))
+                for gain in ['p', 'i', 'd']])
+                           for joint in req.joints])
+            return GetGainValuesListResponse(gain_values_list, True)
+        except KeyError:
+            return GetGainValuesListResponse(GainValuesList([]), False)
 
     @staticmethod
     def set_gain_values_callback(req):
-        rospy.loginfo('Setting gains for joints:' + str(req.joints))
+        """
+        Set gain values in the ROS1 parameter server.
 
+        :param req Request containing the joints to set gain values of, and the gain values to set.
+
+        :return Returns a SetGainValuesListResponse with success set to True.
+        """
         for joint_index, joint in enumerate(req.joints):
-            gains = req.gain_values.gain_values_list[joint_index].gains
+            gains = req.gain_values_list.gain_values_list[joint_index].gains
             for gain_index, gain in enumerate(['p', 'i', 'd']):
                 rospy.set_param('/march/controller/trajectory/gains/{joint}/{gain}'.format(joint=joint, gain=gain),
                                 gains[gain_index])

@@ -1,5 +1,3 @@
-from typing import List
-
 import numpy as np
 
 from .interpolation_errors import NegativeValueError, UnequalLengthError
