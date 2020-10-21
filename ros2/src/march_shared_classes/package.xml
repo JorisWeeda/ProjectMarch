@@ -8,12 +8,11 @@
   <license>TODO: License declaration</license>
 
   <depend>march_shared_msgs</depend>
-  <depend>urdfdom_py</depend>
+  <depend>urdfdom</depend>
 
   <test_depend>python3-pytest</test_depend>
-  <test_depend>unittest</test_depend>
   <test_depend>march_description</test_depend>
-  <test_depend>urdfdom_py</test_depend>
+  <test_depend>urdfdom</test_depend>
 
   <export>
     <build_type>ament_python</build_type>

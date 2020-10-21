@@ -29,7 +29,7 @@ setup(
     maintainer_email='software@projectmarch.nl',
     description='Classes that are used by the march packages',
     license='TODO: License declaration',
-    tests_require=['pytest', 'urfdom_py', 'unittest', 'parameterized'],
+    tests_require=['pytest', 'urfdom_py', 'parameterized'],
     entry_points={
         'console_scripts': [
         ],

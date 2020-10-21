@@ -88,12 +88,12 @@ print_info "Creating schroot profiles..."
 ROS1_LOCATION="/srv/chroot/ros1"
 sudo mkdir -p $ROS1_LOCATION/opt/ros/melodic
 check_error
-sudo chmod -R 755 $ROS1_LOCATION
+sudo chmod 755 $ROS1_LOCATION
 check_error
 ROS2_LOCATION="/srv/chroot/ros2"
 sudo mkdir -p $ROS2_LOCATION/opt/ros/foxy
 check_error
-sudo chmod -R 755 $ROS2_LOCATION
+sudo chmod 755 $ROS2_LOCATION
 check_error
 
 # Create a schroot profile for ROS 1
@@ -252,7 +252,7 @@ check_error
 
 # Install required packages
 print_info "Installing basic packages of Ubuntu Bionic..."
-sudo schroot --automatic-session -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh && chmod +s \$(which sudo)"
+sudo schroot --automatic-session -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh"
 check_error
 
 # Add key from ROS 1 
@@ -331,7 +331,7 @@ check_error
 
 # Install required packages
 print_info "Installing basic packages of Ubuntu Focal..."
-sudo schroot --automatic-session -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg zsh python3-pip && chmod +s \$(which sudo) && pip3 install -U argcomplete"
+sudo schroot --automatic-session -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg zsh python3-pip && pip3 install -U argcomplete"
 check_error
 
 # Add key from ROS 2
@@ -351,11 +351,7 @@ check_error
 
 # Install ROS Foxy
 print_info "Installing ROS 2 Foxy..."
-sudo schroot --automatic-session -c ros2 -- zsh -c "apt update && apt install -y ros-foxy-desktop"
-check_error
-
-# Add automatic sourcing to the .bashrc file of the user
-sudo schroot --automatic-session -c ros2 -- zsh -c "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc"
+sudo schroot --automatic-session -c ros2 -- zsh -c "apt update && apt install -y ros-foxy-desktop ros-robot"
 check_error
 
 # Install dependencies for building ROS 2 packages
@@ -364,6 +360,7 @@ sudo schroot --automatic-session -c ros2 -- zsh -c "apt install -y build-essenti
 sudo schroot --automatic-session -c ros2 -- zsh -c "sudo apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 check_error
 sudo schroot --automatic-session -c ros2 -- zsh -c "rosdep init"
+
 
 # Install March specific ROS 2 dependencies
 print_info "Update ROS dependencies list..."
@@ -374,16 +371,28 @@ schroot --automatic-session -c ros2 -- zsh -c "source /opt/ros/foxy/setup.zsh; r
 check_error
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
-schroot --automatic-session -c ros2 -- zsh -c "mkdir -p /home/$USERNAME/march/.ros_bridge/src && cd /home/$USERNAME/march/.ros_bridge && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos && vcs import src < ros2.repos"
+schroot --automatic-session -c ros2 -- zsh -c "mkdir -p /home/$USERNAME/march/.ros_bridge/src && cd /home/$USERNAME/march/.ros_bridge && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
 check_error
+function import_ros2_repo
+{
+    schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros_bridge && vcs import src < ros2.repos && rm ros2.repos"
+    ERROR_CODE=$?
+    if [ $ERROR_CODE -ne 0 ]
+    then
+        print_error "[MARCH] Downloading ROS 2 repos failed! Retry! Exit code: $ERROR_CODE"
+        import_ros2_repo
+    fi
+}
+import_ros2_repo
 
 print_info "Install ROS 2 source dependencies..."
-schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.rosbridge && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
+schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros_bridge && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
 check_error
 
 # Add the build and run commands of ROS 2
 print_info "Add aliases to ROS 2 chroot environment..."
 schroot --automatic-session -c ros2 -- zsh -c "echo \"alias march_build_ros2='source /opt/ros/foxy/setup.zsh;
+cd /home/$USERNAME/march/ros2;
 colcon build'
 
 alias march_run_ros2='
@@ -430,7 +439,7 @@ chmod +x start_ros1.sh
 check_error
 cp start_ros1.sh start_ros2.sh
 check_error
-sed -i 's/ros1/ros2/g' /tmp/.start_ros2.sh
+sed -i 's/ros1/ros2/g' start_ros2.sh
 check_error
 
 print_info_bold "Installation succesful!"
