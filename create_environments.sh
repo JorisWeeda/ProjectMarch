@@ -216,7 +216,7 @@ cd $WORKSPACE_PATH
 # sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 # Download the files for Ubuntu Focal in the ROS 2 chroot
-#sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
+sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 
 #####################################
@@ -238,7 +238,7 @@ sudo schroot --automatic-session -c ros1 -- bash -c "mkdir -p /home/$USERNAME/ma
 check_error
 
 # Install required packages
-print_info "Installing basic packages..."
+print_info "Installing basic packages of Ubuntu Bionic..."
 sudo schroot --automatic-session -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh && chmod +s \$(which sudo)"
 check_error
 
@@ -258,7 +258,7 @@ EOF
 check_error
 
 # Install ROS Melodic
-print_info "Installing ROS 1 Melodic.."
+print_info "Installing ROS 1 Melodic..."
 sudo schroot --automatic-session -c ros1 -- zsh -c "apt update && apt install -y ros-melodic-desktop-full"
 check_error
 
@@ -287,14 +287,89 @@ cd /home/$USERNAME/march/ros1;
 catkin_make_isolated --install'
 
 alias march_run_ros1='
-source /opt/ros/melodic/setup.bash;
-cd <your-march-folder-location>/ros1;
-source install_isolated/setup.bash;
-roslaunch march_launch march_ros2_simulation.launch'\" > /home/$USERNAME/.zshrc"
+source /opt/ros/melodic/setup.zsh;
+cd /home/$USERNAME/march/ros1;
+source install_isolated/setup.zsh;
+roslaunch march_launch march_ros2_simulation.launch'
+
+export precmd_functions='';
+export PS1='ROS 1> ' \" > /home/$USERNAME/.zshrc"
 check_error
 
-print_info "Changing hostname to 'ros1'..."
-sudo schroot --automatic-session -c ros1 -- zsh -c "hostname ros1"
+#####################################
+# INSTALLING ROS 2 ON UBUNTU FOCAL #
+#####################################
+
+# Define package locations
+sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
+deb http://archive.ubuntu.com/ubuntu focal main
+deb http://archive.ubuntu.com/ubuntu focal universe
+deb http://archive.ubuntu.com/ubuntu focal restricted
+deb http://archive.ubuntu.com/ubuntu focal multiverse
+EOF
+check_error
+
+# Configure the home directory of the user
+print_info "Creating user in Ubuntu Focal..."
+sudo schroot --automatic-session -c ros2 -- bash -c "mkdir -p /home/$USERNAME/march; chown -R $USERNAME:$USERNAME /home/$USERNAME"
+check_error
+
+# Install required packages
+print_info "Installing basic packages of Ubuntu Focal..."
+sudo schroot --automatic-session -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg2 zsh python3-pip && chmod +s \$(which sudo) && pip3 install -U argcomplete"
+check_error
+
+# Add key from ROS 2
+print_info "Add ROS 2 signing key..."
+sudo schroot --automatic-session -c ros2 -- zsh -c "curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -"
+check_error
+
+# Add ROS 2 to package locations
+sudo tee <<EOF $ROS2_LOCATION/etc/apt/sources.list >/dev/null
+deb http://archive.ubuntu.com/ubuntu bionic main
+deb http://archive.ubuntu.com/ubuntu bionic universe
+deb http://archive.ubuntu.com/ubuntu bionic restricted
+deb http://archive.ubuntu.com/ubuntu bionic multiverse
+deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu focal
+EOF
+check_error
+
+# Install ROS Foxy
+print_info "Installing ROS 2 Foxy..."
+sudo schroot --automatic-session -c ros2 -- zsh -c "apt update && apt install -y ros-foxy-desktop"
+check_error
+
+# Add automatic sourcing to the .bashrc file of the user
+sudo schroot --automatic-session -c ros2 -- zsh -c "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc"
+check_error
+
+# Install dependencies for building ROS 2 packages
+print_info "Install ROS 2 building dependencies..."
+sudo schroot --automatic-session -c ros2 -- zsh -c "apt install -y python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential python3-colcon-common-extensions"
+check_error
+sudo schroot --automatic-session -c ros2 -- zsh -c "rosdep init"
+
+# Install March specific ROS 2 dependencies
+print_info "Update ROS dependencies list..."
+schroot --automatic-session -c ros2 -- zsh -c "rosdep update"
+check_error
+print_info "Install March specific ROS 2 dependencies..."
+schroot --automatic-session -c ros2 -- zsh -c "source /opt/ros/foxy/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros2/src --ignore-src"
+check_error
+
+# Add the build and run commands of ROS 2
+print_info "Add aliases to ROS 2 chroot environment..."
+schroot --automatic-session -c ros2 -- zsh -c "echo \"alias march_build_ros2='source /opt/ros/foxy/setup.zsh;
+colcon build'
+
+alias march_run_ros2='
+source /opt/ros/foxy/setup.zsh;
+cd /home/$USERNAME/march/ros2;
+source install/setup.zsh;
+ros2 launch march_launch march_ros2_simulation.launch.py'
+
+export precmd_functions='';
+export PS1='ROS 2> ' \" > /home/$USERNAME/.zshrc"
 check_error
 
 ################################
