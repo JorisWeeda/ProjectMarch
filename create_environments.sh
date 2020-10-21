@@ -219,9 +219,9 @@ check_error
 #sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 
-############################
-# INSTALLING UBUNTU BIONIC #
-############################
+#####################################
+# INSTALLING ROS 1 ON UBUNTU BIONIC #
+#####################################
 
 # Define package locations
 sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
@@ -282,7 +282,7 @@ check_error
 
 # Add the build and run commands of ROS 1
 print_info "Add aliases to ROS 1 chroot environment..."
-sudo schroot --automatic-session -c ros1 -- zsh -c "echo \"alias march_build_ros1='source /opt/ros/melodic/setup.zsh;
+schroot --automatic-session -c ros1 -- zsh -c "echo \"alias march_build_ros1='source /opt/ros/melodic/setup.zsh;
 cd /home/$USERNAME/march/ros1;
 catkin_make_isolated --install'
 
@@ -290,8 +290,12 @@ alias march_run_ros1='
 source /opt/ros/melodic/setup.bash;
 cd <your-march-folder-location>/ros1;
 source install_isolated/setup.bash;
-roslaunch march_launch march_ros2_simulation.launch'
-'\" > /home/$USERNAME/.zshrc"
+roslaunch march_launch march_ros2_simulation.launch'\" > /home/$USERNAME/.zshrc"
+check_error
+
+print_info "Changing hostname to 'ros1'..."
+sudo schroot --automatic-session -c ros1 -- zsh -c "hostname ros1"
+check_error
 
 ################################
 # CREATION OF STARTING SCRIPTS #
@@ -302,7 +306,7 @@ cd $WORKSPACE_PATH
 # Create the startup script and copy it to start_ros2.sh
 tee <<EOF start_ros1.sh >/dev/null
 xhost +local:
-schroot --automatic-session -c ros1
+schroot --automatic-session -c ros1 -- zsh
 EOF
 check_error
 
