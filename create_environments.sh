@@ -208,6 +208,9 @@ check_error
 # DOWNLOADING UBUNTU DISTRIBUTIONS IN CHROOT #
 ##############################################
 
+# Go to the workspace
+cd $WORKSPACE_PATH
+
 # TODO UNCOMMENT THIS
 # Download the files for Ubuntu Bionic in the ROS 1 chroot
 # sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
@@ -229,14 +232,14 @@ deb http://archive.ubuntu.com/ubuntu bionic multiverse
 EOF
 check_error
 
-# Add a non-root user with sudo privilege
+# Configure the home directory of the user
 print_info "Creating user in Ubuntu Bionic..."
 sudo schroot --automatic-session -c ros1 -- bash -c "mkdir -p /home/$USERNAME/march; chown -R $USERNAME:$USERNAME /home/$USERNAME" 
 check_error
 
 # Install required packages
-print_info "Install basic packages..."
-sudo schroot --automatic-session -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh"
+print_info "Installing basic packages..."
+sudo schroot --automatic-session -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh && chmod +s \$(which sudo)"
 check_error
 
 # Add key from ROS 1 
@@ -255,7 +258,7 @@ EOF
 check_error
 
 # Install ROS Melodic
-print_info "Install ROS 1 Melodic"
+print_info "Installing ROS 1 Melodic.."
 sudo schroot --automatic-session -c ros1 -- zsh -c "apt update && apt install -y ros-melodic-desktop-full"
 check_error
 
