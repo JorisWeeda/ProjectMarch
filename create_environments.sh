@@ -64,7 +64,7 @@ then
     read SURE_CONTINUE
     if [ $SURE_CONTINUE != "y" ]
     then
-        print_error "[MARCH] Installation failed!"
+        print_error "[MARCH] Installation cancelled!"
         exit 1
     fi
 fi
@@ -226,7 +226,7 @@ check_error
 
 print_info "Installing minimal version of Ubuntu Focal..."
 # Download the files for Ubuntu Focal in the ROS 2 chroot
-# sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
+#sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 
 #####################################
@@ -295,21 +295,19 @@ check_error
 
 # Add the build and run commands of ROS 1
 print_info "Add aliases to ROS 1 chroot environment..."
-schroot --automatic-session -c ros1 -- zsh -c "echo \"alias march_build_ros1='source /opt/ros/melodic/setup.zsh;
+schroot --automatic-session -c ros1 -- zsh -c "echo \"alias march_build_ros1='source /opt/ros/melodic/local_setup.zsh;
 cd /home/$USERNAME/march/ros1;
 catkin_make_isolated --install'
 
 alias march_run_ros1='
-source /opt/ros/melodic/setup.zsh;
+source /opt/ros/melodic/local_setup.zsh;
 cd /home/$USERNAME/march/ros1;
-source install_isolated/setup.zsh;
+source install_isolated/local_setup.zsh;
 roslaunch march_launch march_ros2_simulation.launch'
 
 export precmd_functions='';
 export PS1='ROS 1> ' \" > /home/$USERNAME/.zshrc"
 check_error
-
-fi
 
 #####################################
 # INSTALLING ROS 2 ON UBUNTU FOCAL #
@@ -331,7 +329,12 @@ check_error
 
 # Install required packages
 print_info "Installing basic packages of Ubuntu Focal..."
-sudo schroot --automatic-session -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg zsh python3-pip && pip3 install -U argcomplete"
+sudo schroot --automatic-session -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg zsh python3-pip locales && pip3 install -U argcomplete"
+check_error
+
+# Set locale to UTF8 supported locale
+print_info "Settings locale to en_US.UTF-8..."
+sudo schroot --automatic-session -c ros2 -- bash -c "locale && sudo locale-gen en_US en_US.UTF-8 && sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && export LANG=en_US.UTF-8"
 check_error
 
 # Add key from ROS 2
@@ -349,33 +352,19 @@ deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu foca
 EOF
 check_error
 
-# Install ROS Foxy
-print_info "Installing ROS 2 Foxy..."
-sudo schroot --automatic-session -c ros2 -- zsh -c "apt update && apt install -y ros-foxy-desktop ros-robot"
-check_error
+fi
 
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
-sudo schroot --automatic-session -c ros2 -- zsh -c "apt install -y build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest"
-sudo schroot --automatic-session -c ros2 -- zsh -c "sudo apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
-check_error
-sudo schroot --automatic-session -c ros2 -- zsh -c "rosdep init"
-
-
-# Install March specific ROS 2 dependencies
-print_info "Update ROS dependencies list..."
-schroot --automatic-session -c ros2 -- zsh -c "rosdep update"
-check_error
-print_info "Install March specific ROS 2 dependencies..."
-schroot --automatic-session -c ros2 -- zsh -c "source /opt/ros/foxy/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros2/src --ignore-src"
+sudo schroot --automatic-session -c ros2 -- zsh -c "apt update && apt install -y build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 check_error
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
-schroot --automatic-session -c ros2 -- zsh -c "mkdir -p /home/$USERNAME/march/.ros_bridge/src && cd /home/$USERNAME/march/.ros_bridge && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
+schroot --automatic-session -c ros2 -- zsh -c "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
 check_error
 function import_ros2_repo
 {
-    schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros_bridge && vcs import src < ros2.repos && rm ros2.repos"
+    schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && vcs import src < ros2.repos && rm ros2.repos"
     ERROR_CODE=$?
     if [ $ERROR_CODE -ne 0 ]
     then
@@ -385,35 +374,50 @@ function import_ros2_repo
 }
 import_ros2_repo
 
+# Install ROS dependencies that are necessary for building ROS 2
 print_info "Install ROS 2 source dependencies..."
-schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros_bridge && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
+sudo schroot --automatic-session -c ros2 -- zsh -c "rosdep init"
+schroot --automatic-session -c ros2 -- zsh -c "rosdep update"
+sudo schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
 check_error
+
+# Building ROS 2 (takes a long time)
+print_info "Building ROS 2... (THIS TAKES A LONG TIME)"
+schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --merge-install"
+
+# Install March specific ROS 2 dependencies
+print_info "Install March specific ROS 2 dependencies..."
+schroot --automatic-session -c ros2 -- zsh -c "source /home/$USERNAME/march/.ros2_foxy/install/setup.zsh && rosdep install -y --from-paths /home/$USERNAME/march/ros2/src --ignore-src"
+check_error
+
+# CHECK CONTENT OF /opt/ros/foxy AND POSSIBLY CREAT A SYM LINK
+exit 0
 
 # Add the build and run commands of ROS 2
 print_info "Add aliases to ROS 2 chroot environment..."
 schroot --automatic-session -c ros2 -- zsh -c "echo \"alias march_build_ros2='source /opt/ros/foxy/setup.zsh;
 cd /home/$USERNAME/march/ros2;
-colcon build'
+colcon build --merge-install --symlink-install'
 
 alias march_run_ros2='
-source /opt/ros/foxy/setup.zsh;
+source /opt/ros/foxy/local_setup.zsh;
 cd /home/$USERNAME/march/ros2;
-source install/setup.zsh;
+source install/local_setup.zsh;
 ros2 launch march_launch march_ros2_simulation.launch.py'
 
 alias march_build_bridge='
-source /opt/ros/melodic/setup.zsh;
-source /opt/ros/foxy/setup.zsh;
-source /home/$USERNAME/march/ros1/install_isolated/setup.zsh;
+source /opt/ros/melodic/local_setup.zsh;
+source /opt/ros/foxy/local_setup.zsh;
+source /home/$USERNAME/march/ros1/install_isolated/local_setup.zsh;
 source /home/$USERNAME/march/ros2/install/local_setup.zsh;
 cd /home/$USERNAME/march/.ros_bridge;
 colcon build --symlink-install --packages-select ros1_bridge --cmake-force-configure;
 cd /home/$USERNAME/march'
 
 alias march_run_bridge='
-source /opt/ros/melodic/setup.zsh;
-source /opt/ros/foxy/setup.zsh;
-source /home/$USERNAME/march/.ros_bridge/install/setup.zsh;
+source /opt/ros/melodic/local_setup.zsh;
+source /opt/ros/foxy/local_setup.zsh;
+source /home/$USERNAME/march/.ros_bridge/install/local_setup.zsh;
 export ROS_MASTER_URI=http://localhost:11311;
 ros2 run ros1_bridge dynamic_bridge --bridge-all-topics --print-pairs'
 

@@ -208,4 +208,4 @@ venv/
 
 start_ros1.sh
 start_ros2.sh
-.ros_bridge
+.ros2_foxy
