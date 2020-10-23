@@ -1,11 +1,12 @@
 import rospy
-from march_shared_resources.msg import GainValues, GainValuesList
 
-from march_shared_resources.srv import GetParamBool, GetParamBoolResponse, GetParamFloat, GetParamFloatResponse, \
-    GetParamInt, GetParamIntResponse, GetParamString, GetParamStringList, GetParamStringListResponse, \
-    GetParamStringResponse, SetParamBool, SetParamBoolResponse, SetParamFloat, SetParamFloatResponse, SetParamInt, \
-    SetParamIntResponse, SetParamString, SetParamStringList, SetParamStringListResponse, SetParamStringResponse, \
-    GetGainValuesListResponse, GetGainValuesList, SetGainValuesList, SetGainValuesListResponse
+from march_shared_resources.msg import GainValues, GainValuesList
+from march_shared_resources.srv import GetGainValuesList, GetGainValuesListResponse, GetParamBool, \
+    GetParamBoolResponse, GetParamFloat, GetParamFloatResponse, GetParamInt, GetParamIntResponse, GetParamString, \
+    GetParamStringList, GetParamStringListResponse, GetParamStringResponse, SetGainValuesList, \
+    SetGainValuesListResponse, SetParamBool, SetParamBoolResponse, SetParamFloat, SetParamFloatResponse, \
+    SetParamInt, SetParamIntResponse, SetParamString, SetParamStringList, SetParamStringListResponse, \
+    SetParamStringResponse
 
 
 class ParameterServer:
@@ -53,6 +54,7 @@ class ParameterServer:
                 The success variable of the response is set to true if the parameter could be read from the ROS1
                 parameter server, otherwise it is set to false.
         """
+        rospy.logdebug('Retrieving parameter with name: {name}'.format(name=req.name))
         try:
             return response_type(rospy.get_param(req.name), True)
         except KeyError:
@@ -68,6 +70,7 @@ class ParameterServer:
 
         :return Returns a Response of 'response_type' with the success variable set to true
         """
+        rospy.loginfo('Setting parameter with name {name} to value: {value}'.format(name=req.name, value=req.value))
         rospy.set_param(req.name, req.value)
         return response_type(True)
 
@@ -85,7 +88,7 @@ class ParameterServer:
             gain_values_list = GainValuesList([GainValues([
                 rospy.get_param('/march/controller/trajectory/gains/{joint}/{gain}'.format(joint=joint, gain=gain))
                 for gain in ['p', 'i', 'd']])
-                           for joint in req.joints])
+                for joint in req.joints])
             return GetGainValuesListResponse(gain_values_list, True)
         except KeyError:
             return GetGainValuesListResponse(GainValuesList([]), False)
@@ -100,8 +103,12 @@ class ParameterServer:
         :return Returns a SetGainValuesListResponse with success set to True.
         """
         for joint_index, joint in enumerate(req.joints):
+            if joint not in rospy.get_param('/march/controller/trajectory/gains/'):
+                return SetGainValuesListResponse(False)
             gains = req.gain_values_list.gain_values_list[joint_index].gains
             for gain_index, gain in enumerate(['p', 'i', 'd']):
+                if gains[gain_index] < 0:
+                    return SetGainValuesListResponse(False)
                 rospy.set_param('/march/controller/trajectory/gains/{joint}/{gain}'.format(joint=joint, gain=gain),
                                 gains[gain_index])
 

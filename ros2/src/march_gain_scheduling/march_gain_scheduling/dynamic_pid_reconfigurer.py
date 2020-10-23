@@ -61,6 +61,7 @@ class DynamicPIDReconfigurer(Node):
         :return Returns a list of joint names
         """
         joint_list_ci = self.create_client(GetParamStringList, 'march/parameter_server/get_param_string_list')
+        joint_list_ci.wait_for_service()
         future = joint_list_ci.call_async(GetParamStringList.Request(name='/march/joint_names'))
         rclpy.spin_until_future_complete(self, future)
         joint_list_ci.destroy()

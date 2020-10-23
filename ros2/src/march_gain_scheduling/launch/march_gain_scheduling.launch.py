@@ -9,6 +9,7 @@ def generate_launch_description() -> launch.LaunchDescription:
     ld = launch.LaunchDescription([
         DeclareLaunchArgument(
             name='configuration',
+            default_value='groundgait',
             description='Tuning configuration to use. Must be name of file in config/ directory.'
         ),
         DeclareLaunchArgument(
