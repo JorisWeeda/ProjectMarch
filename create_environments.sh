@@ -58,6 +58,13 @@ echo -e "\033[1;34m
 USERNAME=$(whoami)
 WORKSPACE_PATH=$(dirname "$(readlink -f "$0")")
 
+# Quit if script is executed as root
+if [ $(id -u) -eq 0 ]
+then
+    print_error "This script should NOT run as root."
+    exit 1
+fi
+
 if [ "$(lsb_release -si)" != "Ubuntu" ]
 then
     print_error "This script is intended to run on Ubuntu machines. This is $(lsb_release -is). Are you sure you want to continue? (y/N)"
