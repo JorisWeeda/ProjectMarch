@@ -72,11 +72,10 @@ fi
 # Install debootstrap and schroot
 print_info "Installing required packages 'debootstrap' and 'schroot'..."
 print_info "Requesting root permissions..."
-# TODO REMOVE COMMENTS
-#sudo apt update
-#check_error
-#sudo apt install -y debootstrap schroot
-#check_error
+sudo apt update
+check_error
+sudo apt install -y debootstrap schroot
+check_error
 
 ################################
 # CREATION OF SCHROOT PROFILES #
@@ -222,15 +221,14 @@ cd $WORKSPACE_PATH
 print_info "Creating focal symlink for debootstrap..."
 sudo ln -s gutsy /usr/share/debootstrap/scripts/focal
 
-# TODO UNCOMMENT THIS
 print_info "Installing minimal version of Ubuntu Bionic..."
 # Download the files for Ubuntu Bionic in the ROS 1 chroot
-# sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
+sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 
 print_info "Installing minimal version of Ubuntu Focal..."
 # Download the files for Ubuntu Focal in the ROS 2 chroot
-#sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
+sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 
 #####################################
@@ -282,7 +280,7 @@ check_error
 
 # Install dependencies for building ROS 1 packages
 print_info "Install ROS 1 building dependencies..."
-sudo schroot --automatic-session -c ros1 -- zsh -c "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip"
+sudo schroot --automatic-session -c ros1 -- zsh -c "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip libspdlog-dev python3-lark-parser"
 check_error
 sudo schroot --automatic-session -c ros1 -- zsh -c "rosdep init"
 
@@ -294,7 +292,7 @@ print_info "Install March specific ROS 1 dependencies..."
 schroot --automatic-session -c ros1 -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
 check_error
 
-ALIAS_MARCH_BUILD_BRIDGE="source /opt/ros/melodic/setup.zsh;
+ALIAS_MARCH_BUILD_BRIDGE="source /opt/ros/melodic/local_setup.zsh;
 source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 source /home/$USERNAME/march/ros1/install_isolated/local_setup.zsh;
@@ -307,6 +305,8 @@ cd /home/$USERNAME/march"
 
 ALIAS_MARCH_BUILD_ROS1="source /opt/ros/melodic/local_setup.zsh;
 cd /home/$USERNAME/march/ros1;
+export CC=clang;
+export CXX=clang++;
 catkin_make_isolated --install"
 
 # Add the build and run commands of ROS 1
@@ -315,15 +315,15 @@ schroot --automatic-session -c ros1 -- zsh -c "echo \"
 alias march_build_ros1='$ALIAS_MARCH_BUILD_ROS1'
 
 alias march_run_ros1='
-source /opt/ros/melodic/local_setup.zsh;
+source /opt/ros/melodic/setup.zsh;
 cd /home/$USERNAME/march/ros1;
-source install_isolated/local_setup.zsh;
+source install_isolated/setup.zsh;
 roslaunch march_launch march_ros2_simulation.launch'
 
 alias march_build_bridge='$ALIAS_MARCH_BUILD_BRIDGE'
 
 alias march_run_bridge='
-source /opt/ros/melodic/setup.zsh;
+source /opt/ros/melodic/local_setup.zsh;
 source /home/$USERNAME/march/ros1/install_isolated/local_setup.zsh;
 source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
@@ -359,7 +359,7 @@ check_error
 
 # Install required packages
 print_info "Installing basic packages of Ubuntu Focal..."
-sudo schroot --automatic-session -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg zsh python3-pip locales clang && pip3 install -U argcomplete"
+sudo schroot --automatic-session -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg zsh python3-pip locales && pip3 install -U argcomplete"
 check_error
 
 # Set locale to UTF8 supported locale
@@ -413,7 +413,7 @@ sudo schroot -c ros2 -- zsh -c "ln -s python2 /usr/bin/python"
 
 # Building ROS 2 (takes a long time)
 print_info "Building ROS 2... (THIS TAKES A LONG TIME)"
-#schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && export CC=clang && export CXX=clang++ && colcon build --symlink-install --packages-skip ros1_bridge"
+schroot --automatic-session -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros1_bridge"
 
 # Install March specific ROS 2 dependencies
 print_info "Install March specific ROS 2 dependencies..."
@@ -441,9 +441,6 @@ ros2 launch march_launch march_ros2_simulation.launch.py'
 
 export precmd_functions='';
 export PS1='ROS 2> ';
- --cmake-force-configure
-export CC=clang;
-export CXX=clang++;
 \" > /home/$USERNAME/.zshrc"
 check_error
 
