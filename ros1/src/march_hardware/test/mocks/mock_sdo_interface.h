@@ -9,6 +9,7 @@ class MockSdoInterface : public march::SdoInterface
 {
 public:
   MockSdoInterface() = default;
+  virtual ~MockSdoInterface() noexcept = default;
 
 protected:
   MOCK_METHOD5(write, int(uint16_t, uint16_t, uint8_t, std::size_t, void*));

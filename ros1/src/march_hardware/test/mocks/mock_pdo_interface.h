@@ -10,6 +10,7 @@ class MockPdoInterface : public march::PdoInterface
 {
 public:
   MockPdoInterface() = default;
+  virtual ~MockPdoInterface() noexcept = default;
 
   MOCK_METHOD3(write8, void(uint16_t, uint8_t, march::bit8));
   MOCK_METHOD3(write16, void(uint16_t, uint8_t, march::bit16));

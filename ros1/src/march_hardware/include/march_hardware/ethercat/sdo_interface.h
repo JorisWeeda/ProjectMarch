@@ -98,6 +98,8 @@ public:
     return std::make_shared<SdoInterfaceImpl>();
   }
 
+  virtual ~SdoInterfaceImpl() noexcept = default;
+
 protected:
   int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size, void* value) override;
 

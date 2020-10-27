@@ -86,6 +86,8 @@ public:
     return std::make_shared<PdoInterfaceImpl>();
   }
 
+  virtual ~PdoInterfaceImpl() noexcept = default;
+
   void write8(uint16_t slave_index, uint8_t module_index, bit8 value) override;
   void write16(uint16_t slave_index, uint8_t module_index, bit16 value) override;
   void write32(uint16_t slave_index, uint8_t module_index, bit32 value) override;
