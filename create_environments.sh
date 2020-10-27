@@ -282,7 +282,7 @@ sudo schroot --automatic-session -c ros1 -- zsh -c "apt update && apt install -y
 check_error
 
 # Add automatic sourcing to the .bashrc file of the user
-sudo schroot --automatic-session -c ros1 -- zsh -c "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc"
+sudo schroot --automatic-session -c ros1 -- zsh -c "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc && chown $USERNAME:$USERNAME /home/$USERNAME/.zshrc && chmod 755 /home/$USERNAME/.zshrc"
 check_error
 
 # Install dependencies for building ROS 1 packages
@@ -295,7 +295,9 @@ sudo schroot --automatic-session -c ros1 -- zsh -c "rosdep init"
 print_info "Update ROS dependencies list..."
 schroot --automatic-session -c ros1 -- zsh -c "rosdep update"
 check_error
+
 print_info "Install March specific ROS 1 dependencies..."
+sudo schroot -c ros1 -- zsh -c "sudo chmod -R 755 /opt"
 schroot --automatic-session -c ros1 -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
 check_error
 
@@ -391,6 +393,7 @@ check_error
 
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
+sudo schroot -c ros2 -- zsh -c "sudo chmod -R 755 /opt"
 sudo schroot --automatic-session -c ros2 -- zsh -c "apt update && apt install -y libboost-all-dev build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python-yaml wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 check_error
 
