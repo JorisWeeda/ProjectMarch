@@ -258,7 +258,7 @@ check_error
 
 # Install required packages
 print_info "Installing basic packages of Ubuntu Bionic..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh clang"
+sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh"
 check_error
 
 # Add key from ROS 1 
@@ -307,15 +307,15 @@ source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 source /home/$USERNAME/march/ros1/install_isolated/local_setup.zsh;
 source /home/$USERNAME/march/ros2/install/local_setup.zsh;
 cd /home/$USERNAME/march/.ros2_foxy;
-export CC=clang;
-export CXX=clang++;
+export CC=gcc;
+export CXX=g++;
 colcon build --symlink-install --packages-select ros1_bridge --cmake-force-configure;
 cd /home/$USERNAME/march"
 
 ALIAS_MARCH_BUILD_ROS1="source /opt/ros/melodic/local_setup.zsh;
 cd /home/$USERNAME/march/ros1;
-export CC=clang;
-export CXX=clang++;
+export CC=gcc;
+export CXX=g++;
 catkin_make_isolated --install"
 
 # Add the build and run commands of ROS 1
@@ -435,8 +435,8 @@ ALIAS_MARCH_BUILD_ROS2="
 source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 cd /home/$USERNAME/march/ros2;
-export CC=clang;
-export CXX=clang++;
+export CC=gcc;
+export CXX=g++;
 colcon build --symlink-install --cmake-force-configure"
 
 # Add the build and run commands of ROS 2
