@@ -364,7 +364,7 @@ check_error
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
 sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "sudo chmod -R 755 /opt"
-sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "apt update && apt install -y libboost-all-dev build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python-yaml wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
+sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "apt update && apt install -y ros-foxy-rcl-logging-spdlog libboost-all-dev build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python-yaml wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 check_error
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
@@ -415,6 +415,7 @@ check_error
 #######################
 # BUILDING THE BRIDGE #
 #######################
+
 print_info "Build the ROS 1 bridge for the first time..."
 schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_bridge"
 check_error

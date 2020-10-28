@@ -1,11 +1,11 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 USERNAME=$(whoami)
 ROS1_LOCATION="/srv/chroot/ros1"
 ROS2_LOCATION="/srv/chroot/ros2"
 
 sudo tee <<EOF $ROS1_LOCATION/usr/bin/march_build_bridge >/dev/null
-#!/usr/bin/env zsg
+#!/usr/bin/env zsh
 source /opt/ros/melodic/local_setup.zsh;
 source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
