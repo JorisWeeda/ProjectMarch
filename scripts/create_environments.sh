@@ -423,7 +423,7 @@ check_error
 # CREATION OF STARTING SCRIPTS #
 ################################
 print_info "Creating startup scripts..."
-cd $WORKSPACE_PATH
+cd $WORKSPACE_PATH/scripts
 
 # Create the startup script and copy it to start_ros2.sh
 tee <<EOF start_ros1.sh >/dev/null
