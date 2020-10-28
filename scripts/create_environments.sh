@@ -315,7 +315,7 @@ export PS1='ROS 1> ' \" > /home/$USERNAME/.zshrc"
 check_error
 
 # Update compiler
-print_info "Updating compiler to GCC 10..."
+print_info "Updating compiler to GCC 9..."
 schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "
 sudo apt update && \
 sudo apt install build-essential software-properties-common -y && \
@@ -324,8 +324,8 @@ sudo apt update && \
 sudo apt install gcc-snapshot -y && \
 sudo apt update && \
 sudo apt upgrade -y && \
-sudo apt install gcc-10 g++-10 -y && \
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 60 --slave /usr/bin/g++ g++ /usr/bin/g++-10 && \
+sudo apt install gcc-9 g++-9 -y && \
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 && \
 sudo update-alternatives --config gcc"
 
 print_info "Build March ROS 1 for the first time..."
@@ -406,7 +406,7 @@ print_info "Adding Python symlink to Python 3"
 sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "ln -s python2 /usr/bin/python"
 
 # Update compiler
-print_info "Updating compiler to GCC 10..."
+print_info "Updating compiler to GCC 9..."
 schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "
 sudo apt update && \
 sudo apt install build-essential software-properties-common -y && \
@@ -415,8 +415,8 @@ sudo apt update && \
 sudo apt install gcc-snapshot -y && \
 sudo apt update && \
 sudo apt upgrade -y && \
-sudo apt install gcc-10 g++-10 -y && \
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 60 --slave /usr/bin/g++ g++ /usr/bin/g++-10 && \
+sudo apt install gcc-9 g++-9 -y && \
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 && \
 sudo update-alternatives --config gcc"
 
 # Building ROS 2 (takes a long time)
