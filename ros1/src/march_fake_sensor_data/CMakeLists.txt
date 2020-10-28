@@ -23,7 +23,7 @@ target_include_directories(march_fake_temperature_data_node PRIVATE ${catkin_INC
 add_dependencies(march_fake_temperature_data_node ${PROJECT_NAME}_gencfg ${catkin_EXPORTED_TARGETS})
 target_link_libraries(march_fake_temperature_data_node PRIVATE ${catkin_LIBRARIES})
 target_compile_features(march_fake_temperature_data_node PRIVATE cxx_std_14)
-target_compile_options(march_fake_temperature_data_node PRIVATE -Wall -Wextra -Werror)
+target_compile_options(march_fake_temperature_data_node PRIVATE -Wall -Wextra)
 
 include_directories(${catkin_INCLUDE_DIRS})
 
