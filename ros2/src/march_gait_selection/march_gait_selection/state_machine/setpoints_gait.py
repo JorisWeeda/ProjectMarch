@@ -1,6 +1,11 @@
+from copy import deepcopy
+
 from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
+from march_gait_selection.state_machine.home_gait import HomeGait
 from march_shared_classes.exceptions.gait_exceptions import GaitError
 from march_shared_classes.gait.gait import Gait
+from march_shared_classes.gait.setpoint import Setpoint
+from march_shared_classes.gait.subgait import Subgait
 
 from .gait_interface import GaitInterface
 from .state_machine_input import TransitionRequest
@@ -15,6 +20,11 @@ class SetpointsGait(GaitInterface, Gait):
         self._transition_to_subgait = None
         self._is_transitioning = False
         self._time_since_start = 0.0
+        ############################################
+        self._should_freeze = False
+        self._is_frozen = False
+        self._freeze_duration = 0
+        ############################################
 
     @property
     def name(self):
@@ -71,14 +81,19 @@ class SetpointsGait(GaitInterface, Gait):
 
     def update(self, elapsed_time):
         """
-        Update the theoretical progress of the gait, should be called regularly.
+        Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
         If the gait should be stopped, this will be done
         If the current subgait is done, it will start the next subgait
         :param elapsed_time:
-        :return:
+        :return: trjectory, is_finished
         """
         self._time_since_start += elapsed_time
+        if self._should_freeze:
+            trajectory = self._execute_freeze()
+            self._time_since_start = 0.0
+            return trajectory, False
+
         if self._time_since_start < self._current_subgait.duration:
             return None, False
 
@@ -92,8 +107,15 @@ class SetpointsGait(GaitInterface, Gait):
             next_subgait = self._transition_to_subgait.subgait_name
             self._transition_to_subgait = None
             self._is_transitioning = False
+
+        elif self._is_frozen:
+            self._current_subgait = self._subgait_after_freeze
+            trajectory = self._current_subgait.to_joint_trajectory_msg()
+            self._time_since_start = 0.0 # New subgait is started, so reset the time
+            self._is_frozen = False
+            return trajectory, False
         else:
-            # If there is no next subgait to transition to, go to TO subgait
+            # If there is transition to do, go to next (TO) subgait
             next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
 
         if next_subgait == self.graph.END:
@@ -103,9 +125,32 @@ class SetpointsGait(GaitInterface, Gait):
         self._time_since_start = 0.0 # New subgait is started, so reset the time
         return trajectory, False
 
+    def _execute_freeze(self):
+        ## Set the rest of current subgait as next subgait
+        if self._time_since_start < self._current_subgait.duration:
+            self._subgait_after_freeze = deepcopy(self._current_subgait)
+            for joint in self._subgait_after_freeze:
+                joint.from_begin_point(self._time_since_start)
+        ## Set a freeze subgait for the freeze duration
+        freeze_subgait = deepcopy(self._current_subgait)
+        freeze_subgait.duration = self._freeze_duration
+        # new_joint_trajectories = []
+        position = self._current_position(self._time_since_start)
+        for joint in freeze_subgait.joints:
+            joint.setpoints = [Setpoint(time=self._freeze_duration,
+                                        position=position[joint.name],
+                                        velocity=0)]
+        self._current_subgait = freeze_subgait
+        self._should_freeze = False
+        self._is_frozen = True
+        return freeze_subgait.to_joint_trajectory_msg()
+
+
+
     def transition(self, transition_request):
         """
-        Request
+        Request to transition between two subgaits with increasing or decreasing
+        size of the step.
         :param transition_request:
         :return:
         """
@@ -171,3 +216,12 @@ class SetpointsGait(GaitInterface, Gait):
         self._time_since_start = 0.0
         self._is_transitioning = True
         return transition_subgait.to_joint_trajectory_msg(), False
+
+    def freeze(self, duration: float = 10.0):
+        self._should_freeze = True
+        self._freeze_duration = duration
+        return True
+
+    def _current_position(self, elapsed_time):
+        return {joint.name: joint.get_interpolated_setpoint(elapsed_time).position for
+                joint in self._current_subgait}

@@ -37,14 +37,14 @@ class InputDeviceView(QWidget):
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
-        self.refresh_button.clicked.connect(self._update_possible_gaits)
+        self.refresh_button.clicked.connect(self._controller.update_possible_gaits)
 
         self._create_buttons()
         # Start with only 'always available' buttons
-        self.possible_gaits = []
+        self.possible_gaits = [None]
         self._update_gait_buttons([])
-        # Request actual possible gaits
-        self._update_possible_gaits()
+
+        self._controller.get_node().create_timer(0.2, self._update_possible_gaits)
 
     def _create_buttons(self) -> None:
         """
@@ -347,31 +347,30 @@ class InputDeviceView(QWidget):
         """
         self.gait_label.setText(gait_name)
 
-    def _update_possible_gaits(self) -> None:
-        """
-        First requests the controller to update the possible, then create a timer to update the view if the possible
-        gaits changed.
-        """
-        self._controller.update_possible_gaits()
-        self._update_timer = self._controller.get_node().create_timer(0.1, self._update_possible_gaits_view,
-                                                                      clock=self._controller.get_node().get_clock())
+    # def _update_possible_gaits(self) -> None:
+    #     """
+    #     First requests the controller to update the possible, then create a timer to update the view if the possible
+    #     gaits changed.
+    #     """
+    #     self._update_possible_gaits()update_possible_gaits()
+        # self._update_timer = self._controller.get_node().create_timer(0.1, self._update_possible_gaits_view,
+        #                                                               clock=self._controller.get_node().get_clock())
 
-    def _update_possible_gaits_view(self) -> None:
+    def _update_possible_gaits(self) -> None:
         """
         Update the buttons if the possible gaits have changed and cancel the timer.
         """
-        new_possible_gaits_future = self._controller.get_possible_gaits()
-        if new_possible_gaits_future.done():
-            self._update_timer.cancel()
-            new_possible_gaits = new_possible_gaits_future.result().gaits
-            if set(self.possible_gaits) != set(new_possible_gaits):
-                self._update_gait_buttons(new_possible_gaits)
+        new_possible_gaits = self._controller.get_possible_gaits()
+        # self._controller.get_node().get_logger().info(f'Updating possible gaits to {new_possible_gaits}')
+        if set(self.possible_gaits) != set(new_possible_gaits):
+            self._update_gait_buttons(new_possible_gaits)
 
     def _update_gait_buttons(self, possible_gaits: List[str]) -> None:
         """
         Update which buttons are available to the given possible gaits list
         @param possible_gaits: The gaits that can be executed
         """
+        self._controller.get_node().get_logger().info(f'BUTTONS to {possible_gaits}')
         self.frame.setEnabled(False)
         self.frame.verticalScrollBar().setEnabled(False)
         self.possible_gaits = possible_gaits
