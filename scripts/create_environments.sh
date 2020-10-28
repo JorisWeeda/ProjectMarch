@@ -56,7 +56,10 @@ echo -e "\033[1;34m
 
 # User configuation
 USERNAME=$(whoami)
-WORKSPACE_PATH=$(dirname "$(readlink -f "$0")")
+WORKSPACE_PATH="$(dirname "$(readlink -f "$0")")"
+cd $WORKSPACE_PATH
+cd ..
+WORKSPACE_PATH="$(pwd)"
 
 # Quit if script is executed as root
 if [ $(id -u) -eq 0 ]
@@ -228,6 +231,9 @@ cd $WORKSPACE_PATH
 print_info "Creating focal symlink for debootstrap..."
 sudo ln -s gutsy /usr/share/debootstrap/scripts/focal
 
+if [ 1 -eq 0 ]
+then
+
 print_info "Installing minimal version of Ubuntu Bionic..."
 # Download the files for Ubuntu Bionic in the ROS 1 chroot
 sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
@@ -237,6 +243,8 @@ print_info "Installing minimal version of Ubuntu Focal..."
 # Download the files for Ubuntu Focal in the ROS 2 chroot
 sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
+
+fi
 
 #####################################
 # INSTALLING ROS 1 ON UBUNTU BIONIC #
@@ -301,7 +309,14 @@ sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "sudo chmod -R 755 /opt"
 schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
 check_error
 
-ALIAS_MARCH_BUILD_BRIDGE="source /opt/ros/melodic/local_setup.zsh;
+##############################################
+# INSTALL ROS 1 MARCH BUILD AND RUN COMMANDS #
+##############################################
+
+print_info "Install march build ROS 1 commands..."
+sudo tee <<EOF $ROS1_LOCATION/usr/bin/march_build_bridge >/dev/null
+#!/usr/bin/env zsg
+source /opt/ros/melodic/local_setup.zsh;
 source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 source /home/$USERNAME/march/ros1/install_isolated/local_setup.zsh;
@@ -310,42 +325,58 @@ cd /home/$USERNAME/march/.ros2_foxy;
 export CC=gcc;
 export CXX=g++;
 colcon build --symlink-install --packages-select ros1_bridge --cmake-force-configure;
-cd /home/$USERNAME/march"
+cd /home/$USERNAME/march
+EOF
+check_error
+sudo chmod 755 $ROS1_LOCATION/usr/bin/march_build_bridge
+check_error
 
-ALIAS_MARCH_BUILD_ROS1="source /opt/ros/melodic/local_setup.zsh;
+sudo tee <<EOF $ROS1_LOCATION/usr/bin/march_build_ros1 >/dev/null
+#!/usr/bin/env zsh
+source /opt/ros/melodic/local_setup.zsh;
 cd /home/$USERNAME/march/ros1;
 export CC=gcc;
 export CXX=g++;
-catkin_make_isolated --install"
+catkin_make_isolated --install
+EOF
+check_error
+sudo chmod 755 $ROS1_LOCATION/usr/bin/march_build_ros1
+check_error
 
-# Add the build and run commands of ROS 1
-print_info "Add aliases to ROS 1 chroot environment..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "echo \"
-alias march_build_ros1='$ALIAS_MARCH_BUILD_ROS1'
-
-alias march_run_ros1='
+print_info "Install march run ROS 1 commands..."
+sudo tee <<EOF $ROS1_LOCATION/usr/bin/march_run_ros1 >/dev/null
+#!/usr/bin/env zsh
 source /opt/ros/melodic/setup.zsh;
 cd /home/$USERNAME/march/ros1;
 source install_isolated/setup.zsh;
-roslaunch march_launch march_ros2_simulation.launch'
+roslaunch march_launch march_ros2_simulation.launch
+EOF
+check_error
+sudo chmod 755 $ROS1_LOCATION/usr/bin/march_run_ros1
+check_error
 
-alias march_build_bridge='$ALIAS_MARCH_BUILD_BRIDGE'
-
-alias march_run_bridge='
+sudo tee <<EOF $ROS1_LOCATION/usr/bin/march_run_bridge >/dev/null
+#!/usr/bin/env zsh
 source /opt/ros/melodic/local_setup.zsh;
 source /home/$USERNAME/march/ros1/install_isolated/local_setup.zsh;
 source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 source /home/$USERNAME/march/ros2/install/local_setup.zsh;
 export ROS_MASTER_URI=http://localhost:11311;
-ros2 run ros1_bridge dynamic_bridge --bridge-all-topics --print-pairs'
+ros2 run ros1_bridge dynamic_bridge --bridge-all-topics --print-pairs
+EOF
+check_error
+sudo chmod 755 $ROS1_LOCATION/usr/bin/march_run_bridge
+check_error
 
+print_info "Set ROS 1 shell prefix..."
+schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "echo \"
 export precmd_functions='';
 export PS1='ROS 1> ' \" > /home/$USERNAME/.zshrc"
 check_error
 
 print_info "Build March ROS 1 for the first time..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "$ALIAS_MARCH_BUILD_ROS1"
+schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_ros1"
 check_error
 
 #####################################
@@ -398,6 +429,9 @@ sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "sudo chmod -R 755 /opt"
 sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "apt update && apt install -y libboost-all-dev build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python-yaml wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 check_error
 
+if [ 1 -eq 0]
+then
+
 print_info "Install the source files from ROS 2 in order to install the bridge..."
 schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
 check_error
@@ -426,44 +460,57 @@ sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "ln -s python2 /usr/bin/pyth
 print_info "Building ROS 2... (THIS TAKES A LONG TIME)"
 schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros1_bridge"
 
+fi
+
 # Install March specific ROS 2 dependencies
 print_info "Install March specific ROS 2 dependencies..."
 schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "source /home/$USERNAME/march/.ros2_foxy/install/setup.zsh && rosdep install -y --from-paths /home/$USERNAME/march/ros2/src --ignore-src"
 check_error
 
-ALIAS_MARCH_BUILD_ROS2="
+print_info "Install march build ROS 2 commands..."
+sudo tee <<EOF $ROS2_LOCATION/usr/bin/march_build_ros2 >/dev/null
+#!/usr/bin/env zsh
 source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 cd /home/$USERNAME/march/ros2;
 export CC=gcc;
 export CXX=g++;
-colcon build --symlink-install --cmake-force-configure"
+colcon build --symlink-install --cmake-force-configure
+EOF
+check_error
+sudo chmod 755 $ROS2_LOCATION/usr/bin/march_build_ros2
+check_error
 
-# Add the build and run commands of ROS 2
-print_info "Add aliases to ROS 2 chroot environment..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "echo \"alias march_build_ros2='$ALIAS_MARCH_BUILD_ROS2'
-
-alias march_run_ros2='
+print_info "Install march run ROS 2 commands..."
+sudo tee <<EOF $ROS2_LOCATION/usr/bin/march_run_ros2 >/dev/null
+#!/usr/bin/env zsh
 source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 cd /home/$USERNAME/march/ros2;
 source install/local_setup.zsh;
-ros2 launch march_launch march_ros2_simulation.launch.py'
+ros2 launch march_launch march_ros2_simulation.launch.py
+EOF
+check_error
+sudo chmod 755 $ROS2_LOCATION/usr/bin/march_run_ros2
+check_error
 
+# Add the build and run commands of ROS 2
+print_info "Set ROS 2 shell prefix..."
+schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "echo \"
 export precmd_functions='';
 export PS1='ROS 2> ';
 \" > /home/$USERNAME/.zshrc"
 check_error
 
 print_info "Build March ROS 2 for the first time..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "$ALIAS_MARCH_BUILD_ROS2"
+schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "march_build_ros2"
 check_error
 
 #######################
 # BUILDING THE BRIDGE #
 #######################
 print_info "Build the ROS 1 bridge for the first time..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "$ALIAS_MARCH_BUILD_BRIDGE"
+schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_bridge"
 check_error
 
 
