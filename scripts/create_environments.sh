@@ -306,7 +306,7 @@ schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "source /opt/ros/melodic/setup.zs
 check_error
 
 print_info "Install spdlog from source..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "git clone https://github.com/gabime/spdlog.git && cd spdlog && mkdir build && cd build && cmake .. && make -j"
+schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "git clone https://github.com/gabime/spdlog.git && cd spdlog && mkdir build && cd build && cmake .. -DSPDLOG_BUILD_SHARED=ON && make -j"
 sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "cd spdlog/build && sudo make install"
 
 print_info "Creating commands..."
