@@ -138,6 +138,7 @@ sudo tee <<EOF $SCHROOT_ROS1/copyfiles >/dev/null
 /etc/passwd
 /etc/shadow
 /etc/group
+/etc/sudoers
 EOF
 
 # Create an empty nssdatabases file
