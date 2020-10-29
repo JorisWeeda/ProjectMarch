@@ -261,7 +261,7 @@ check_error
 
 # Install required packages
 print_info "Installing basic packages of Ubuntu Bionic..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh"
+sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh git"
 check_error
 
 # Add key from ROS 1 
@@ -290,7 +290,7 @@ check_error
 
 # Install dependencies for building ROS 1 packages
 print_info "Install ROS 1 building dependencies..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip libspdlog-dev python3-lark-parser"
+sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip python3-lark-parser"
 check_error
 sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "rosdep init"
 
@@ -303,6 +303,10 @@ print_info "Install March specific ROS 1 dependencies..."
 sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "sudo chmod -R 755 /opt"
 schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
 check_error
+
+print_info "Install spdlog from source..."
+schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "git clone https://github.com/gabime/spdlog.git && cd spdlog && mkdir build && cd build && cmake .. && make -j"
+sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "cd spdlog/build && sudo make install"
 
 print_info "Creating commands..."
 bash -c "$WORKSPACE_PATH/scripts/create_commands.sh"
