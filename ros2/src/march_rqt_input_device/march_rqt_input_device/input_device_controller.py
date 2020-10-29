@@ -59,7 +59,7 @@ class InputDeviceController(object):
             self._alive_timer = self._node.create_timer(timer_period_sec=0.2, callback=self._timer_callback,
                                                         clock=self._node.get_clock())
 
-        self._gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
+        self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
 
     def __del__(self):
         self._node.destroy_publisher(self._instruction_gait_pub)
@@ -102,17 +102,13 @@ class InputDeviceController(object):
         """
         msg = Alive(stamp=self._node.get_clock().now().to_msg(), id=self._id)
         self._alive_pub.publish(msg)
-        if self._gait_future.done():
-            # self._node.get_logger().info(f'Possible gaits future done, new is {self._gait_future.result().gaits}')
-            self._possible_gaits = self._gait_future.result().gaits
-            self.update_possible_gaits()
 
     def update_possible_gaits(self) -> None:
         """
         Send out an asynchronous request to get the possible gaits and stores response in gait_future
         """
         if self._possible_gait_client.service_is_ready():
-            self._gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
+            self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
         else:
             self._node.get_logger().warn('Failed to contact get_possible_gaits service')
 
@@ -121,7 +117,7 @@ class InputDeviceController(object):
         Returns the future for the list of names of possible gaits.
         :return: List of possible gaits
         """
-        return self._possible_gaits
+        return self.gait_future
 
     def get_node(self) -> Node:
         """

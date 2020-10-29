@@ -48,7 +48,7 @@ class GaitInterface(object):
         optional starting trajectory."""
         return None
 
-    def update(self, elapsed_time, logger):
+    def update(self, elapsed_time):
         """Called in a loop with the elapsed time since the last update.
 
         :param float elapsed_time: Elapsed time in seconds since the last update
