@@ -7,7 +7,7 @@ ROS2_LOCATION="/srv/chroot/ros2"
 sudo rm $ROS1_LOCATION/usr/bin/march_* -f
 sudo rm $ROS2_LOCATION/usr/bin/march_* -f
 
-sudo tee <<EOF $ROS1_LOCATION/usr/bin/march_build_bridge >/dev/null
+sudo tee <<EOF $ROS2_LOCATION/usr/bin/march_build_bridge >/dev/null
 #!/usr/bin/env zsh
 source /opt/ros/melodic/local_setup.zsh;
 source /opt/ros/foxy/local_setup.zsh;
@@ -20,7 +20,7 @@ export CXX=g++;
 colcon build --symlink-install --packages-select ros1_bridge --cmake-force-configure;
 cd /home/$USERNAME/march
 EOF
-sudo chmod 755 $ROS1_LOCATION/usr/bin/march_build_bridge
+sudo chmod 755 $ROS2_LOCATION/usr/bin/march_build_bridge
 
 sudo tee <<EOF $ROS1_LOCATION/usr/bin/march_build_ros1 >/dev/null
 #!/usr/bin/env zsh
