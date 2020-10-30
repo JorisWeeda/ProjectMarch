@@ -8,7 +8,6 @@ from march_shared_classes.gait.subgait import Subgait
 class TransitionSubgait(Subgait):
     """ Class that defines the subgait used for transitioning between
     subgaits with not matching begin and end points"""
-
     def __init__(self, joints, duration,
                  gait_type='walk_like', gait_name='Transition',
                  subgait_name='Transition_subgait', version='Default',
@@ -19,14 +18,13 @@ class TransitionSubgait(Subgait):
                                                 version, description)
 
     @classmethod
-    def from_subgaits(cls, old_subgait, new_subgait, new_subgait_name):
+    def from_subgaits(cls, old_subgait, new_subgait, transition_subgait_name):
         """Create a new transition subgait object between two given subgaits.
-
         :param old_subgait: The old subgait to transition from
         :param new_subgait: The new gait which must be executed after the
                             old gait
-        :param new_subgait_name: Name of the subgait in which the transition
-                                 will occur
+        :param transition_subgait_name: Name to use for the subgait that will be created
+        in which the transition will occur
 
         :return: A populated TransitionSubgait object which holds the data to
                  transition between given gaits
@@ -38,7 +36,7 @@ class TransitionSubgait(Subgait):
         transition_duration = new_subgait_copy.duration
 
         transition_subgait = cls(transition_joints, transition_duration,
-                                 subgait_name=new_subgait_name)
+                                 subgait_name=transition_subgait_name)
 
         cls._validate_transition_gait(old_subgait_copy, transition_subgait,
                                       new_subgait_copy)
@@ -99,10 +97,10 @@ class TransitionSubgait(Subgait):
         new setpoint and transition factor."""
         old_factor = 1.0 - new_factor
 
-        position = (old_setpoint.position * old_factor) + (
-                    new_setpoint.position * new_factor)
-        velocity = (old_setpoint.velocity * old_factor) + (
-                    new_setpoint.velocity * new_factor)
+        position = (old_setpoint.position * old_factor) + \
+                   (new_setpoint.position * new_factor)
+        velocity = (old_setpoint.velocity * old_factor) + \
+                   (new_setpoint.velocity * new_factor)
 
         return Setpoint(new_setpoint.time, position, velocity)
 
@@ -111,16 +109,13 @@ class TransitionSubgait(Subgait):
         """Validates the transition point."""
         try:
             if (not old_subgait.validate_subgait_transition(transition_subgait)
-                    or not transition_subgait.validate_subgait_transition(
-                        new_subgait)):
+                    or not transition_subgait.validate_subgait_transition(new_subgait)):
                 raise TransitionError('Transition subgaits do not match')
         except Exception as error:
-            TransitionError(
-                'Error when creating transition: {er}'.format(er=error))
+            TransitionError('Error when creating transition: {er}'.format(er=error))
 
     @staticmethod
-    def _validate_transition_trajectory(old_subgait, transition_subgait,
-                                        new_subgait):
+    def _validate_transition_trajectory(old_subgait, transition_subgait, new_subgait):
         """Validate if the calculated trajectory is within the given subgaits."""
         for transition_joint in transition_subgait.joints:
             old_joint = old_subgait.get_joint(transition_joint.name)

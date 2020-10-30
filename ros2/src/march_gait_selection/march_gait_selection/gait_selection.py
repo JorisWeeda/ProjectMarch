@@ -47,7 +47,10 @@ class GaitSelection(Node):
 
         self._gait_version_map, self._positions = self._load_configuration()
         self._robot = self._initial_robot_description() if robot is None else robot
-        self._robot_description_sub = self.create_subscription(
+
+        # Subsribe to the robot description channel to be kept up to date of
+        # changes in the robot description
+        self.robot_description_sub = self.create_subscription(
             msg_type=String, topic='/robot_description',
             callback=self._update_robot_description_cb,
             qos_profile=10)
@@ -73,14 +76,17 @@ class GaitSelection(Node):
         return urdf.Robot.from_xml_string(robot_future.result().values[0].string_value)
 
     def _create_services(self):
-        self.create_service(Trigger, '/march/gait_selection/get_version_map',
-                            lambda msg: [True, str(self.gait_version_map)])
+        self.create_service(srv_type=Trigger,
+                            srv_name='/march/gait_selection/get_version_map',
+                            callback=lambda msg: [True, str(self.gait_version_map)])
 
-        self.create_service(SetGaitVersion, '/march/gait_selection/set_gait_version',
-                            lambda msg: set_gait_versions(msg, self))
+        self.create_service(srv_type=SetGaitVersion,
+                            srv_name='/march/gait_selection/set_gait_version',
+                            callback=self.set_gait_versions_cb)
 
-        self.create_service(Trigger, '/march/gait_selection/get_directory_structure',
-                            lambda msg: [True, str(self.scan_directory())])
+        self.create_service(srv_type=Trigger,
+                            srv_name='/march/gait_selection/get_directory_structure',
+                            callback=lambda msg: [True, str(self.scan_directory())])
 
         self.create_service(srv_type=Trigger,
                             srv_name='/march/gait_selection/update_default_versions',
@@ -88,7 +94,7 @@ class GaitSelection(Node):
 
         self.create_service(srv_type=ContainsGait,
                             srv_name='/march/gait_selection/contains_gait',
-                            callback=lambda msg: contains_gait(msg, self))
+                            callback=self.contains_gait_cb)
 
     @property
     def robot(self):
@@ -128,6 +134,38 @@ class GaitSelection(Node):
             self._robot, self._gait_directory, version_map)
         self._gait_version_map[gait_name].update(version_map)
 
+    def set_gait_versions_cb(self, msg):
+        """Sets a new gait version to the gait selection instance.
+
+        :type msg: march_shared_resources.srv.SetGaitVersionRequest
+        :rtype march_shared_resources.srv.SetGaitVersionResponse
+        """
+        if len(msg.subgaits) != len(msg.versions):
+            return [False, '`subgaits` and `versions` array are not of equal length']
+
+        version_map = dict(zip(msg.subgaits, msg.versions))
+        try:
+            self.set_gait_versions(msg.gait, version_map)
+            return [True, '']
+        except Exception as e:
+            return [False, str(e)]
+
+    def contains_gait_cb(self, request):
+        """
+        Checks whether a gait and subgait are loaded.
+
+        :type request: ContainsGaitRequest
+        :param request: service request
+        :return: True when the gait and subgait are loaded
+        """
+        gait = self._loaded_gaits.get(request.gait)
+        if gait is None:
+            return ContainsGait.Response(contains=False)
+        for subgait in request.subgaits:
+            if gait[subgait] is None:
+                return ContainsGait.Response(contains=False)
+        return ContainsGait.Response(contains=True)
+
     def scan_directory(self):
         """Scans the gait_directory recursively and create a dictionary of all
         subgait files.
@@ -156,13 +194,13 @@ class GaitSelection(Node):
 
     def update_default_versions(self):
         """Updates the default.yaml file with the current loaded gait versions."""
-        new_default_dict = {'gaits': self._gait_version_map,
-                            'positions': self._positions}
+        new_default_dict = {'gaits': self._gait_version_map, 'positions': self._positions}
 
         try:
             with open(self._default_yaml, 'w') as default_yaml_content:
                 yaml_content = yaml.dump(new_default_dict, default_flow_style=False)
                 default_yaml_content.write(yaml_content)
+
             return [True, 'New default values were written to: {pn}'
                           .format(pn=self._default_yaml)]
 
@@ -216,8 +254,7 @@ class GaitSelection(Node):
             raise TypeError('Gait version map should be of type; dictionary')
 
         if not self._validate_version_map(version_map):
-            raise GaitError(msg='Gait version map: {gm}, is not valid'
-                            .format(gm=version_map))
+            raise GaitError(msg='Gait version map: {gm}, is not valid'.format(gm=version_map))
 
         return version_map, default_config['positions']
 
@@ -248,40 +285,3 @@ class GaitSelection(Node):
     def __iter__(self):
         """Returns an iterator over all loaded gaits."""
         return iter(self._loaded_gaits.values())
-
-
-def set_gait_versions(msg, gait_selection):
-    """Sets a new gait version to the gait selection instance.
-
-    :type msg: march_shared_resources.srv.SetGaitVersionRequest
-    :type gait_selection: GaitSelection
-    :rtype march_shared_resources.srv.SetGaitVersionResponse
-    """
-    if len(msg.subgaits) != len(msg.versions):
-        return [False, '`subgaits` and `versions` array are not of equal length']
-
-    version_map = dict(zip(msg.subgaits, msg.versions))
-    try:
-        gait_selection.set_gait_versions(msg.gait, version_map)
-        return [True, '']
-    except Exception as e:
-        return [False, str(e)]
-
-
-def contains_gait(request, gait_selection):
-    """
-    Checks whether a gait and subgait are loaded.
-
-    :type request: ContainsGaitRequest
-    :param request: service request
-    :param gait_selection: current loaded gaits
-    :return: True when the gait and subgait are loaded
-    """
-    gait = gait_selection[request.gait]
-    if gait is None:
-        return ContainsGait.Response(False)
-    for subgait in request.subgaits:
-        if gait[subgait] is None:
-            return ContainsGait.Response(False)
-
-    return ContainsGait.Response(True)

@@ -101,7 +101,7 @@ class SetpointsGait(GaitInterface, Gait):
             self._is_transitioning = False
 
         else:
-            # If there is transition to do, go to next (TO) subgait
+            # If there is no transition subgait that has to be used, go to next (TO) subgait
             next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
 
         if next_subgait == self.graph.END:
@@ -113,11 +113,11 @@ class SetpointsGait(GaitInterface, Gait):
 
     def transition(self, transition_request):
         """
-        Request to transition between two subgaits with increasing or decreasing
-        size of the step.
+        Request a transition (decrease or increase)
         :param transition_request:
-        :return:
+        :return: whether the transition can be executed
         """
+
         if self._is_transitioning or self._should_stop:
             return False
 
@@ -169,6 +169,11 @@ class SetpointsGait(GaitInterface, Gait):
         return next_subgait
 
     def _transition_subgait(self):
+        """
+        Creates the transition subgait message from the next subgait to the
+        subgait stored in _transition_to_subgait
+        :return: The trajectory message for the transition step
+        """
         old_subgait = self.subgaits[self.graph[
             (self._current_subgait.subgait_name, self.graph.TO)]]
         new_subgait = self.subgaits[self.graph[
@@ -179,4 +184,4 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_subgait = transition_subgait
         self._time_since_start = 0.0
         self._is_transitioning = True
-        return transition_subgait.to_joint_trajectory_msg(), False
+        return transition_subgait.to_joint_trajectory_msg()

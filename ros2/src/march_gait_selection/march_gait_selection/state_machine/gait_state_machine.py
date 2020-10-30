@@ -7,6 +7,7 @@ from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
 
 DEFAULT_TIMER_PERIOD = 0.04
+NANOSEC_TO_SEC = 1e-9
 
 
 class GaitStateMachine(object):
@@ -45,6 +46,7 @@ class GaitStateMachine(object):
         self._is_idle = True
         self._shutdown_requested = False
         self._should_stop = False
+
         self.update_timer = None
         self.last_update_time = None
 
@@ -104,9 +106,10 @@ class GaitStateMachine(object):
 
     def _error_cb(self, msg):
         """ Standard callback for state machine errors, completely stops
-        updating if the error is fatal """
+        updating if the error is fatal. If non fatal, it stops the current
+        gait. """
         if msg.type == Error.NON_FATAL:
-            self.stop()
+            self.stop_gait()
         elif msg.type == Error.FATAL:
             self.request_shutdown()
 
@@ -121,6 +124,7 @@ class GaitStateMachine(object):
             return []
 
     def add_transition_callback(self, cb):
+
         """Adds a callback function that will be called when a transition to
         a state happens.
 
@@ -129,12 +133,12 @@ class GaitStateMachine(object):
 
         :param cb: method that accepts a name of the state and a boolean if it
                    is an idle state.
+
         """
         self._add_callback(self._transition_callbacks, cb)
 
     def add_gait_callback(self, cb):
-        """Adds a callback function that will be called when a trajectory of a
-        gait is being scheduled.
+        """Adds a callback function that will be called when a trajectory of a gait is being scheduled.
 
         The given method should be running as shortly as possible, since they
         will be called from within the main loop.
@@ -145,8 +149,8 @@ class GaitStateMachine(object):
         self._add_callback(self._gait_callbacks, cb)
 
     def add_stop_accepted_callback(self, cb):
-        """Adds a callback function that will be called when a gait accepts the
-        stop command.
+        """Adds a callback function that will be called when a gait accepts the stop command.
+
 
         The given method should be running as shortly as possible, since they
         will be called from within the main loop.
@@ -173,7 +177,7 @@ class GaitStateMachine(object):
             if self._is_idle:
                 self._process_idle_state()
             else:
-                self._process_gait_state(elapsed_time.nanoseconds * 1e-9)
+                self._process_gait_state(elapsed_time.nanoseconds * NANOSEC_TO_SEC)
         else:
             self.update_timer.cancel()
 
@@ -182,7 +186,7 @@ class GaitStateMachine(object):
         possible."""
         self._shutdown_requested = True
 
-    def stop(self):
+    def stop_gait(self):
         """Requests a stop from the current executing gait, but keeps the state
         machine running."""
         if not self._is_idle:
@@ -224,6 +228,7 @@ class GaitStateMachine(object):
                 self._current_gait = self._home_gaits[self._current_state]
             else:
                 self._current_gait = self._gait_selection[self._current_state]
+
             self._gait_selection.get_logger().info(
                 'Executing gait `{0}`'.format(self._current_gait.name))
             trajectory = self._current_gait.start()
@@ -232,6 +237,7 @@ class GaitStateMachine(object):
                 self._gait_selection.get_logger().info(
                     'Scheduling {subgait}'.format(
                         subgait=self._current_gait.subgait_name))
+
                 self._trajectory_scheduler.schedule(trajectory)
             elapsed_time = 0.0
 
@@ -388,8 +394,8 @@ class GaitStateMachine(object):
             self._home_gaits[home_gait_name] = home_gait
             if home_gait_name in self._gait_transitions:
                 raise GaitStateMachineError(
-                    'Gaits cannot have the same name as home gait `{0}`'
-                    .format(home_gait_name))
+                    f'Gaits cannot have the same name as home gait `{home_gait_name}`')
+
             self._gait_transitions[home_gait_name] = idle_name
             self._idle_transitions[self.UNKNOWN].add(home_gait_name)
 
