@@ -310,7 +310,7 @@ schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "git clone https://github.com/gab
 sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "cd spdlog/build && sudo make install"
 
 print_info "Creating commands..."
-bash -c "$WORKSPACE_PATH/scripts/create_commands.sh"
+bash -c "$WORKSPACE_PATH/scripts/.create_commands.sh"
 check_error
 
 print_info "Set ROS 1 shell prefix..."
