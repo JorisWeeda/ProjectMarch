@@ -305,10 +305,6 @@ sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "sudo chmod -R 755 /opt"
 schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
 check_error
 
-print_info "Install spdlog from source..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "git clone https://github.com/gabime/spdlog.git && cd spdlog && git checkout v1.5.0 && mkdir build && cd build && cmake .. -DSPDLOG_BUILD_SHARED=ON && make -j"
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "cd spdlog/build && sudo make install"
-
 print_info "Creating commands..."
 bash -c "$WORKSPACE_PATH/scripts/.create_commands.sh"
 check_error
@@ -452,7 +448,8 @@ check_error
 #######################
 
 print_info "Build the ROS 1 bridge for the first time..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "march_build_bridge"
+sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "apt update && apt full-upgrade -y"
+schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_bridge"
 check_error
 
 ################################
