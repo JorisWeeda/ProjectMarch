@@ -192,7 +192,7 @@ check_error
 # Add the ROS 1 config
 sudo tee <<EOF ros1.conf >/dev/null
 [ros1]
-description=Ubuntu 18.04 (Bionic) with ROS Melodic
+description=Ubuntu 20.04 (Focal) with ROS Melodic
 type=directory
 directory=$ROS1_LOCATION
 users=$USER
@@ -234,34 +234,33 @@ sudo ln -s gutsy /usr/share/debootstrap/scripts/focal
 
 print_info "Installing minimal version of Ubuntu Bionic..."
 # Download the files for Ubuntu Bionic in the ROS 1 chroot
-sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
+sudo debootstrap --variant=buildd --arch=amd64 focal $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 
 print_info "Installing minimal version of Ubuntu Focal..."
-# Download the files for Ubuntu Focal in the ROS 2 chroot
-sudo debootstrap --variant=buildd --arch=amd64 focal $ROS2_LOCATION http://archive.ubuntu.com/ubuntu/
+sudo cp -R $ROS1_LOCATION $ROS2_LOCATION
 check_error
 
-#####################################
-# INSTALLING ROS 1 ON UBUNTU BIONIC #
-#####################################
+####################################
+# INSTALLING ROS 1 ON UBUNTU FOCAL #
+####################################
 
 # Define package locations
 sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
-deb http://archive.ubuntu.com/ubuntu bionic main
-deb http://archive.ubuntu.com/ubuntu bionic universe
-deb http://archive.ubuntu.com/ubuntu bionic restricted
-deb http://archive.ubuntu.com/ubuntu bionic multiverse
+deb http://archive.ubuntu.com/ubuntu focal main
+deb http://archive.ubuntu.com/ubuntu focal universe
+deb http://archive.ubuntu.com/ubuntu focal restricted
+deb http://archive.ubuntu.com/ubuntu focal multiverse
 EOF
 check_error
 
 # Configure the home directory of the user
-print_info "Creating user in Ubuntu Bionic..."
+print_info "Creating user in Ubuntu Focal ROS 1..."
 sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "mkdir -p /home/$USERNAME/march; chown -R $USERNAME:$USERNAME /home/$USERNAME" 
 check_error
 
 # Install required packages
-print_info "Installing basic packages of Ubuntu Bionic..."
+print_info "Installing basic packages of Ubuntu Focal ROS 1..."
 sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh git"
 check_error
 
@@ -272,10 +271,10 @@ check_error
 
 # Add ROS 1 to package locations
 sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
-deb http://archive.ubuntu.com/ubuntu bionic main
-deb http://archive.ubuntu.com/ubuntu bionic universe
-deb http://archive.ubuntu.com/ubuntu bionic restricted
-deb http://archive.ubuntu.com/ubuntu bionic multiverse
+deb http://archive.ubuntu.com/ubuntu focal main
+deb http://archive.ubuntu.com/ubuntu focal universe
+deb http://archive.ubuntu.com/ubuntu focal restricted
+deb http://archive.ubuntu.com/ubuntu focal multiverse
 deb http://packages.ros.org/ros/ubuntu bionic main
 EOF
 check_error
@@ -316,20 +315,6 @@ export precmd_functions='';
 export PS1='ROS 1> ' \" > /home/$USERNAME/.zshrc"
 check_error
 
-# Update compiler
-print_info "Updating compiler to GCC 9..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "
-apt update && \
-apt install build-essential software-properties-common -y && \
-add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
-apt update && \
-apt install gcc-snapshot -y && \
-apt update && \
-apt upgrade -y && \
-apt install gcc-9 g++-9 -y && \
-update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 && \
-update-alternatives --config gcc"
-
 print_info "Build March ROS 1 for the first time..."
 schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_ros1"
 check_error
@@ -348,12 +333,12 @@ EOF
 check_error
 
 # Configure the home directory of the user
-print_info "Creating user in Ubuntu Focal..."
+print_info "Creating user in Ubuntu Focal ROS 2..."
 sudo schroot -d "/home/$USERNAME" -c ros2 -- bash -c "mkdir -p /home/$USERNAME/march; chown -R $USERNAME:$USERNAME /home/$USERNAME"
 check_error
 
 # Install required packages
-print_info "Installing basic packages of Ubuntu Focal..."
+print_info "Installing basic packages of Ubuntu Focal ROS 2..."
 sudo schroot -d "/home/$USERNAME" -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg zsh python3-pip locales && pip3 install -U argcomplete"
 check_error
 
@@ -407,20 +392,6 @@ check_error
 print_info "Adding Python symlink to Python 3"
 sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "ln -s python2 /usr/bin/python"
 
-# Update compiler
-print_info "Updating compiler to GCC 9..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "
-sudo apt update && \
-sudo apt install build-essential software-properties-common -y && \
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
-sudo apt update && \
-sudo apt install gcc-snapshot -y && \
-sudo apt update && \
-sudo apt upgrade -y && \
-sudo apt install gcc-9 g++-9 -y && \
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 && \
-sudo update-alternatives --config gcc"
-
 # Building ROS 2 (takes a long time)
 print_info "Building ROS 2... (THIS TAKES A LONG TIME)"
 schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros1_bridge"
@@ -448,8 +419,7 @@ check_error
 #######################
 
 print_info "Build the ROS 1 bridge for the first time..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "apt update && apt full-upgrade -y"
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_bridge"
+schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "march_build_bridge"
 check_error
 
 ################################
