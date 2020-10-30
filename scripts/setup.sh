@@ -322,17 +322,17 @@ check_error
 
 # Update compiler
 print_info "Updating compiler to GCC 9..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "
-sudo apt update && \
-sudo apt install build-essential software-properties-common -y && \
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
-sudo apt update && \
-sudo apt install gcc-snapshot -y && \
-sudo apt update && \
-sudo apt upgrade -y && \
-sudo apt install gcc-9 g++-9 -y && \
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 && \
-sudo update-alternatives --config gcc"
+sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "
+apt update && \
+apt install build-essential software-properties-common -y && \
+add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
+apt update && \
+apt install gcc-snapshot -y && \
+apt update && \
+apt upgrade -y && \
+apt install gcc-9 g++-9 -y && \
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 && \
+update-alternatives --config gcc"
 
 print_info "Build March ROS 1 for the first time..."
 schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_ros1"
@@ -452,7 +452,7 @@ check_error
 #######################
 
 print_info "Build the ROS 1 bridge for the first time..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_bridge"
+schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "march_build_bridge"
 check_error
 
 ################################
