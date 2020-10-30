@@ -46,7 +46,7 @@ source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 source /home/$USERNAME/march/ros2/install/local_setup.zsh;
 export ROS_MASTER_URI=http://localhost:11311;
-ros2 run ros1_bridge dynamic_bridge --bridge-all-topics --print-pairs
+ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
 EOF
 sudo chmod 755 $ROS1_LOCATION/usr/bin/march_run_bridge
 
