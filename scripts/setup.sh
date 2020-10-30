@@ -315,6 +315,7 @@ check_error
 
 print_info "Set ROS 1 shell prefix..."
 schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "echo \"
+export DISPLAY=:0;
 export precmd_functions='';
 export PS1='ROS 1> ' \" > /home/$USERNAME/.zshrc"
 check_error
@@ -436,6 +437,7 @@ check_error
 # Add the build and run commands of ROS 2
 print_info "Set ROS 2 shell prefix..."
 schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "echo \"
+export DISPLAY=:0;
 export precmd_functions='';
 export PS1='ROS 2> ';
 \" > /home/$USERNAME/.zshrc"
