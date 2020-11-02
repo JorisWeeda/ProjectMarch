@@ -192,7 +192,7 @@ check_error
 # Add the ROS 1 config
 sudo tee <<EOF ros1.conf >/dev/null
 [ros1]
-description=Ubuntu 20.04 (Focal) with ROS Melodic
+description=Ubuntu 18.04 (Bionic) with ROS Melodic
 type=directory
 directory=$ROS1_LOCATION
 users=$USER
@@ -229,28 +229,28 @@ check_error
 cd $WORKSPACE_PATH
 
 # Create symbolic link if focal is not yet recognized
-print_info "Creating focal symlink for debootstrap..."
-sudo ln -s gutsy /usr/share/debootstrap/scripts/focal
+#print_info "Creating focal symlink for debootstrap..."
+#sudo ln -s gutsy /usr/share/debootstrap/scripts/focal
 
-print_info "Installing minimal version of Ubuntu Bionic..."
+print_info "Installing minimal version of Ubuntu Bionic for ROS 1..."
 # Download the files for Ubuntu Bionic in the ROS 1 chroot
-sudo debootstrap --variant=buildd --arch=amd64 focal $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
+sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 
-print_info "Installing minimal version of Ubuntu Focal..."
-sudo cp -R $ROS1_LOCATION $ROS2_LOCATION
+print_info "Installing minimal version of Ubuntu Bionic for ROS 2..."
+sudo cp -R -p $ROS1_LOCATION/* $ROS2_LOCATION
 check_error
 
-####################################
-# INSTALLING ROS 1 ON UBUNTU FOCAL #
-####################################
+#####################################
+# INSTALLING ROS 1 ON UBUNTU BIONIC #
+#####################################
 
 # Define package locations
 sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
-deb http://archive.ubuntu.com/ubuntu focal main
-deb http://archive.ubuntu.com/ubuntu focal universe
-deb http://archive.ubuntu.com/ubuntu focal restricted
-deb http://archive.ubuntu.com/ubuntu focal multiverse
+deb http://archive.ubuntu.com/ubuntu bionic main
+deb http://archive.ubuntu.com/ubuntu bionic universe
+deb http://archive.ubuntu.com/ubuntu bionic restricted
+deb http://archive.ubuntu.com/ubuntu bionic multiverse
 EOF
 check_error
 
@@ -260,7 +260,7 @@ sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "mkdir -p /home/$USERNAME/m
 check_error
 
 # Install required packages
-print_info "Installing basic packages of Ubuntu Focal ROS 1..."
+print_info "Installing basic packages of Ubuntu Bionic ROS 1..."
 sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh git"
 check_error
 
@@ -271,10 +271,10 @@ check_error
 
 # Add ROS 1 to package locations
 sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
-deb http://archive.ubuntu.com/ubuntu focal main
-deb http://archive.ubuntu.com/ubuntu focal universe
-deb http://archive.ubuntu.com/ubuntu focal restricted
-deb http://archive.ubuntu.com/ubuntu focal multiverse
+deb http://archive.ubuntu.com/ubuntu bionic main
+deb http://archive.ubuntu.com/ubuntu bionic universe
+deb http://archive.ubuntu.com/ubuntu bionic restricted
+deb http://archive.ubuntu.com/ubuntu bionic multiverse
 deb http://packages.ros.org/ros/ubuntu bionic main
 EOF
 check_error
@@ -320,26 +320,26 @@ schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_ros1"
 check_error
 
 #####################################
-# INSTALLING ROS 2 ON UBUNTU FOCAL #
+# INSTALLING ROS 2 ON UBUNTU BIONIC #
 #####################################
 
 # Define package locations
 sudo tee <<EOF $ROS2_LOCATION/etc/apt/sources.list >/dev/null
-deb http://archive.ubuntu.com/ubuntu focal main
-deb http://archive.ubuntu.com/ubuntu focal universe
-deb http://archive.ubuntu.com/ubuntu focal restricted
-deb http://archive.ubuntu.com/ubuntu focal multiverse
+deb http://archive.ubuntu.com/ubuntu bionic main
+deb http://archive.ubuntu.com/ubuntu bionic universe
+deb http://archive.ubuntu.com/ubuntu bionic restricted
+deb http://archive.ubuntu.com/ubuntu bionic multiverse
 EOF
 check_error
 
 # Configure the home directory of the user
-print_info "Creating user in Ubuntu Focal ROS 2..."
+print_info "Creating user in Ubuntu Bionic ROS 2..."
 sudo schroot -d "/home/$USERNAME" -c ros2 -- bash -c "mkdir -p /home/$USERNAME/march; chown -R $USERNAME:$USERNAME /home/$USERNAME"
 check_error
 
 # Install required packages
-print_info "Installing basic packages of Ubuntu Focal ROS 2..."
-sudo schroot -d "/home/$USERNAME" -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg zsh python3-pip locales && pip3 install -U argcomplete"
+print_info "Installing basic packages of Ubuntu Bionic ROS 2..."
+sudo schroot -d "/home/$USERNAME" -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg2 zsh locales"
 check_error
 
 # Set locale to UTF8 supported locale
@@ -354,18 +354,18 @@ check_error
 
 # Add ROS 2 to package locations
 sudo tee <<EOF $ROS2_LOCATION/etc/apt/sources.list >/dev/null
-deb http://archive.ubuntu.com/ubuntu focal main
-deb http://archive.ubuntu.com/ubuntu focal universe
-deb http://archive.ubuntu.com/ubuntu focal restricted
-deb http://archive.ubuntu.com/ubuntu focal multiverse
-deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu focal main
+deb http://archive.ubuntu.com/ubuntu bionic main
+deb http://archive.ubuntu.com/ubuntu bionic universe
+deb http://archive.ubuntu.com/ubuntu bionic restricted
+deb http://archive.ubuntu.com/ubuntu bionic multiverse
+deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu bionic main
 EOF
 check_error
 
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
 sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "sudo chmod -R 755 /opt"
-sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "apt update && apt install -y ros-foxy-rcl-logging-spdlog libboost-all-dev build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python-yaml wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
+sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "apt update && apt install -y build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python3-catkin-pkg python3-rosdistro python3-rospkg python3-rosdep-modules wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 check_error
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
@@ -389,16 +389,16 @@ sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "rosdep init"
 schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && rosdep update && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
 check_error
 
-print_info "Adding Python symlink to Python 3"
-sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "ln -s python2 /usr/bin/python"
+#print_info "Adding Python symlink to Python 3"
+#sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "ln -s python2 /usr/bin/python"
 
 # Building ROS 2 (takes a long time)
 print_info "Building ROS 2... (THIS TAKES A LONG TIME)"
 schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros1_bridge"
+check_error
 
-# Install March specific ROS 2 dependencies
-print_info "Install March specific ROS 2 dependencies..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "source /home/$USERNAME/march/.ros2_foxy/install/setup.zsh && rosdep install -y --from-paths /home/$USERNAME/march/ros2/src --ignore-src"
+print_info "Build March specific ROS 2 dependencies..."
+schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy/src/ros2 && git clone https://github.com/ros/xacro.git -b dashing-devel && git clone https://github.com/ros/urdf_parser_py.git -b ros2 && cd /home/$USERNAME/march/.ros2_foxy && colcon build --packages-select urdfdom_py xacro"
 check_error
 
 # Add the build and run commands of ROS 2
@@ -419,7 +419,7 @@ check_error
 #######################
 
 print_info "Build the ROS 1 bridge for the first time..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "march_build_bridge"
+schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_bridge"
 check_error
 
 ################################
