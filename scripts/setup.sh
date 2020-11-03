@@ -263,14 +263,8 @@ sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "apt install -y python-rosdep
 check_error
 sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "rosdep init"
 
-# Install March specific ROS 1 dependencies
-print_info "Update ROS dependencies list..."
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "rosdep update"
-check_error
-
-print_info "Install March specific ROS 1 dependencies..."
-sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "sudo chmod -R 755 /opt"
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
+# Install the ROS 1 dependencies
+bash -c "$WORKSPACE_PATH/scripts/install_dependencies_ros1.sh"
 check_error
 
 print_info "Creating commands..."
@@ -323,8 +317,8 @@ print_info "Building ROS 2... (THIS TAKES A LONG TIME)"
 schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros_bridge"
 check_error
 
-print_info "Build March specific ROS 2 dependencies..."
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy/src/ros2 && git clone https://github.com/ros/xacro.git -b dashing-devel && git clone https://github.com/ros/urdf_parser_py.git -b ros2 && cd /home/$USERNAME/march/.ros2_foxy && colcon build --packages-select urdfdom_py xacro"
+# Install the ROS 2 dependencies
+bash -c "$WORKSPACE_PATH/scripts/install_dependencies_ros2.sh"
 check_error
 
 print_info "Build March ROS 2 for the first time..."
