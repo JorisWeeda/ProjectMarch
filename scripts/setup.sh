@@ -275,7 +275,7 @@ bash -c "$WORKSPACE_PATH/scripts/install_dependencies_ros1.sh"
 check_error
 
 print_info "Creating commands..."
-bash -c "$WORKSPACE_PATH/scripts/.create_commands.sh"
+bash -c "$WORKSPACE_PATH/scripts/create_commands.sh"
 check_error
 
 print_info "Set ROS shell prefix..."
