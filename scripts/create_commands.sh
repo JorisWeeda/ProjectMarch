@@ -16,7 +16,7 @@ sudo tee <<EOF $ROS_LOCATION/usr/bin/march_build_bridge >/dev/null
 source /opt/ros/melodic/setup.zsh;
 source /opt/ros/foxy/setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/setup.zsh;
-source /home/$USERNAME/march/ros1/install_isolated/setup.zsh;
+source /home/$USERNAME/march/ros1/install/setup.zsh;
 source /home/$USERNAME/march/ros2/install/setup.zsh;
 cd /home/$USERNAME/march/.ros2_foxy;
 export CC=gcc;
@@ -32,7 +32,7 @@ source /opt/ros/melodic/local_setup.zsh;
 cd /home/$USERNAME/march/ros1;
 export CC=gcc;
 export CXX=g++;
-catkin_make_isolated --install
+colcon build --symlink-install --cmake-force-configure
 EOF
 sudo chmod 755 $ROS_LOCATION/usr/bin/march_build_ros1
 
@@ -40,7 +40,7 @@ sudo tee <<EOF $ROS_LOCATION/usr/bin/march_run_ros1 >/dev/null
 #!/usr/bin/env zsh
 source /opt/ros/melodic/setup.zsh;
 cd /home/$USERNAME/march/ros1;
-source install_isolated/setup.zsh;
+source install/setup.zsh;
 roslaunch march_launch march_ros2_simulation.launch
 EOF
 sudo chmod 755 $ROS_LOCATION/usr/bin/march_run_ros1
@@ -48,7 +48,7 @@ sudo chmod 755 $ROS_LOCATION/usr/bin/march_run_ros1
 sudo tee <<EOF $ROS_LOCATION/usr/bin/march_run_bridge >/dev/null
 #!/usr/bin/env zsh
 source /opt/ros/melodic/local_setup.zsh;
-source /home/$USERNAME/march/ros1/install_isolated/local_setup.zsh;
+source /home/$USERNAME/march/ros1/install/local_setup.zsh;
 source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 source /home/$USERNAME/march/ros2/install/local_setup.zsh;
