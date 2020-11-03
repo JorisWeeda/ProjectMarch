@@ -215,6 +215,7 @@
     <!-- Parts -->
     <!-- New order of links; The new robot model is a chain, with the origin in the 'Foot left' !-->
     <!-- Foot Left -->
+
     <link name="foot_left">
         <inertial>
             <origin xyz="${foot_com_x} ${-foot_com_y} ${foot_com_z}" rpy="0 0 0"/>
@@ -234,7 +235,7 @@
             </geometry>
         </collision>
     </link>
-
+   
     <gazebo reference="foot_left">
         <mu1>${foot_mu1}</mu1>
         <mu2>${foot_mu2}</mu2>
@@ -242,13 +243,12 @@
         <fdir1>1 0 0</fdir1>
     </gazebo>
 
-    <!-- Ankle plate Left -->
     <link name="ankle_plate_left">
         <visual>
             <origin
                 xyz="0
                      ${hip_base_height/2 + hip_aa_frame_height - upper_leg_offset - ankle_plate_offset}
-                     ${foot_scale * (upper_leg_height + lower_leg_height + ankle_plate_height)}"
+                     ${foot_scale * (upper_leg_height + lower_leg_height + ankle_plate_height) - foot_height_backward}"
                 rpy="0 0 ${pi}"
             />
             <geometry>
@@ -262,10 +262,21 @@
                 <box size="${width} ${width} ${ankle_plate_height}"/>
             </geometry>
         </collision>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1"/> <!-- ARBITRARY NON-ZERO VALUE-->
+            <inertia
+                    ixx="${lower_leg_Ixx}"
+                    ixy="${-lower_leg_Ixy}"
+                    ixz="${lower_leg_Ixz}"
+                    iyy="${lower_leg_Iyy}"
+                    iyz="${-lower_leg_Iyz}"
+                    izz="${lower_leg_Izz}"
+                />
+        </inertial>
     </link>
 
 
-    <!-- Lower Leg Left -->
     <link name="lower_leg_left">
         <visual>
             <origin
@@ -298,7 +309,6 @@
         </collision>
     </link>
 
-    <!-- Upper Leg Left-->
     <link name="upper_leg_left">
         <visual>
             <origin xyz="0 ${hip_base_height/2 + hip_aa_frame_height - upper_leg_offset} ${upper_leg_height}" rpy="0 0 ${pi}"/>
@@ -327,7 +337,7 @@
             </geometry>
         </collision>
     </link>
-   <!-- Left Moving Hip-->
+
     <link name="hip_aa_frame_left_front">
         <inertial>
             <origin xyz="${hip_aa_com_x} ${-hip_aa_com_y} ${hip_aa_com_z}" rpy="0 0 0"/>
@@ -365,9 +375,21 @@
                 <box size="${width} ${hip_aa_frame_height} ${width}"/>
             </geometry>
         </collision>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1"/> <!-- ARBITRARY NON-ZERO VALUE-->
+            <inertia
+                    ixx="${lower_leg_Ixx}"
+                    ixy="${-lower_leg_Ixy}"
+                    ixz="${lower_leg_Ixz}"
+                    iyy="${lower_leg_Iyy}"
+                    iyz="${-lower_leg_Iyz}"
+                    izz="${lower_leg_Izz}"
+                />
+        </inertial>
     </link>
 
-    <!-- hip !-->
+
     <link name="hip_base">
         <visual>
             <origin xyz="0 ${hip_base_height/2} 0" rpy="0 0 ${pi}"/>
@@ -435,7 +457,7 @@
         </collision>
     </link>
 
-        <!-- Upper Leg Right-->
+
     <link name="upper_leg_right">
         <visual>
             <origin xyz="0 ${-hip_base_height/2 - hip_aa_frame_height + upper_leg_offset} 0" rpy="0 0 ${pi}"/>
@@ -466,7 +488,7 @@
 
     </link>
 
-    <!-- Lower Leg Right -->
+
     <link name="lower_leg_right">
         <visual>
             <origin
@@ -499,7 +521,7 @@
         </collision>
     </link>
 
-    <!-- Ankle Plate Right -->
+
     <link name="ankle_plate_right">
         <visual>
             <origin
@@ -521,7 +543,7 @@
         </collision>
     </link>
 
-    <!-- Foot Right -->
+
     <link name="foot_right">
         <inertial>
             <origin xyz="${foot_com_x} ${foot_com_y} ${foot_com_z}" rpy="0 0 0"/>
@@ -558,7 +580,7 @@
         <parent link="ankle_plate_left"/>
         <child link="lower_leg_left"/>
         <origin xyz="0 ${-ankle_plate_offset} ${ankle_plate_height}" rpy="0 0 0"/>
-        <axis xyz="0 1 0"/>
+        <axis xyz="0 -1 0"/>
 
         <limit velocity="${ankle_velocity_limit}"
                effort="${ankle_effort_limit}"
@@ -574,7 +596,7 @@
         <parent link= "lower_leg_left"/>
         <child link="upper_leg_left"/>
         <origin xyz="0 0 ${lower_leg_height}" rpy="0 0 0"/>
-        <axis xyz="0 -1 0"/>
+        <axis xyz="0 1 0"/>
 
         <limit velocity="${knee_velocity_limit}"
                effort="${knee_effort_limit}"
@@ -590,7 +612,7 @@
         <parent link="upper_leg_left"/>
         <child link="hip_aa_frame_left_front"/>
         <origin xyz="0 ${-upper_leg_offset} ${upper_leg_height}" rpy="0 0 0"/>
-        <axis xyz="0 1 0"/>
+        <axis xyz="0 -1 0"/>
 
         <limit velocity="${hip_fe_velocity_limit}"
                effort="${hip_fe_effort_limit}"
@@ -612,7 +634,7 @@
         <parent link="hip_aa_frame_left_side"/>
         <child link="hip_base"/>
         <origin xyz="0 ${hip_aa_frame_height} 0" rpy="0 0 0"/>
-        <axis xyz="-1 0 0"/>
+        <axis xyz="1 0 0"/>
 
         <limit velocity="${hip_aa_velocity_limit}"
                effort="${hip_aa_effort_limit}"
@@ -703,23 +725,14 @@
     </joint>
 
     <!-- ROS Control plugin for Gazebo -->
-    <transmission name="left_hip_aa">
+    
+    <transmission name="left_ankle">
         <type>transmission_interface/SimpleTransmission</type>
-        <joint name="left_hip_aa">
+        <joint name="left_ankle">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </joint>
-        <actuator name="left_hip_aa_motor">
+        <actuator name="left_ankle_motor">
             <mechanicalReduction>200</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="left_hip_fe">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="left_hip_fe">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="left_hip_fe_motor">
-            <mechanicalReduction>101</mechanicalReduction>
         </actuator>
     </transmission>
 
@@ -733,12 +746,22 @@
         </actuator>
     </transmission>
 
-    <transmission name="left_ankle">
+    <transmission name="left_hip_fe">
         <type>transmission_interface/SimpleTransmission</type>
-        <joint name="left_ankle">
+        <joint name="left_hip_fe">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </joint>
-        <actuator name="left_ankle_motor">
+        <actuator name="left_hip_fe_motor">
+            <mechanicalReduction>101</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+    <transmission name="left_hip_aa">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="left_hip_aa">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="left_hip_aa_motor">
             <mechanicalReduction>200</mechanicalReduction>
         </actuator>
     </transmission>
@@ -782,4 +805,5 @@
             <mechanicalReduction>200</mechanicalReduction>
         </actuator>
     </transmission>
+
 </robot>
