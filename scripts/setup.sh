@@ -334,7 +334,6 @@ import_ros2_repo
 
 # Install ROS dependencies that are necessary for building ROS 2
 print_info "Install ROS 2 source dependencies..."
-sudo_schroot_zsh "rosdep init"
 schroot_zsh "cd /home/$USERNAME/march/.ros2_foxy && rosdep update && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
 
 # Building ROS 2 (takes a long time)
