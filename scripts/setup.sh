@@ -285,7 +285,7 @@ export precmd_functions='';
 export PS1='ROS > ' \" > /home/$USERNAME/.zshrc"
 
 print_info "Build March ROS 1 for the first time..."
-schroot_zsh "march_build_ros"
+schroot_zsh "march_build_ros1"
 
 #####################################
 # INSTALLING ROS 2 ON UBUNTU BIONIC #
