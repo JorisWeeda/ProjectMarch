@@ -91,46 +91,40 @@ check_error
 # CREATION OF SCHROOT PROFILES #
 ################################
 
-print_info "Creating schroot profiles..."
-# Create ROS 1 and ROS 2 chroot and installation folders that will be shared across
-# both ROS chroots
-ROS1_LOCATION="/srv/chroot/ros1"
-sudo mkdir -p $ROS1_LOCATION/opt/ros/melodic
+print_info "Creating schroot profile..."
+# Create a chroot for ROS
+ROS_LOCATION="/srv/chroot/ros"
+sudo mkdir -p $ROS_LOCATION/opt/ros/melodic
 check_error
-sudo chmod 755 $ROS1_LOCATION
-check_error
-ROS2_LOCATION="/srv/chroot/ros2"
-sudo mkdir -p $ROS2_LOCATION/opt/ros/foxy
-check_error
-sudo chmod 755 $ROS2_LOCATION
+sudo chmod 755 $ROS_LOCATION
 check_error
 
 # Set permissions of /opt and child folders
-sudo chmod -R 755 $ROS1_LOCATION/opt/ros
+sudo chmod -R 755 $ROS_LOCATION/opt/ros
 check_error
 
-# Create a schroot profile for ROS 1
-SCHROOT_ROS1="/etc/schroot/ros1"
-sudo mkdir -p $SCHROOT_ROS1
+# Create a schroot profile for ROS
+SCHROOT_ROS="/etc/schroot/ros"
+sudo mkdir -p $SCHROOT_ROS
 check_error
-sudo chmod 755 $SCHROOT_ROS1
+sudo chmod 755 $SCHROOT_ROS
 check_error
 
 # Write the config file that refers to all the files of schroot
-sudo tee <<EOF $SCHROOT_ROS1/config >/dev/null
+sudo tee <<EOF $SCHROOT_ROS/config >/dev/null
 # Filesystems to mount inside the chroot.
-FSTAB="$SCHROOT_ROS1/mount"
+FSTAB="$SCHROOT_ROS/mount"
 
 # Files to copy from the host system into the chroot.
-COPYFILES="$SCHROOT_ROS1/copyfiles"
+COPYFILES="$SCHROOT_ROS/copyfiles"
 
 # System databases to copy into the chroot
-NSSDATABASES="$SCHROOT_ROS1/nssdatabases"
+NSSDATABASES="$SCHROOT_ROS/nssdatabases"
 EOF
 check_error
 
 # Define which files should be copied over to the chroot jail
-sudo tee <<EOF $SCHROOT_ROS1/copyfiles >/dev/null
+sudo tee <<EOF $SCHROOT_ROS/copyfiles >/dev/null
 /etc/hosts
 /etc/resolv.conf
 /etc/localtime
@@ -142,11 +136,11 @@ sudo tee <<EOF $SCHROOT_ROS1/copyfiles >/dev/null
 EOF
 
 # Create an empty nssdatabases file
-sudo touch $SCHROOT_ROS1/nssdatabases
+sudo touch $SCHROOT_ROS/nssdatabases
 check_error
 
 # Create the mount file that defines which folders should be mounted in the chroot jail
-sudo tee <<EOF $SCHROOT_ROS1/mount >/dev/null
+sudo tee <<EOF $SCHROOT_ROS/mount >/dev/null
 # mount.defaults: static file system information for chroots.
 # Note that the mount point will be prefixed by the chroot path
 # (CHROOT_PATH)
@@ -159,27 +153,11 @@ tmpfs		/dev/shm	tmpfs	defaults	0	0
 /sys		/sys		none	rw,bind		0	0
 /tmp		/tmp		none	rw,bind		0	0
 $WORKSPACE_PATH	/home/$USERNAME/march	none	rw,bind	0	0
-$ROS2_LOCATION/opt/ros/foxy	/opt/ros/foxy	none	rw,bind	0	0
 EOF
 check_error
 
 # Set the file permissions to 744 for all chroot configuration files
-sudo chmod 744 $SCHROOT_ROS1/*
-check_error
-
-# Create ROS 2 schroot profile by copying the files from ROS 1 and changing some values with sed
-SCHROOT_ROS2="/etc/schroot/ros2"
-sudo mkdir -p $SCHROOT_ROS2
-check_error
-sudo chmod 755 $SCHROOT_ROS2
-check_error
-sudo cp $SCHROOT_ROS1/* $SCHROOT_ROS2
-check_error
-sudo sed -i 's/ros1/ros2/g' $SCHROOT_ROS2/config
-check_error
-sudo sed -i 's/ros2/ros1/g' $SCHROOT_ROS2/mount
-check_error
-sudo sed -i 's/foxy/melodic/g' $SCHROOT_ROS2/mount
+sudo chmod 744 $SCHROOT_ROS/*
 check_error
 
 ###############################
@@ -190,35 +168,20 @@ cd /etc/schroot/chroot.d
 check_error
 
 # Add the ROS 1 config
-sudo tee <<EOF ros1.conf >/dev/null
-[ros1]
-description=Ubuntu 18.04 (Bionic) with ROS Melodic
+sudo tee <<EOF ros.conf >/dev/null
+[ros]
+description=Ubuntu 18.04 (Bionic) with ROS Melodic and ROS 2 Foxy from source
 type=directory
-directory=$ROS1_LOCATION
+directory=$ROS_LOCATION
 users=$USER
 root-groups=root
-profile=ros1
-personality=linux
-EOF
-check_error
-
-# Add the ROS 2 config
-sudo tee <<EOF ros2.conf >/dev/null
-[ros2]
-description=Ubuntu 20.04 (Focal) with ROS 2 Foxy
-type=directory
-directory=$ROS2_LOCATION
-users=$USER
-root-groups=root
-profile=ros2
+profile=ros
 personality=linux
 EOF
 check_error
 
 # Set the configs to rw only for root
-sudo chmod 600 ros1.conf
-check_error
-sudo chmod 600 ros2.conf
+sudo chmod 600 ros.conf
 check_error
 
 ##############################################
@@ -232,13 +195,9 @@ cd $WORKSPACE_PATH
 #print_info "Creating focal symlink for debootstrap..."
 #sudo ln -s gutsy /usr/share/debootstrap/scripts/focal
 
-print_info "Installing minimal version of Ubuntu Bionic for ROS 1..."
-# Download the files for Ubuntu Bionic in the ROS 1 chroot
-sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS1_LOCATION http://archive.ubuntu.com/ubuntu/
-check_error
-
-print_info "Installing minimal version of Ubuntu Bionic for ROS 2..."
-sudo cp -R -p $ROS1_LOCATION/* $ROS2_LOCATION
+print_info "Installing minimal version of Ubuntu Bionic..."
+# Download the files for Ubuntu Bionic in the ROS 2 chroot
+sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS_LOCATION http://archive.ubuntu.com/ubuntu/
 check_error
 
 #####################################
@@ -246,7 +205,7 @@ check_error
 #####################################
 
 # Define package locations
-sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
+sudo tee <<EOF $ROS_LOCATION/etc/apt/sources.list >/dev/null
 deb http://archive.ubuntu.com/ubuntu bionic main
 deb http://archive.ubuntu.com/ubuntu bionic universe
 deb http://archive.ubuntu.com/ubuntu bionic restricted
@@ -255,22 +214,32 @@ EOF
 check_error
 
 # Configure the home directory of the user
-print_info "Creating user in Ubuntu Focal ROS 1..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "mkdir -p /home/$USERNAME/march; chown -R $USERNAME:$USERNAME /home/$USERNAME" 
+print_info "Creating user in Ubuntu Bionic..."
+sudo schroot -d "/home/$USERNAME" -c ros -- bash -c "mkdir -p /home/$USERNAME/march; chown -R $USERNAME:$USERNAME /home/$USERNAME" 
 check_error
 
 # Install required packages
-print_info "Installing basic packages of Ubuntu Bionic ROS 1..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gpg zsh git"
+print_info "Installing basic packages of Ubuntu Bionic..."
+sudo schroot -d "/home/$USERNAME" -c ros -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg2 zsh git locales"
 check_error
 
 # Add key from ROS 1 
 print_info "Add ROS 1 signing key..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"
+sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"
+check_error
+
+# Add key from ROS 2
+print_info "Add ROS 2 signing key..."
+sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -"
+check_error
+
+# Set locale to UTF8 supported locale
+print_info "Settings locale to en_US.UTF-8..."
+sudo schroot -d "/home/$USERNAME" -c ros -- bash -c "locale && sudo locale-gen en_US en_US.UTF-8 && sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && export LANG=en_US.UTF-8 && locale"
 check_error
 
 # Add ROS 1 to package locations
-sudo tee <<EOF $ROS1_LOCATION/etc/apt/sources.list >/dev/null
+sudo tee <<EOF $ROS_LOCATION/etc/apt/sources.list >/dev/null
 deb http://archive.ubuntu.com/ubuntu bionic main
 deb http://archive.ubuntu.com/ubuntu bionic universe
 deb http://archive.ubuntu.com/ubuntu bionic restricted
@@ -281,99 +250,59 @@ check_error
 
 # Install ROS Melodic
 print_info "Installing ROS 1 Melodic..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "apt update && apt install -y ros-melodic-desktop-full"
+sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "apt update && apt install -y ros-melodic-desktop-full"
 check_error
 
 # Add automatic sourcing to the .bashrc file of the user
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc && chown $USERNAME:$USERNAME /home/$USERNAME/.zshrc && chmod 755 /home/$USERNAME/.zshrc"
+sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc && chown $USERNAME:$USERNAME /home/$USERNAME/.zshrc && chmod 755 /home/$USERNAME/.zshrc"
 check_error
 
 # Install dependencies for building ROS 1 packages
 print_info "Install ROS 1 building dependencies..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip python3-lark-parser"
+sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip python3-lark-parser"
 check_error
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "rosdep init"
+sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "rosdep init"
 
 # Install March specific ROS 1 dependencies
 print_info "Update ROS dependencies list..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "rosdep update"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "rosdep update"
 check_error
 
 print_info "Install March specific ROS 1 dependencies..."
-sudo schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "sudo chmod -R 755 /opt"
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
+sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "sudo chmod -R 755 /opt"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros/src --ignore-src"
 check_error
 
 print_info "Creating commands..."
 bash -c "$WORKSPACE_PATH/scripts/.create_commands.sh"
 check_error
 
-print_info "Set ROS 1 shell prefix..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "echo \"
+print_info "Set ROS shell prefix..."
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "echo \"
 export DISPLAY=:0;
 export precmd_functions='';
-export PS1='ROS 1> ' \" > /home/$USERNAME/.zshrc"
+export PS1='ROS > ' \" > /home/$USERNAME/.zshrc"
 check_error
 
 print_info "Build March ROS 1 for the first time..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_ros1"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "march_build_ros"
 check_error
 
 #####################################
 # INSTALLING ROS 2 ON UBUNTU BIONIC #
 #####################################
 
-# Define package locations
-sudo tee <<EOF $ROS2_LOCATION/etc/apt/sources.list >/dev/null
-deb http://archive.ubuntu.com/ubuntu bionic main
-deb http://archive.ubuntu.com/ubuntu bionic universe
-deb http://archive.ubuntu.com/ubuntu bionic restricted
-deb http://archive.ubuntu.com/ubuntu bionic multiverse
-EOF
-check_error
-
-# Configure the home directory of the user
-print_info "Creating user in Ubuntu Bionic ROS 2..."
-sudo schroot -d "/home/$USERNAME" -c ros2 -- bash -c "mkdir -p /home/$USERNAME/march; chown -R $USERNAME:$USERNAME /home/$USERNAME"
-check_error
-
-# Install required packages
-print_info "Installing basic packages of Ubuntu Bionic ROS 2..."
-sudo schroot -d "/home/$USERNAME" -c ros2 -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg2 zsh locales"
-check_error
-
-# Set locale to UTF8 supported locale
-print_info "Settings locale to en_US.UTF-8..."
-sudo schroot -d "/home/$USERNAME" -c ros2 -- bash -c "locale && sudo locale-gen en_US en_US.UTF-8 && sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && export LANG=en_US.UTF-8 && locale"
-check_error
-
-# Add key from ROS 2
-print_info "Add ROS 2 signing key..."
-sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -"
-check_error
-
-# Add ROS 2 to package locations
-sudo tee <<EOF $ROS2_LOCATION/etc/apt/sources.list >/dev/null
-deb http://archive.ubuntu.com/ubuntu bionic main
-deb http://archive.ubuntu.com/ubuntu bionic universe
-deb http://archive.ubuntu.com/ubuntu bionic restricted
-deb http://archive.ubuntu.com/ubuntu bionic multiverse
-deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu bionic main
-EOF
-check_error
-
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
-sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "sudo chmod -R 755 /opt"
-sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "apt update && apt install -y build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python3-catkin-pkg python3-rosdistro python3-rospkg python3-rosdep-modules wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
+sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "apt update && apt install -y build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python3-catkin-pkg python3-rosdistro python3-rospkg python3-rosdep-modules wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 check_error
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
 check_error
 function import_ros2_repo
 {
-    schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && vcs import src < ros2.repos && rm ros2.repos"
+    schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && vcs import src < ros2.repos && rm ros2.repos"
     ERROR_CODE=$?
     if [ $ERROR_CODE -ne 0 ]
     then
@@ -385,33 +314,21 @@ import_ros2_repo
 
 # Install ROS dependencies that are necessary for building ROS 2
 print_info "Install ROS 2 source dependencies..."
-sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "rosdep init"
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && rosdep update && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
+sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "rosdep init"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && rosdep update && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
 check_error
-
-#print_info "Adding Python symlink to Python 3"
-#sudo schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "ln -s python2 /usr/bin/python"
 
 # Building ROS 2 (takes a long time)
 print_info "Building ROS 2... (THIS TAKES A LONG TIME)"
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros1_bridge"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros_bridge"
 check_error
 
 print_info "Build March specific ROS 2 dependencies..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy/src/ros2 && git clone https://github.com/ros/xacro.git -b dashing-devel && git clone https://github.com/ros/urdf_parser_py.git -b ros2 && cd /home/$USERNAME/march/.ros2_foxy && colcon build --packages-select urdfdom_py xacro"
-check_error
-
-# Add the build and run commands of ROS 2
-print_info "Set ROS 2 shell prefix..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "echo \"
-export DISPLAY=:0;
-export precmd_functions='';
-export PS1='ROS 2> ';
-\" > /home/$USERNAME/.zshrc"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy/src/ros2 && git clone https://github.com/ros/xacro.git -b dashing-devel && git clone https://github.com/ros/urdf_parser_py.git -b ros2 && cd /home/$USERNAME/march/.ros2_foxy && colcon build --packages-select urdfdom_py xacro"
 check_error
 
 print_info "Build March ROS 2 for the first time..."
-schroot -d "/home/$USERNAME" -c ros2 -- zsh -c "march_build_ros2"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "march_build_ros2"
 check_error
 
 #######################
@@ -419,7 +336,7 @@ check_error
 #######################
 
 print_info "Build the ROS 1 bridge for the first time..."
-schroot -d "/home/$USERNAME" -c ros1 -- zsh -c "march_build_bridge"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "march_build_bridge"
 check_error
 
 ################################
@@ -429,18 +346,14 @@ print_info "Creating startup scripts..."
 cd $WORKSPACE_PATH/scripts
 
 # Create the startup script and copy it to start_ros2.sh
-tee <<EOF start_ros1.sh >/dev/null
+tee <<EOF start_ros.sh >/dev/null
 xhost +local:
-schroot -d "/home/$USERNAME" -c ros1 -- zsh
+schroot -d "/home/$USERNAME" -c ros -- zsh
 EOF
 check_error
 
 # Give the scripts execute permissions
-chmod +x start_ros1.sh
-check_error
-cp start_ros1.sh start_ros2.sh
-check_error
-sed -i 's/ros1/ros2/g' start_ros2.sh
+chmod +x start_ros.sh
 check_error
 
 print_info_bold "Installation succesful!"
