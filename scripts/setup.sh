@@ -28,6 +28,19 @@ function check_error ()
     fi
 }
 
+function sudo_schroot_zsh ()
+{
+    sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "$1"
+    check_error
+}
+
+function schroot_zsh ()
+{
+    schroot -d "/home/$USERNAME" -c ros -- zsh -c "$1"
+    check_error
+}
+
+
 echo -e "\033[1;34m
 
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠏⠉⠉⠙⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -225,18 +238,15 @@ check_error
 
 # Add key from ROS 1 
 print_info "Add ROS 1 signing key..."
-sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"
-check_error
+sudo_schroot_zsh "apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"
 
 # Add key from ROS 2
 print_info "Add ROS 2 signing key..."
-sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -"
-check_error
+sudo_schroot_zsh "curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -"
 
 # Set locale to UTF8 supported locale
 print_info "Settings locale to en_US.UTF-8..."
-sudo schroot -d "/home/$USERNAME" -c ros -- bash -c "locale && sudo locale-gen en_US en_US.UTF-8 && sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && export LANG=en_US.UTF-8 && locale"
-check_error
+sudo_schroot_zsh "locale && sudo locale-gen en_US en_US.UTF-8 && sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && export LANG=en_US.UTF-8 && locale"
 
 # Add ROS 1 to package locations
 sudo tee <<EOF $ROS_LOCATION/etc/apt/sources.list >/dev/null
@@ -250,18 +260,15 @@ check_error
 
 # Install ROS Melodic
 print_info "Installing ROS 1 Melodic..."
-sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "apt update && apt install -y ros-melodic-desktop-full"
-check_error
+sudo_schroot_zsh "apt update && apt install -y ros-melodic-desktop-full"
 
 # Add automatic sourcing to the .bashrc file of the user
-sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc && chown $USERNAME:$USERNAME /home/$USERNAME/.zshrc && chmod 755 /home/$USERNAME/.zshrc"
-check_error
+sudo_schroot_zsh "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc && chown $USERNAME:$USERNAME /home/$USERNAME/.zshrc && chmod 755 /home/$USERNAME/.zshrc"
 
 # Install dependencies for building ROS 1 packages
 print_info "Install ROS 1 building dependencies..."
-sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip python3-lark-parser"
-check_error
-sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "rosdep init"
+sudo_schroot_zsh "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip python3-lark-parser"
+sudo_schroot_zsh "rosdep init"
 
 # Install the ROS 1 dependencies
 bash -c "$WORKSPACE_PATH/scripts/install_dependencies_ros1.sh"
@@ -272,15 +279,13 @@ bash -c "$WORKSPACE_PATH/scripts/.create_commands.sh"
 check_error
 
 print_info "Set ROS shell prefix..."
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "echo \"
+schroot_zsh "echo \"
 export DISPLAY=:0;
 export precmd_functions='';
 export PS1='ROS > ' \" > /home/$USERNAME/.zshrc"
-check_error
 
 print_info "Build March ROS 1 for the first time..."
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "march_build_ros"
-check_error
+schroot_zsh "march_build_ros"
 
 #####################################
 # INSTALLING ROS 2 ON UBUNTU BIONIC #
@@ -288,12 +293,10 @@ check_error
 
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
-sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "apt update && apt install -y build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python3-catkin-pkg python3-rosdistro python3-rospkg python3-rosdep-modules wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
-check_error
+sudo_schroot_zsh "apt update && apt install -y build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python3-catkin-pkg python3-rosdistro python3-rospkg python3-rosdep-modules wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
-check_error
+schroot_zsh "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
 function import_ros2_repo
 {
     schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && vcs import src < ros2.repos && rm ros2.repos"
@@ -308,30 +311,26 @@ import_ros2_repo
 
 # Install ROS dependencies that are necessary for building ROS 2
 print_info "Install ROS 2 source dependencies..."
-sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "rosdep init"
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && rosdep update && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
-check_error
+sudo_schroot_zsh "rosdep init"
+schroot_zsh "cd /home/$USERNAME/march/.ros2_foxy && rosdep update && rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys \"console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers\""
 
 # Building ROS 2 (takes a long time)
 print_info "Building ROS 2... (THIS TAKES A LONG TIME)"
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros_bridge"
-check_error
+schroot_zsh "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros_bridge"
 
 # Install the ROS 2 dependencies
 bash -c "$WORKSPACE_PATH/scripts/install_dependencies_ros2.sh"
 check_error
 
 print_info "Build March ROS 2 for the first time..."
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "march_build_ros2"
-check_error
+schroot_zsh "march_build_ros2"
 
 #######################
 # BUILDING THE BRIDGE #
 #######################
 
 print_info "Build the ROS 1 bridge for the first time..."
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "march_build_bridge"
-check_error
+schroot_zsh "march_build_bridge"
 
 ################################
 # CREATION OF STARTING SCRIPTS #
