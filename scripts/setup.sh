@@ -270,7 +270,7 @@ check_error
 
 print_info "Install March specific ROS 1 dependencies..."
 sudo schroot -d "/home/$USERNAME" -c ros -- zsh -c "sudo chmod -R 755 /opt"
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros/src --ignore-src"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "source /opt/ros/melodic/setup.zsh; rosdep install -y --from-paths /home/$USERNAME/march/ros1/src --ignore-src"
 check_error
 
 print_info "Creating commands..."
