@@ -10,16 +10,19 @@
 #include <urdf/model.h>
 #include <yaml-cpp/yaml.h>
 
-#include <march_hardware/imotioncube/actuation_mode.h>
+#include <march_hardware/motor_controller/actuation_mode.h>
 #include <march_hardware/encoder/absolute_encoder.h>
 #include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/ethercat/pdo_interface.h>
 #include <march_hardware/ethercat/sdo_interface.h>
-#include <march_hardware/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/joint.h>
 #include <march_hardware/march_robot.h>
 #include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/temperature/temperature_ges.h>
+
+#include <march_hardware/motor_controller/odrive/usb_master.h>
+#include <march_hardware/motor_controller/odrive/odrive_motor.h>
 
 /**
  * @brief Creates a MarchRobot from a robot yaml and URDF.
@@ -68,7 +71,7 @@ public:
 
   static march::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name,
                                   const urdf::JointConstSharedPtr& urdf_joint, march::PdoInterfacePtr pdo_interface,
-                                  march::SdoInterfacePtr sdo_interface);
+                                  march::SdoInterfacePtr sdo_interface, march::UsbMaster& usb_master);
   static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
                                                                        const urdf::JointConstSharedPtr& urdf_joint);
   static std::unique_ptr<march::IncrementalEncoder>
@@ -84,9 +87,14 @@ public:
   createPowerDistributionBoard(const YAML::Node& power_distribution_board_config, march::PdoInterfacePtr pdo_interface,
                                march::SdoInterfacePtr sdo_interface);
 
+  static std::unique_ptr<march::OdriveMotor> createOdrive(const YAML::Node& imc_config, march::ActuationMode mode,
+                                                          const urdf::JointConstSharedPtr& urdf_joint,
+                                                          march::UsbMaster& usb_master);
+
   static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
+  static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
   static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
   static const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
   static const std::vector<std::string> JOINT_REQUIRED_KEYS;
@@ -105,7 +113,7 @@ private:
    * @return list of created joints
    */
   std::vector<march::Joint> createJoints(const YAML::Node& joints_config, march::PdoInterfacePtr pdo_interface,
-                                         march::SdoInterfacePtr sdo_interface) const;
+                                         march::SdoInterfacePtr sdo_interface, march::UsbMaster& usb_master) const;
 
   YAML::Node robot_config_;
   urdf::Model urdf_;
@@ -116,5 +124,10 @@ private:
  * Converts the input filestream object to a stringstream object so that is easier to test for in IMotionCUbe.cpp
  */
 std::string convertSWFileToString(std::ifstream& sw_file);
+
+/**
+ * Returns the highest slave index of motor controllers and GESs in joints
+ */
+int getMaxSlaveIndex(std::vector<march::Joint>& jointList);
 
 #endif  // MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H

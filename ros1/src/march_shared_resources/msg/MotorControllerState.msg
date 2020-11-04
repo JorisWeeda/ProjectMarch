@@ -1,0 +1,10 @@
+Header header
+string[] joint_names
+float32[] motor_current
+float32[] controller_voltage
+float32[] motor_voltage
+int32[] absolute_encoder_value
+int32[] incremental_encoder_value
+float32[] absolute_velocity
+float32[] incremental_velocity
+string[] error_status

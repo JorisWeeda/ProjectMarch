@@ -1,14 +1,14 @@
 // Copyright 2019 Project March.
 #include "march_hardware_interface/march_hardware_interface.h"
 
-#include <march_hardware/march_robot.h>
-#include <march_hardware/error/hardware_exception.h>
-#include <march_hardware_builder/hardware_builder.h>
-
 #include <cstdlib>
 
 #include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
+
+#include <march_hardware/march_robot.h>
+#include <march_hardware/error/hardware_exception.h>
+#include <march_hardware_builder/hardware_builder.h>
 
 std::unique_ptr<march::MarchRobot> build(AllowedRobot robot);
 
@@ -24,6 +24,9 @@ int main(int argc, char** argv)
     return 1;
   }
   AllowedRobot selected_robot = AllowedRobot(argv[1]);
+
+  std::cout << argv[1] << std::endl;
+
   ROS_INFO_STREAM("Selected robot: " << selected_robot);
 
   bool reset_imc = ros::param::param<bool>("~reset_imc", false);
@@ -54,7 +57,7 @@ int main(int argc, char** argv)
   {
     try
     {
-      march.waitForPdo();
+      march.waitForUpdate();
 
       const ros::Time now = ros::Time::now();
       ros::Duration elapsed_time = now - last_update_time;

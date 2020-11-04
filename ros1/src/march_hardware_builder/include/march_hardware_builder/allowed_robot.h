@@ -15,8 +15,10 @@ public:
     march4,
     march3,
     test_joint_rotational,
+    odrive_test_joint_rotational,
     test_joint_linear,
     pdb,
+    two_odrive_joints,
   };
 
   AllowedRobot() = default;
@@ -33,6 +35,14 @@ public:
     else if (robot_name == "test_joint_rotational")
     {
       this->value = test_joint_rotational;
+    }
+    else if (robot_name == "odrive_test_joint_rotational")
+    {
+      this->value = odrive_test_joint_rotational;
+    }
+    else if (robot_name == "two_odrive_joints")
+    {
+      this->value = two_odrive_joints;
     }
     else if (robot_name == "test_joint_linear")
     {
@@ -62,7 +72,15 @@ public:
     }
     else if (this->value == AllowedRobot::test_joint_rotational)
     {
-      return base_path.append("/robots/test_joint_rotational.yaml");
+      return base_path.append("/robots/odrive_test_joint_rotational.yaml");
+    }
+    else if (this->value == AllowedRobot::two_odrive_joints)
+    {
+      return base_path.append("/robots/two_odrive_joints.yaml");
+    }
+    else if (this->value == AllowedRobot::odrive_test_joint_rotational)
+    {
+      return base_path.append("/robots/odrive_test_joint_rotational.yaml");
     }
     else if (this->value == AllowedRobot::test_joint_linear)
     {
@@ -104,6 +122,12 @@ public:
         break;
       case test_joint_rotational:
         out << "test_joint_rotational";
+        break;
+      case odrive_test_joint_rotational:
+        out << "odrive_test_joint_rotational";
+        break;
+      case two_odrive_joints:
+        out << "two_odrive_joints";
         break;
       case pdb:
         out << "pdb";
