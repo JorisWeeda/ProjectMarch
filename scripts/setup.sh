@@ -317,7 +317,7 @@ schroot_zsh "march_build_ros1"
 print_info "Install up-to-date cmake version"
 sudo_schroot_zsh "apt update && apt install -y build-essential libssl-dev wget"
 schroot_zsh "wget https://github.com/Kitware/CMake/archive/v3.18.4.tar.gz && tar -zxvf v3.18.4.tar.gz && cd CMake-3.18.4 && ./bootstrap && make"
-sudo_schroot_zsh "sudo make install"
+sudo_schroot_zsh "cd CMake-3.18.4 && sudo make install"
 
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
