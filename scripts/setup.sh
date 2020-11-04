@@ -314,9 +314,14 @@ schroot_zsh "march_build_ros1"
 # INSTALLING ROS 2 ON UBUNTU BIONIC #
 #####################################
 
+print_info "Install up-to-date cmake version"
+sudo_schroot_zsh "apt update && apt install -y build-essential libssl-dev"
+schroot_zsh "wget https://github.com/Kitware/CMake/archive/v3.18.4.tar.gz && tar -zxvf v3.18.4.tar.gz && cd CMake-3.18.4 && ./bootstrap && make"
+sudo_schroot_zsh "sudo make install"
+
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
-sudo_schroot_zsh "apt update && apt install -y build-essential cmake git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python3-catkin-pkg python3-rosdistro python3-rospkg python3-rosdep-modules wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
+sudo_schroot_zsh "apt update && apt install -y build-essential git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python3-catkin-pkg python3-rosdistro python3-rospkg python3-rosdep-modules wget && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
 schroot_zsh "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
