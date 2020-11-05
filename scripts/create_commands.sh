@@ -27,7 +27,7 @@ sudo chmod 755 $ROS_LOCATION/usr/bin/march_build_bridge
 
 sudo tee <<EOF $ROS_LOCATION/usr/bin/march_build_ros1 >/dev/null
 #!/usr/bin/env zsh
-source /opt/ros/melodic/setup.bash;
+source /opt/ros/melodic/local_setup.bash;
 cd /home/$USERNAME/march/ros1;
 export CC=gcc;
 export CXX=g++;
