@@ -69,5 +69,5 @@
         "name":"axis0.config.watchdog_timeout",
         "type":"float",
         "value":0
-    },
+    }
 ]

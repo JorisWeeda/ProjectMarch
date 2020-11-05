@@ -34,7 +34,9 @@
     <arg name="controller" default="effort_control" doc="Changes the controller used by simulation."/>
 
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
-    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot).urdf"/>
+    <arg name="robot_description" default="$(arg robot)" doc="Robot urdf file to use"/>
+
+    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_description).urdf"/>
 
     <node
             if="$(arg rosbag)"
@@ -77,6 +79,7 @@
     <group if="$(eval configuration == 'exoskeleton')">
         <include file="$(find march_hardware_interface)/launch/hardware.launch" if="$(arg hardware_interface)">
             <arg name="robot" value="$(arg robot)"/>
+            <arg name="robot_description" value="$(arg robot_description)"/>
         </include>
     </group>
 
