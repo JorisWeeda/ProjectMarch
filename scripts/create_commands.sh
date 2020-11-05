@@ -55,7 +55,6 @@ sudo chmod 755 $ROS_LOCATION/usr/bin/march_run_bridge
 
 sudo tee <<EOF $ROS_LOCATION/usr/bin/march_build_ros2 >/dev/null
 #!/usr/bin/env zsh
-source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 cd /home/$USERNAME/march/ros2;
 export CC=gcc;
@@ -66,7 +65,6 @@ sudo chmod 755 $ROS_LOCATION/usr/bin/march_build_ros2
 
 sudo tee <<EOF $ROS_LOCATION/usr/bin/march_run_ros2 >/dev/null
 #!/usr/bin/env zsh
-source /opt/ros/foxy/local_setup.zsh;
 source /home/$USERNAME/march/.ros2_foxy/install/local_setup.zsh;
 cd /home/$USERNAME/march/ros2;
 source install/local_setup.zsh;
