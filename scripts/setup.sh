@@ -227,10 +227,6 @@ check_error
 # Go to the workspace
 cd $WORKSPACE_PATH
 
-# Create symbolic link if focal is not yet recognized
-#print_info "Creating focal symlink for debootstrap..."
-#sudo ln -s gutsy /usr/share/debootstrap/scripts/focal
-
 print_info "Installing minimal version of Ubuntu Bionic..."
 # Download the files for Ubuntu Bionic in the ROS 2 chroot
 sudo debootstrap --variant=buildd --arch=amd64 bionic $ROS_LOCATION http://archive.ubuntu.com/ubuntu/
@@ -321,7 +317,7 @@ sudo_schroot_zsh "cd CMake-3.18.4 && sudo make install && cd .. && rm -rf CMake-
 
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
-sudo_schroot_zsh "apt update && apt install -y build-essential git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python3-rosdep python3-setuptools python3-vcstool python3-catkin-pkg python3-rosdistro python3-rospkg python3-rosdep-modules && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
+sudo_schroot_zsh "apt update && apt install -y build-essential git libbullet-dev python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python-rosdep python-setuptools python-vcstool python-catkin-pkg python-rosdistro python-rospkg python-rosdep-modules && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
 schroot_zsh "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
@@ -343,7 +339,7 @@ schroot_zsh "cd /home/$USERNAME/march/.ros2_foxy && rosdep update && rosdep inst
 
 # Building ROS 2 (takes a long time)
 print_info "Building ROS 2... (THIS TAKES A LONG TIME)"
-schroot_zsh "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros_bridge"
+schroot_zsh "cd /home/$USERNAME/march/.ros2_foxy && colcon build --symlink-install --packages-skip ros1_bridge"
 
 # Install the ROS 2 dependencies
 bash -c "$WORKSPACE_PATH/scripts/install_dependencies_ros2.sh"
