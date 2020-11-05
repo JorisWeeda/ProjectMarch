@@ -18,7 +18,7 @@ function check_error ()
 
 print_info "Build March specific ROS 2 dependencies..."
 # Delete old folders
-schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy/src/ros2 && rm xacro urdfdom_parser_py control_msgs -rf"
+schroot -d "/home/$USERNAME" -c ros -- zsh -c "cd /home/$USERNAME/march/.ros2_foxy/src/ros2 && rm xacro urdf_parser_py control_msgs -rf"
 check_error
 # Clone the folders and build them
 schroot -d "/home/$USERNAME" -c ros -- zsh -c "
