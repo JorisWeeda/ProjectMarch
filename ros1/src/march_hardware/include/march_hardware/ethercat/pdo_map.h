@@ -46,8 +46,6 @@ enum class IMCObjectName
   ActualPosition,
   ActualVelocity,
   MotionErrorRegister,
-  DetailedErrorRegister,
-  SecondDetailedErrorRegister,
   DCLinkVoltage,
   DriveTemperature,
   ActualTorque,
@@ -56,10 +54,7 @@ enum class IMCObjectName
   MotorVelocity,
   ControlWord,
   TargetPosition,
-  TargetTorque,
-  QuickStopDeceleration,
-  QuickStopOption,
-  MotorVoltage
+  TargetTorque
 };
 
 class PDOmap

@@ -12,22 +12,17 @@ namespace march
 std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
   { IMCObjectName::StatusWord, IMCObject(0x6041, 0, 16) },
   { IMCObjectName::ActualPosition, IMCObject(0x6064, 0, 32) },
-  { IMCObjectName::ActualVelocity, IMCObject(0x6069, 0, 32) },
-  { IMCObjectName::MotionErrorRegister, IMCObject(0x2000, 0, 16) },
-  { IMCObjectName::DetailedErrorRegister, IMCObject(0x2002, 0, 16) },
-  { IMCObjectName::SecondDetailedErrorRegister, IMCObject(0x2009, 0, 16) },
-  { IMCObjectName::DCLinkVoltage, IMCObject(0x2055, 0, 16) },
-  { IMCObjectName::DriveTemperature, IMCObject(0x2058, 0, 16) },
+  { IMCObjectName::ActualVelocity, IMCObject(0x606C, 0, 32) },
+  { IMCObjectName::MotionErrorRegister, IMCObject(0x200F, 0, 32) },
+  { IMCObjectName::DCLinkVoltage, IMCObject(0x2060, 0, 16) },
+  { IMCObjectName::DriveTemperature, IMCObject(0x2061, 0, 16) },
   { IMCObjectName::ActualTorque, IMCObject(0x6077, 0, 16) },
-  { IMCObjectName::CurrentLimit, IMCObject(0x207F, 0, 16) },
-  { IMCObjectName::MotorPosition, IMCObject(0x2088, 0, 32) },
-  { IMCObjectName::MotorVelocity, IMCObject(0x2087, 0, 32) },
+  { IMCObjectName::CurrentLimit, IMCObject(0x21E0, 0, 16) },
+  { IMCObjectName::MotorPosition, IMCObject(0x2030, 0, 32) },
+  { IMCObjectName::MotorVelocity, IMCObject(0x2031, 0, 32) },
   { IMCObjectName::ControlWord, IMCObject(0x6040, 0, 16) },
-  { IMCObjectName::TargetPosition, IMCObject(0x607A, 0, 32) },
-  { IMCObjectName::TargetTorque, IMCObject(0x6071, 0, 16) },
-  { IMCObjectName::QuickStopDeceleration, IMCObject(0x6085, 0, 32) },
-  { IMCObjectName::QuickStopOption, IMCObject(0x605A, 0, 16) },
-  { IMCObjectName::MotorVoltage, IMCObject(0x2108, 3, 16) }
+  { IMCObjectName::TargetPosition, IMCObject(0x2020, 0, 32) },
+  { IMCObjectName::TargetTorque, IMCObject(0x6071, 0, 16) }
 };
 
 void PDOmap::addObject(IMCObjectName object_name)

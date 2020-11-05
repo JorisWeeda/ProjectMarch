@@ -3,7 +3,7 @@
 #include "mock_incremental_encoder.h"
 #include "mock_slave.h"
 
-#include "march_hardware/imotioncube/imotioncube.h"
+#include "march_hardware/motor_controller/imotioncube/imotioncube.h"
 #include "march_hardware/ethercat/sdo_interface.h"
 
 #include <memory>
@@ -28,7 +28,6 @@ public:
   MOCK_METHOD0(getVelocityRadAbsolute, double());
 
   MOCK_METHOD0(getIMCVoltage, float());
-  MOCK_METHOD0(getMotorVoltage, float());
   MOCK_METHOD0(getMotorCurrent, float());
 
   MOCK_METHOD1(actuateRad, void(double));

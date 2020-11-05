@@ -57,9 +57,7 @@ public:
   virtual double getVelocityRadIncremental() override;
 
   uint16_t getStatusWord();
-  uint16_t getMotionError();
-  uint16_t getDetailedError();
-  uint16_t getSecondDetailedError();
+  uint32_t getMotionError();
 
   ActuationMode getActuationMode() const override;
 

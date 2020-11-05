@@ -66,10 +66,7 @@ void IMotionCube::mapMisoPDOs(SdoSlaveInterface& sdo)
   map_miso.addObject(IMCObjectName::ActualPosition);  // Compulsory!
   map_miso.addObject(IMCObjectName::ActualTorque);    // Compulsory!
   map_miso.addObject(IMCObjectName::MotionErrorRegister);
-  map_miso.addObject(IMCObjectName::DetailedErrorRegister);
-  map_miso.addObject(IMCObjectName::SecondDetailedErrorRegister);
   map_miso.addObject(IMCObjectName::DCLinkVoltage);
-  map_miso.addObject(IMCObjectName::MotorVoltage);
   map_miso.addObject(IMCObjectName::MotorPosition);
   map_miso.addObject(IMCObjectName::MotorVelocity);
   map_miso.addObject(IMCObjectName::ActualVelocity);
@@ -127,21 +124,21 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
   int stop_opt = sdo.write<int16_t>(0x605A, 0, 6);
 
   // Quick stop deceleration
-  int stop_decl = sdo.write<uint32_t>(0x6085, 0, 0x7FFFFFFF);
+  //int stop_decl = sdo.write<uint32_t>(0x6085, 0, 0x7FFFFFFF);
 
   // Abort connection option code
-  int abort_con = sdo.write<int16_t>(0x6007, 0, 1);
+  //int abort_con = sdo.write<int16_t>(0x6007, 0, 1);
 
   // set the ethercat rate of encoder in form x*10^y
   int rate_ec_x = sdo.write<uint8_t>(0x60C2, 1, cycle_time);
   int rate_ec_y = sdo.write<int8_t>(0x60C2, 2, -3);
 
   // use filter object to read motor voltage
-  int volt_address = sdo.write<int16_t>(0x2108, 1, 0x0232);
-  int volt_filter = sdo.write<int16_t>(0x2108, 2, 32767);
+  //int volt_address = sdo.write<int16_t>(0x2108, 1, 0x0232);
+  //int volt_filter = sdo.write<int16_t>(0x2108, 2, 32767);
 
-  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y &&
-        volt_address && volt_filter))
+  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && /*stop_decl && abort_con &&*/ rate_ec_x && rate_ec_y /*&&
+        volt_address && volt_filter*/))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed writing initial settings to IMC of slave %d", this->getSlaveIndex());
@@ -288,19 +285,9 @@ uint16_t IMotionCube::getStatusWord()
   return this->read16(this->miso_byte_offsets_.at(IMCObjectName::StatusWord)).ui;
 }
 
-uint16_t IMotionCube::getMotionError()
+uint32_t IMotionCube::getMotionError()
 {
-  return this->read16(this->miso_byte_offsets_.at(IMCObjectName::MotionErrorRegister)).ui;
-}
-
-uint16_t IMotionCube::getDetailedError()
-{
-  return this->read16(this->miso_byte_offsets_.at(IMCObjectName::DetailedErrorRegister)).ui;
-}
-
-uint16_t IMotionCube::getSecondDetailedError()
-{
-  return this->read16(this->miso_byte_offsets_.at(IMCObjectName::SecondDetailedErrorRegister)).ui;
+  return this->read32(this->miso_byte_offsets_.at(IMCObjectName::MotionErrorRegister)).ui;
 }
 
 float IMotionCube::getMotorCurrent()
@@ -327,7 +314,7 @@ float IMotionCube::getMotorControllerVoltage()
 
 float IMotionCube::getMotorVoltage()
 {
-  return this->read16(this->miso_byte_offsets_.at(IMCObjectName::MotorVoltage)).ui;
+  return this->read16(this->miso_byte_offsets_.at(IMCObjectName::DCLinkVoltage)).ui;
 }
 
 void IMotionCube::setControlWord(uint16_t control_word)
@@ -351,19 +338,12 @@ MotorControllerStates& IMotionCube::getStates()
   states.incrementalVelocity = this->getVelocityIUIncremental();
 
   states.statusWord = this->getStatusWord();
-  std::bitset<16> motionErrorBits = this->getMotionError();
+  std::bitset<32> motionErrorBits = this->getMotionError();
   states.motionError = motionErrorBits.to_string();
-  std::bitset<16> detailedErrorBits = this->getDetailedError();
-  states.detailedError = detailedErrorBits.to_string();
-  std::bitset<16> secondDetailedErrorBits = this->getSecondDetailedError();
-  states.secondDetailedError = secondDetailedErrorBits.to_string();
 
   states.state = IMCStateOfOperation(this->getStatusWord());
 
   states.motionErrorDescription = error::parseError(this->getMotionError(), error::ErrorRegisters::MOTION_ERROR);
-  states.detailedErrorDescription = error::parseError(this->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR);
-  states.secondDetailedErrorDescription =
-      error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR);
 
   return states;
 }
@@ -383,11 +363,6 @@ void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
                 target_state.getDescription().c_str());
       ROS_FATAL("Motion Error (MER): %s",
                 error::parseError(this->getMotionError(), error::ErrorRegisters::MOTION_ERROR).c_str());
-      ROS_FATAL("Detailed Error (DER): %s",
-                error::parseError(this->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR).c_str());
-      ROS_FATAL(
-          "Detailed Error 2 (DER2): %s",
-          error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR).c_str());
 
       throw std::domain_error("IMC to fault state");
     }
@@ -442,7 +417,10 @@ void IMotionCube::reset(SdoSlaveInterface& sdo)
 {
   this->setControlWord(0);
   ROS_DEBUG("Slave: %d, Try to reset IMC", this->getSlaveIndex());
-  sdo.write<uint16_t>(0x2080, 0, 1);
+  //sdo.write<uint16_t>(0x2080, 0, 1);
+  uint32_t info;
+  int value_size = sizeof(info);
+  sdo.read<uint32_t>(0x1000, 0, value_size, info);
 }
 
 void IMotionCube::reset()
@@ -479,7 +457,7 @@ uint16_t IMotionCube::computeSWCheckSum(uint16_t& start_address, uint16_t& end_a
 
 bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
 {
-  uint16_t start_address = 0;
+  /**uint16_t start_address = 0;
   uint16_t end_address = 0;
   const uint32_t sw_value = this->computeSWCheckSum(start_address, end_address);
   // set parameters to compute checksum on the imc
@@ -496,12 +474,21 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
   }
 
   ROS_DEBUG("The .sw checksum is : %d, and the drive checksum is %d", sw_value, imc_value);
-  return sw_value == imc_value;
+  return sw_value == imc_value;*/
+  uint32_t info;
+  int value_size = sizeof(info);
+  sdo.read<uint32_t>(0x1000, 0, value_size, info);
+  ROS_DEBUG("The .sw checksum is not performed on the Ingenia");
+  return true;
 }
 
 void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
 {
-  int result = 0;
+  uint32_t info;
+  int value_size = sizeof(info);
+  sdo.read<uint32_t>(0x1000, 0, value_size, info);
+  ROS_DEBUG("downloadSetupToDrive Not needed in the case of Ingenia");
+  /*int result = 0;
   int final_result = 0;
 
   size_t pos = 0;
@@ -548,7 +535,7 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed writing .sw file to IMC of slave %d", this->getSlaveIndex());
-  }
+  }*/
 }
 
 ActuationMode IMotionCube::getActuationMode() const
