@@ -1,0 +1,8 @@
+gaits:
+  test_gait:
+    perform_test: perform_test
+positions:
+  test_gait:
+    gait_type: walk_like
+    joints:
+      rotational_joint: 0.0

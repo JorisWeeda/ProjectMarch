@@ -5,6 +5,6 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-install(DIRECTORY minimal airgait-v test_versions-v training-v
+install(DIRECTORY minimal airgait-v test_versions-v training-v motorcontroller-test
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

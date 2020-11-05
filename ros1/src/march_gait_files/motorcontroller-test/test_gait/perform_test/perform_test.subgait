@@ -1,0 +1,11 @@
+description: ''
+duration: {nsecs: 0, secs: 1}
+gait_type: ''
+joints:
+  rotational_joint:
+  - position: 0.0
+    time_from_start: {nsecs: 30000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 1}
+    velocity: 0.0
