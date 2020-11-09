@@ -285,10 +285,10 @@ sudo_schroot_zsh "apt update && apt install -y ros-melodic-desktop-full"
 sudo_schroot_zsh "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc && chown $USERNAME:$USERNAME /home/$USERNAME/.zshrc && chmod 755 /home/$USERNAME/.zshrc"
 
 # Install dependencies for building ROS 1 packages
-#print_info "Install ROS 1 building dependencies..."
-#sudo_schroot_zsh "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip python3-lark-parser"
+print_info "Install ROS 1 building dependencies..."
+sudo_schroot_zsh "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip python3-lark-parser"
 # Install dependencies for building ROS 2 packages
-print_info "Install ROS building dependencies..."
+print_info "Install ROS 2 building dependencies..."
 sudo_schroot_zsh "apt install -y \
   build-essential \
   cmake \
@@ -298,7 +298,6 @@ sudo_schroot_zsh "apt install -y \
   python3-flake8 \
   python3-pip \
   python3-pytest-cov \
-  python3-rosdep \
   python3-setuptools \
   python3-vcstool \
   wget"
