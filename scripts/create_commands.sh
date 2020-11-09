@@ -49,6 +49,7 @@ sudo tee <<EOF $ROS_LOCATION/usr/bin/march_run_bridge >/dev/null
 source /opt/ros/melodic/setup.zsh &&
 source /home/$USERNAME/march/.ros2_foxy/install/setup.zsh &&
 export ROS_MASTER_URI=http://localhost:11311 &&
+cd /home/$USERNAME/march/.ros2_foxy &&
 ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
 EOF
 sudo chmod 755 $ROS_LOCATION/usr/bin/march_run_bridge

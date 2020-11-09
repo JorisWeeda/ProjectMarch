@@ -252,7 +252,7 @@ check_error
 
 # Install required packages
 print_info "Installing basic packages of Ubuntu Bionic..."
-sudo schroot -d "/home/$USERNAME" -c ros -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg2 zsh git locales"
+sudo schroot -d "/home/$USERNAME" -c ros -- bash -c "apt update && apt upgrade -y && apt install -y lsb-release sudo curl gnupg2 zsh git locales libssl-dev wget"
 check_error
 
 # Add key from ROS 1 
@@ -317,7 +317,37 @@ sudo_schroot_zsh "cd CMake-3.18.4 && sudo make install && cd .. && rm -rf CMake-
 
 # Install dependencies for building ROS 2 packages
 print_info "Install ROS 2 building dependencies..."
-sudo_schroot_zsh "apt update && apt install -y build-essential git libbullet-dev python-catkin-tools python3-colcon-common-extensions python3-flake8 python3-pip python3-pytest-cov python-rosdep python-setuptools python-vcstool python-catkin-pkg python-rosdistro python-rospkg python-rosdep-modules && python3 -m pip install -U argcomplete flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes pytest-repeat pytest-rerunfailures pytest && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev"
+sudo_schroot_zsh "apt install -y \
+  build-essential \
+  cmake \
+  git \
+  libbullet-dev \
+  python3-colcon-common-extensions \
+  python3-flake8 \
+  python3-pip \
+  python3-pytest-cov \
+  python3-rosdep \
+  python3-setuptools \
+  python3-vcstool \
+  wget"
+schroot_zsh "python3 -m pip install -U \
+  argcomplete \
+  flake8-blind-except \
+  flake8-builtins \
+  flake8-class-newline \
+  flake8-comprehensions \
+  flake8-deprecated \
+  flake8-docstrings \
+  flake8-import-order \
+  flake8-quotes \
+  pytest-repeat \
+  pytest-rerunfailures \
+  pytest"
+sudo_schroot_zsh "apt install --no-install-recommends -y \
+  libasio-dev \
+  libtinyxml2-dev && apt install --no-install-recommends -y \
+  libcunit1-dev
+"
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
 schroot_zsh "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
