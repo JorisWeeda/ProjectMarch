@@ -285,38 +285,10 @@ sudo_schroot_zsh "apt update && apt install -y ros-melodic-desktop-full"
 sudo_schroot_zsh "echo 'source /opt/ros/melodic/setup.zsh' > /home/$USERNAME/.zshrc && chown $USERNAME:$USERNAME /home/$USERNAME/.zshrc && chmod 755 /home/$USERNAME/.zshrc"
 
 # Install dependencies for building ROS 1 packages
-print_info "Install ROS 1 building dependencies..."
-sudo_schroot_zsh "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip python3-lark-parser"
-sudo_schroot_zsh "rosdep init"
-
-# Install the ROS 1 dependencies
-bash -c "$WORKSPACE_PATH/scripts/install_dependencies_ros1.sh"
-check_error
-
-print_info "Creating commands..."
-bash -c "$WORKSPACE_PATH/scripts/create_commands.sh"
-check_error
-
-print_info "Set ROS shell prefix..."
-schroot_zsh "echo \"
-export DISPLAY=:0;
-export precmd_functions='';
-export PS1='ROS > ' \" > /home/$USERNAME/.zshrc"
-
-print_info "Build March ROS 1 for the first time..."
-schroot_zsh "march_build_ros1"
-
-#####################################
-# INSTALLING ROS 2 ON UBUNTU BIONIC #
-#####################################
-
-print_info "Install up-to-date cmake version"
-sudo_schroot_zsh "apt update && apt install -y build-essential libssl-dev wget"
-schroot_zsh "wget https://github.com/Kitware/CMake/archive/v3.18.4.tar.gz && tar -zxvf v3.18.4.tar.gz && rm v3.18.4.tar.gz && cd CMake-3.18.4 && ./bootstrap && make"
-sudo_schroot_zsh "cd CMake-3.18.4 && sudo make install && cd .. && rm -rf CMake-3.18.4"
-
+#print_info "Install ROS 1 building dependencies..."
+#sudo_schroot_zsh "apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential python3-colcon-common-extensions python-pip python3-lark-parser"
 # Install dependencies for building ROS 2 packages
-print_info "Install ROS 2 building dependencies..."
+print_info "Install ROS building dependencies..."
 sudo_schroot_zsh "apt install -y \
   build-essential \
   cmake \
@@ -348,6 +320,34 @@ sudo_schroot_zsh "apt install --no-install-recommends -y \
   libtinyxml2-dev && apt install --no-install-recommends -y \
   libcunit1-dev
 "
+sudo_schroot_zsh "rosdep init"
+
+# Install the ROS 1 dependencies
+bash -c "$WORKSPACE_PATH/scripts/install_dependencies_ros1.sh"
+check_error
+
+print_info "Creating commands..."
+bash -c "$WORKSPACE_PATH/scripts/create_commands.sh"
+check_error
+
+print_info "Set ROS shell prefix..."
+schroot_zsh "echo \"
+export DISPLAY=:0;
+export precmd_functions='';
+export PS1='ROS > ' \" > /home/$USERNAME/.zshrc"
+
+print_info "Build March ROS 1 for the first time..."
+schroot_zsh "march_build_ros1"
+
+#####################################
+# INSTALLING ROS 2 ON UBUNTU BIONIC #
+#####################################
+
+print_info "Install up-to-date cmake version"
+sudo_schroot_zsh "apt update && apt install -y build-essential libssl-dev wget"
+schroot_zsh "wget https://github.com/Kitware/CMake/archive/v3.18.4.tar.gz && tar -zxvf v3.18.4.tar.gz && rm v3.18.4.tar.gz && cd CMake-3.18.4 && ./bootstrap && make"
+sudo_schroot_zsh "cd CMake-3.18.4 && sudo make install && cd .. && rm -rf CMake-3.18.4"
+
 
 print_info "Install the source files from ROS 2 in order to install the bridge..."
 schroot_zsh "mkdir -p /home/$USERNAME/march/.ros2_foxy/src && cd /home/$USERNAME/march/.ros2_foxy && wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos"
