@@ -120,7 +120,7 @@ print_info "Installing required packages 'debootstrap' and 'schroot'..."
 print_info "Requesting root permissions..."
 sudo apt update
 check_error
-sudo apt install -y debootstrap schroot
+sudo apt install -y debootstrap schroot apt-utils
 check_error
 
 ################################
