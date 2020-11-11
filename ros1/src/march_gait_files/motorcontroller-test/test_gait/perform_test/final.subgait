@@ -1,0 +1,19 @@
+description: ''
+duration:
+  nsecs: 500000000
+  secs: 1
+gait_type: ''
+joints:
+  rotational_joint:
+  - position: 0.1902
+    time_from_start:
+      nsecs: 750000000
+      secs: 0
+    velocity: 0.0
+  - position: -0.207
+    time_from_start:
+      nsecs: 500000000
+      secs: 1
+    velocity: 0.0
+name: perform_test
+version: final
