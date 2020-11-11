@@ -117,6 +117,12 @@ int Odrive::function(const std::string& function_name)
 template <typename TT>
 int Odrive::validateType(const odrive_json_object& json_object, TT& value)
 {
+  std::cout << "----------" << std::endl;
+  std::cout << "Name: " << json_object.name << std::endl;
+  std::cout << "Type: " << json_object.type << std::endl;
+  std::cout << "Value: " << value << std::endl;
+  std::cout << "Sizeof value: " << sizeof(value) << std::endl;
+
   if (json_object.type == "float")
   {
     if (sizeof(value) != sizeof(float))
@@ -391,9 +397,9 @@ int Odrive::setConfigurations(const std::string& configuration_json_path)
   return ODRIVE_OK
 }
 
-uint16_t Odrive::readAxisError()
+int32_t Odrive::readAxisError()
 {
-  uint16_t axis_error;
+  int32_t axis_error;
   std::string command_name_ = this->create_command(O_PM_AXIS_ERROR);
   if (this->read(command_name_, axis_error) == 1)
   {
@@ -404,9 +410,9 @@ uint16_t Odrive::readAxisError()
   return axis_error;
 }
 
-uint16_t Odrive::readAxisMotorError()
+int32_t Odrive::readAxisMotorError()
 {
-  uint16_t axis_motor_error;
+  int32_t axis_motor_error;
   std::string command_name_ = this->create_command(O_PM_AXIS_MOTOR_ERROR);
   if (this->read(command_name_, axis_motor_error) == 1)
   {
@@ -417,9 +423,9 @@ uint16_t Odrive::readAxisMotorError()
   return axis_motor_error;
 }
 
-uint8_t Odrive::readAxisEncoderError()
+int32_t Odrive::readAxisEncoderError()
 {
-  uint8_t axis_encoder_error;
+  int32_t axis_encoder_error;
   std::string command_name_ = this->create_command(O_PM_AXIS_ENCODER_ERROR);
   if (this->read(command_name_, axis_encoder_error) == 1)
   {
@@ -430,9 +436,9 @@ uint8_t Odrive::readAxisEncoderError()
   return axis_encoder_error;
 }
 
-uint8_t Odrive::readAxisControllerError()
+int32_t Odrive::readAxisControllerError()
 {
-  uint8_t axis_controller_error;
+  int32_t axis_controller_error;
   std::string command_name_ = this->create_command(O_PM_AXIS_CONTROLLER_ERROR);
   if (this->read(command_name_, axis_controller_error) == 1)
   {

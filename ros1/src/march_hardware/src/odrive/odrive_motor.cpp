@@ -72,28 +72,28 @@ bool OdriveMotor::waitForIdleState(float timeout)
 // to be implemented
 void OdriveMotor::reset()
 {
-  uint16_t axis_error = 0;
+  int32_t axis_error = 0;
   std::string command_name_ = this->create_command(O_PM_AXIS_ERROR);
   if (this->write(command_name_, axis_error) == 1)
   {
     ROS_ERROR("Could not reset axis");
   }
 
-  uint16_t axis_motor_error = 0;
+  int32_t axis_motor_error = 0;
   command_name_ = this->create_command(O_PM_AXIS_MOTOR_ERROR);
   if (this->write(command_name_, axis_motor_error) == 1)
   {
     ROS_ERROR("Could not reset motor axis");
   }
 
-  uint8_t axis_encoder_error = 0;
+  int32_t axis_encoder_error = 0;
   command_name_ = this->create_command(O_PM_AXIS_ENCODER_ERROR);
   if (this->write(command_name_, axis_encoder_error) == 1)
   {
     ROS_ERROR("Could not reset encoder axis");
   }
 
-  uint8_t axis_controller_error = 0;
+  int32_t axis_controller_error = 0;
   command_name_ = this->create_command(O_PM_AXIS_CONTROLLER_ERROR);
   if (this->write(command_name_, axis_controller_error) == 1)
   {
@@ -160,22 +160,22 @@ void OdriveMotor::readValues()
   this->velocity_rad_incremental = this->readVelocityRadIncremental();
 }
 
-uint16_t OdriveMotor::getAxisError()
+int32_t OdriveMotor::getAxisError()
 {
   return this->axis_error;
 }
 
-uint16_t OdriveMotor::getAxisMotorError()
+int32_t OdriveMotor::getAxisMotorError()
 {
   return this->axis_motor_error;
 }
 
-uint8_t OdriveMotor::getAxisEncoderError()
+int32_t OdriveMotor::getAxisEncoderError()
 {
   return this->axis_encoder_error;
 }
 
-uint8_t OdriveMotor::getAxisControllerError()
+int32_t OdriveMotor::getAxisControllerError()
 {
   return this->axis_controller_error;
 }
@@ -238,7 +238,7 @@ double OdriveMotor::getVelocityRadIncremental()
   return velocity_rad_incremental_double;
 }
 
-int OdriveMotor::setState(uint8_t state)
+int OdriveMotor::setState(int32_t state)
 {
   std::string command_name_ = this->create_command(O_PM_REQUEST_STATE);
   if (this->write(command_name_, state) == 1)
@@ -249,9 +249,9 @@ int OdriveMotor::setState(uint8_t state)
   return ODRIVE_OK
 }
 
-uint8_t OdriveMotor::getState()
+int32_t OdriveMotor::getState()
 {
-  uint8_t axis_state;
+  int32_t axis_state;
   std::string command_name_ = this->create_command(O_PM_CURRENT_STATE);
   if (this->read(command_name_, axis_state) == 1)
   {

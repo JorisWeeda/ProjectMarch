@@ -82,10 +82,10 @@ protected:
   float readMotorCurrent();
   float readMotorVoltage();
 
-  uint16_t readAxisError();
-  uint16_t readAxisMotorError();
-  uint8_t readAxisEncoderError();
-  uint8_t readAxisControllerError();
+  int32_t readAxisError();
+  int32_t readAxisMotorError();
+  int32_t readAxisEncoderError();
+  int32_t readAxisControllerError();
 
   int readAngleCountsAbsolute();
   double readVelocityRadAbsolute();

@@ -19,7 +19,7 @@
 #define ERROR_NONE 0x00
 
 // axis states
-enum States : int
+enum States : int32_t
 {
   AXIS_STATE_UNDEFINED = 0,
   AXIS_STATE_IDLE = 1,
@@ -34,7 +34,7 @@ enum States : int
   AXIS_STATE_ENCODER_DIR_FIND = 10
 };
 
-enum class AxisError
+enum class AxisError: int32_t
 {
   ERROR_INVALID_STATE = 0x01,
   ERROR_DC_BUS_UNDER_VOLTAGE = 0x02,
@@ -51,7 +51,7 @@ enum class AxisError
 };
 
 //    class motor:
-enum class AxisMotorError
+enum class AxisMotorError: int32_t
 {
   ERROR_PHASE_RESISTANCE_OUT_OF_RANGE = 0x0001,
   ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE = 0x0002,
@@ -67,7 +67,7 @@ enum class AxisMotorError
   ERROR_CURRENT_UNSTABLE = 0x1000
 };
 
-enum class AxisEncoderError
+enum class AxisEncoderError: int32_t
 {
   ERROR_UNSTABLE_GAIN = 0x01,
   ERROR_CPR_OUT_OF_RANGE = 0x02,
@@ -77,7 +77,7 @@ enum class AxisEncoderError
   ERROR_INDEX_NOT_FOUND_YET = 0x20
 };
 
-enum class AxisControllerError
+enum class AxisControllerError: int32_t
 {
   ERROR_OVER_SPEED = 0x01
 };

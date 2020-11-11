@@ -37,10 +37,10 @@ public:
   float getMotorVoltage() override;
   double getTorque() override;
 
-  uint16_t getAxisError();
-  uint16_t getAxisMotorError();
-  uint8_t getAxisEncoderError();
-  uint8_t getAxisControllerError();
+  int32_t getAxisError();
+  int32_t getAxisMotorError();
+  int32_t getAxisEncoderError();
+  int32_t getAxisControllerError();
 
   double getAngleRadAbsolute() override;
   double getVelocityRadAbsolute() override;
@@ -59,8 +59,8 @@ public:
   }
 
 private:
-  int setState(uint8_t state);
-  uint8_t getState();
+  int setState(int32_t state);
+  int32_t getState();
 
   int getAngleCountsAbsolute();
   int getAngleCountsIncremental();
@@ -70,10 +70,10 @@ private:
 
   void readValues();
 
-  uint16_t axis_error;
-  uint16_t axis_motor_error;
-  uint8_t axis_encoder_error;
-  uint8_t axis_controller_error;
+  int32_t axis_error;
+  int32_t axis_motor_error;
+  int32_t axis_encoder_error;
+  int32_t axis_controller_error;
 
   float motor_controller_voltage;
   float motor_current;

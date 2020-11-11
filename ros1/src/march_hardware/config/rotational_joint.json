@@ -17,7 +17,7 @@
   {
     "name":"config.brake_resistance",
     "type":"float",
-    "value":0.0
+    "value":2.0
   },
   {
     "name":"axis0.motor.config.pole_pairs",
@@ -25,49 +25,13 @@
     "value":21
   },
   {
-    "name":"axis0.motor.config.calibration_current",
-    "type":"float",
-    "value":10.0
-  },
-  {
-    "name":"axis0.controller.config.vel_limit",
-    "type":"float",
-    "value":200000.0
-  },
-  {
-    "name":"axis0.motor.config.current_control_bandwidth",
-    "type":"float",
-    "value":100.0
-  },
-
-  {
-    "name":"axis0.motor.config.motor_type",
-    "type":"uint8",
-    "value":0
-  },
-  {
-    "name":"axis0.controller.config.vel_gain",
-    "type":"float",
-    "value":0.01
-  },
-  {
-    "name":"axis0.controller.config.vel_integrator_gain",
-    "type":"float",
-    "value":0.05
-  },
-  {
     "name":"axis0.controller.config.control_mode",
-    "type":"uint8",
+    "type":"int32",
     "value":1
   },
   {
-    "name":"axis0.sensorless_estimator.config.pm_flux_linkage",
-    "type":"float",
-    "value":0.001944723
-  },
-  {
-    "name":"axis0.config.watchdog_timeout",
-    "type":"float",
-    "value":0
+    "name": "axis0.motor.config.torque_constant",
+    "type": "float",
+    "value": 0.05513333
   }
 ]
