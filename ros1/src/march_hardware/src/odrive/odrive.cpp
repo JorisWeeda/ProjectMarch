@@ -117,11 +117,11 @@ int Odrive::function(const std::string& function_name)
 template <typename TT>
 int Odrive::validateType(const odrive_json_object& json_object, TT& value)
 {
-  std::cout << "----------" << std::endl;
-  std::cout << "Name: " << json_object.name << std::endl;
-  std::cout << "Type: " << json_object.type << std::endl;
-  std::cout << "Value: " << value << std::endl;
-  std::cout << "Sizeof value: " << sizeof(value) << std::endl;
+//  std::cout << "----------" << std::endl;
+//  std::cout << "Name: " << json_object.name << std::endl;
+//  std::cout << "Type: " << json_object.type << std::endl;
+//  std::cout << "Value: " << value << std::endl;
+//  std::cout << "Sizeof value: " << sizeof(value) << std::endl;
 
   if (json_object.type == "float")
   {

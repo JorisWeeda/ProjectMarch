@@ -103,7 +103,7 @@ void OdriveMotor::reset()
 
 void OdriveMotor::actuateRad(double target_rad)
 {
-  ROS_INFO("Actuating rad %f", target_rad);
+  ROS_INFO("Not implemented, could not actuate rad %f", target_rad);
   return;
 }
 
@@ -111,7 +111,7 @@ void OdriveMotor::actuateTorque(double target_torque_ampere)
 {
   float target_torque_ampere_float = (float)target_torque_ampere;
 
-  std::string command_name_ = this->create_command(O_PM_DESIRED_MOTOR_CURRENT);
+  std::string command_name_ = this->create_command(O_PM_INPUT_TORQUE);
   if (this->write(command_name_, target_torque_ampere_float) == 1)
   {
     ROS_ERROR("Could net set target torque; %f to the axis", target_torque_ampere);

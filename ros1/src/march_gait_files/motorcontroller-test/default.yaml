@@ -2,7 +2,7 @@ gaits:
   test_gait:
     perform_test: final
 positions:
-  test_gait:
+  setup:
     gait_type: ''
     joints:
       rotational_joint: 0.0

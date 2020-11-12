@@ -45,6 +45,7 @@ int OdriveEndpoint::open_connection(const std::string& serial_number)
     return ODRIVE_COMM_ERROR;
   }
 
+  bool found_odrive = false;
   for (size_t i = 0; i < size_t(device_count); ++i)
   {
     libusb_device* device = usb_device_list[i];
@@ -119,6 +120,7 @@ int OdriveEndpoint::open_connection(const std::string& serial_number)
             this->odrive_serial_number = serial_number;
 
             odrive_handle_ = device_handle;
+            found_odrive = true;
             break;
           }
         }
@@ -133,7 +135,15 @@ int OdriveEndpoint::open_connection(const std::string& serial_number)
 
   libusb_free_device_list(usb_device_list, 1);
 
-  return ODRIVE_COMM_SUCCESS;
+  if (found_odrive)
+  {
+    return ODRIVE_COMM_SUCCESS;
+  }
+  else
+  {
+    ROS_FATAL("Unable to find Odrive");
+    return ODRIVE_COMM_ERROR;
+  }
 }
 
 template <typename T>
