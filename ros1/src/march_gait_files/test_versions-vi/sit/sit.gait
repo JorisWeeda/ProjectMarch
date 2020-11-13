@@ -1,0 +1,9 @@
+name: sit
+subgaits:
+  start:
+    to: sit_down
+  sit_down:
+    to: sit_home
+  sit_home:
+    to: end
+

@@ -1,0 +1,8 @@
+name: stand
+subgaits:
+  start:
+    to: prepare_stand_up
+  prepare_stand_up:
+    to: stand_up
+  stand_up:
+    to: end

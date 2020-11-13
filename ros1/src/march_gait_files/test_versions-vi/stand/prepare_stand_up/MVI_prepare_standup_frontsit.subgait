@@ -1,0 +1,116 @@
+description: Prepare standing up from tip of the chair/bench
+duration:
+  nsecs: 800000000
+  secs: 1
+gait_type: sit_like
+joints:
+  left_ankle:
+  - position: 0.0436
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.0
+  - position: 0.1606
+    time_from_start:
+      nsecs: 800000000
+      secs: 1
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 675000000
+      secs: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 900000000
+      secs: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 800000000
+      secs: 1
+    velocity: 0.0
+  left_hip_fe:
+  - position: 1.2217
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.0
+  - position: 1.6057
+    time_from_start:
+      nsecs: 800000000
+      secs: 1
+    velocity: 0.0
+  left_knee:
+  - position: 1.5708
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.0
+  - position: 1.7279
+    time_from_start:
+      nsecs: 800000000
+      secs: 1
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0436
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.0
+  - position: 0.1606
+    time_from_start:
+      nsecs: 800000000
+      secs: 1
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 675000000
+      secs: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 900000000
+      secs: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 800000000
+      secs: 1
+    velocity: 0.0
+  right_hip_fe:
+  - position: 1.2217
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.0
+  - position: 1.6057
+    time_from_start:
+      nsecs: 800000000
+      secs: 1
+    velocity: 0.0
+  right_knee:
+  - position: 1.5708
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.0
+  - position: 1.7279
+    time_from_start:
+      nsecs: 800000000
+      secs: 1
+    velocity: 0.0
+name: prepare_stand_up
+version: MVI_prepare_standup_frontsit

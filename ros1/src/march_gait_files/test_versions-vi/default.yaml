@@ -1,4 +1,10 @@
 gaits:
+  sit:
+    sit_down: MVI_sitdown_frontsit
+    sit_home: MVI_sithome_frontsit
+  stand:
+    prepare_stand_up: MVI_prepare_standup_frontsit
+    stand_up: MVI_standup_frontsit
   curb_sdg:
     right_open: curb_sdg_rightopen_v1
     left_close: curb_sdg_leftclose_v1
