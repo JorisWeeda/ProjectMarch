@@ -201,6 +201,7 @@ class GaitStateMachine(object):
         self._idle_transitions = {}
         self._gait_transitions = {}
         idle_positions = self._gait_selection.positions
+
         for gait in self._gait_selection:
             gait_name = gait.name
             starting_position = gait.starting_position

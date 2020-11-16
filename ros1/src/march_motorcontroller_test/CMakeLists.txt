@@ -11,6 +11,6 @@ catkin_package(CATKIN_DEPENDS
     march_shared_classes
 )
 
-catkin_install_python(PROGRAMS scripts/march_motorcontroller_test
+catkin_install_python(PROGRAMS scripts/generate_subgait
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

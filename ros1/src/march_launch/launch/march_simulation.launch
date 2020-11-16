@@ -2,7 +2,9 @@
     <arg name="gain_scheduling" default="false" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
     <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
     <arg name="sounds" default="false" doc="Whether to use sounds."/>
+
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
+    <arg name="robot_description" default="$(arg robot)" doc="Robot urdf file to use"/>
 
     <arg name="rviz" default="true" doc="Launches RViz."/>
     <arg name="rqt_input" default="true" doc="Launches the rqt input device."/>
@@ -22,6 +24,7 @@
     <arg name="rosbag" default="false" doc="Enables rosbag record node."/>
 
     <arg name="controller" default="effort_control" doc="Changes the controller used by simulation."/>
+    <arg name="controller_config" default="$(arg robot)" doc="Controller config file to use"/>
 
     <param name="balance" value="$(arg balance)"/>
 

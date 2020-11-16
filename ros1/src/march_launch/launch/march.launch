@@ -35,6 +35,7 @@
 
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
     <arg name="robot_description" default="$(arg robot)" doc="Robot urdf file to use"/>
+    <arg name="controller_config" default="$(arg robot)" doc="Controller config file to use"/>
 
     <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_description).urdf"/>
 
@@ -90,6 +91,9 @@
             <arg name="ground_gait" value="$(arg ground_gait)"/>
             <arg name="obstacle" value="$(arg obstacle)"/>
             <arg name="controller" value="$(arg controller)"/>
+            <arg name="controller_config" value="$(arg controller_config)"/>
+            <arg name="robot" value="$(arg robot)"/>
+            <arg name="robot_description" value="$(arg robot_description)"/>
         </include>
     </group>
 

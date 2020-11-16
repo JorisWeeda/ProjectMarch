@@ -1,6 +1,6 @@
 gaits:
   test_gait:
-    perform_test: final
+    perform_test: version_0
 positions:
   setup:
     gait_type: ''

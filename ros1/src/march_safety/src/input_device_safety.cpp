@@ -22,7 +22,7 @@ void InputDeviceSafety::update(const ros::Time& now)
 {
   if (this->last_alive_stamps_.empty())
   {
-    //ROS_INFO_THROTTLE(5, "No input device connected yet");
+    ROS_INFO_THROTTLE(5, "No input device connected yet");
     return;
   }
 
@@ -74,6 +74,6 @@ void InputDeviceSafety::update(const ros::Time& now)
 
   if (!has_connections)
   {
-    //ROS_INFO_DELAYED_THROTTLE(5.0, "No input device connected");
+    ROS_INFO_DELAYED_THROTTLE(5.0, "No input device connected");
   }
 }
