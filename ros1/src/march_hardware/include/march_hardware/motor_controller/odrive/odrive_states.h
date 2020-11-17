@@ -14,10 +14,10 @@ public:
   OdriveStates() = default;
 
   States state;
-  uint16_t axisError;
-  uint16_t axisMotorError;
-  uint16_t axisEncoderError;
-  uint16_t axisControllerError;
+  int32_t axisError;
+  int32_t axisMotorError;
+  int32_t axisEncoderError;
+  int32_t axisControllerError;
 
   std::string axisErrorDescription;
   std::string axisMotorErrorDescription;

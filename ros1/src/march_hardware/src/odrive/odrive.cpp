@@ -489,11 +489,13 @@ float Odrive::readMotorVoltage()
 
 int Odrive::readAngleCountsAbsolute()
 {
+  // There is no absolute encoder for the Odrive
   return 0;
 }
 
 double Odrive::readVelocityRadAbsolute()
 {
+  // There is no absolute encoder for the Odrive
   return 0;
 }
 
@@ -531,6 +533,7 @@ std::string Odrive::create_command(std::string command_name)
   }
   return command_name;
 }
+
 
 template int Odrive::validateType(const odrive_json_object& json_object, int8_t&);
 template int Odrive::validateType(const odrive_json_object& json_object, int16_t&);
