@@ -8,7 +8,6 @@
     <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
 
     <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
-    <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
 
     <arg name="ground_gait" default="$(arg balance)" doc="Exoskeleton will ground gait in gazebo_ui if true."/>
     <arg name="fixed" default="$(eval not ground_gait)" doc="Fixes the exoskeleton in the world in rviz"/>

@@ -8,7 +8,6 @@
     <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
 
     <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
-    <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
 
     <arg name="ground_gait" default="$(arg balance)" doc="Exoskeleton will ground gait in gazebo_ui if true."/>
     <arg name="unpause" default="$(eval not gazebo_ui)" doc="Unpause simulation when controller starts."/>
@@ -65,12 +64,6 @@
 
         <include file="$(find march_rqt_input_device)/launch/march_rqt_input_device.launch" if="$(eval not headless and rqt_input)">
             <arg name="ping_safety_node" value="true"/>
-        </include>
-
-        <include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or esp or balance)">
-            <arg name="esp" value="$(arg esp)"/>
-            <arg name="pressure_soles" value="$(arg pressure_soles)"/>
-            <arg name="moticon_ip" value="$(arg moticon_ip)"/>
         </include>
 
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
