@@ -7,68 +7,71 @@
 # It defines a total of six commands
 
 USERNAME=$(whoami)
-ROS_LOCATION=""
+SCHROOT_LOCATION=""
+ROS1_LOCATION="/opt/ros/melodic"
+ROS2_LOCATION="/home/$USERNAME/ros2_foxy"
+MARCH_LOCATION="/home/$USERNAME/Desktop/march"
 
-sudo rm $ROS_LOCATION/usr/bin/march_* -f
+sudo rm $SCHROOT_LOCATION/usr/bin/march_* -f
 
-sudo tee <<EOF $ROS_LOCATION/usr/bin/march_build_bridge >/dev/null
+sudo tee <<EOF $SCHROOT_LOCATION/usr/bin/march_build_bridge >/dev/null
 #!/usr/bin/env zsh
-source /opt/ros/melodic/setup.zsh &&
-source /home/$USERNAME/march/.ros2_foxy/install/setup.zsh &&
-source /home/$USERNAME/march/ros1/install_isolated/setup.zsh &&
-source /home/$USERNAME/march/ros2/install/local_setup.zsh &&
-cd /home/$USERNAME/march/.ros2_foxy &&
+source $ROS1_LOCATION/setup.zsh &&
+source $ROS2_LOCATION/install/setup.zsh &&
+source $MARCH_LOCATION/ros1/install/setup.zsh &&
+source $MARCH_LOCATION/ros2/install/local_setup.zsh &&
+cd $ROS2_LOCATION &&
 export CC=gcc &&
 export CXX=g++ &&
 colcon build --symlink-install --packages-select ros1_bridge --cmake-force-configure &&
-cd /home/$USERNAME/march
+cd $MARCH_LOCATION
 EOF
-sudo chmod 755 $ROS_LOCATION/usr/bin/march_build_bridge
+sudo chmod 755 $SCHROOT_LOCATION/usr/bin/march_build_bridge
 
-sudo tee <<EOF $ROS_LOCATION/usr/bin/march_build_ros1 >/dev/null
+sudo tee <<EOF $SCHROOT_LOCATION/usr/bin/march_build_ros1 >/dev/null
 #!/usr/bin/env zsh
-source /opt/ros/melodic/setup.zsh &&
-cd /home/$USERNAME/march/ros1 &&
+source $ROS1_LOCATION/setup.zsh &&
+cd $MARCH_LOCATION/ros1 &&
 export CC=gcc &&
 export CXX=g++ &&
 colcon build --symlink-install --cmake-force-configure
 EOF
-sudo chmod 755 $ROS_LOCATION/usr/bin/march_build_ros1
+sudo chmod 755 $SCHROOT_LOCATION/usr/bin/march_build_ros1
 
-sudo tee <<EOF $ROS_LOCATION/usr/bin/march_run_ros1 >/dev/null
+sudo tee <<EOF $SCHROOT_LOCATION/usr/bin/march_run_ros1 >/dev/null
 #!/usr/bin/env zsh
-source /opt/ros/melodic/setup.zsh &&
-cd /home/$USERNAME/march/ros1 &&
+source $ROS1_LOCATION/setup.zsh &&
+cd $MARCH_LOCATION/ros1 &&
 source install_isolated/setup.zsh &&
 roslaunch march_launch march_ros2_simulation.launch
 EOF
-sudo chmod 755 $ROS_LOCATION/usr/bin/march_run_ros1
+sudo chmod 755 $SCHROOT_LOCATION/usr/bin/march_run_ros1
 
-sudo tee <<EOF $ROS_LOCATION/usr/bin/march_run_bridge >/dev/null
+sudo tee <<EOF $SCHROOT_LOCATION/usr/bin/march_run_bridge >/dev/null
 #!/usr/bin/env zsh
-source /opt/ros/melodic/setup.zsh &&
-source /home/$USERNAME/march/.ros2_foxy/install/setup.zsh &&
+source $ROS1_LOCATION/setup.zsh &&
+source $ROS2_LOCATION/install/setup.zsh &&
 export ROS_MASTER_URI=http://localhost:11311 &&
-cd /home/$USERNAME/march/.ros2_foxy &&
+cd $ROS2_LOCATION
 ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
 EOF
-sudo chmod 755 $ROS_LOCATION/usr/bin/march_run_bridge
+sudo chmod 755 $SCHROOT_LOCATION/usr/bin/march_run_bridge
 
-sudo tee <<EOF $ROS_LOCATION/usr/bin/march_build_ros2 >/dev/null
+sudo tee <<EOF $SCHROOT_LOCATION/usr/bin/march_build_ros2 >/dev/null
 #!/usr/bin/env zsh
-source /home/$USERNAME/march/.ros2_foxy/install/setup.zsh &&
-cd /home/$USERNAME/march/ros2 &&
+source $ROS2_LOCATION/install/setup.zsh &&
+cd $MARCH_LOCATION/ros2 &&
 export CC=gcc &&
 export CXX=g++ &&
 colcon build --symlink-install --cmake-force-configure
 EOF
-sudo chmod 755 $ROS_LOCATION/usr/bin/march_build_ros2
+sudo chmod 755 $SCHROOT_LOCATION/usr/bin/march_build_ros2
 
-sudo tee <<EOF $ROS_LOCATION/usr/bin/march_run_ros2 >/dev/null
+sudo tee <<EOF $SCHROOT_LOCATION/usr/bin/march_run_ros2 >/dev/null
 #!/usr/bin/env zsh
-source /home/$USERNAME/march/.ros2_foxy/install/setup.zsh &&
-cd /home/$USERNAME/march/ros2 &&
+source $ROS2_LOCATION/install/setup.zsh &&
+cd $MARCH_LOCATION/ros2 &&
 source install/setup.zsh &&
 ros2 launch march_launch march_ros2_simulation.launch.py
 EOF
-sudo chmod 755 $ROS_LOCATION/usr/bin/march_run_ros2
+sudo chmod 755 $SCHROOT_LOCATION/usr/bin/march_run_ros2
