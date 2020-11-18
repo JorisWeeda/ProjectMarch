@@ -7,7 +7,7 @@
 # It defines a total of six commands
 
 USERNAME=$(whoami)
-ROS_LOCATION="/srv/chroot/ros"
+ROS_LOCATION=""
 
 sudo rm $ROS_LOCATION/usr/bin/march_* -f
 
@@ -31,7 +31,7 @@ source /opt/ros/melodic/setup.zsh &&
 cd /home/$USERNAME/march/ros1 &&
 export CC=gcc &&
 export CXX=g++ &&
-catkin_make_isolated --install
+colcon build --symlink-install --cmake-force-configure
 EOF
 sudo chmod 755 $ROS_LOCATION/usr/bin/march_build_ros1
 
