@@ -45,7 +45,7 @@
             name="record"
             type="record"
             output="log"
-            args="-a -q -o $(arg bag_prefix)"
+            args=" march/motor_controller_states/ -q -o $(arg bag_prefix)"
     />
 
     <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>

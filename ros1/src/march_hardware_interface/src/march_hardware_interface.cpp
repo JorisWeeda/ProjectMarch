@@ -18,6 +18,10 @@
 #include <march_hardware/motor_controller/motor_controller_states.h>
 #include <march_hardware/joint.h>
 
+#include <std_msgs/Float64.h>
+
+
+
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;
 using hardware_interface::PositionJointInterface;
@@ -33,6 +37,25 @@ MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot
 {
 }
 
+void MarchHardwareInterface::callback(const std_msgs::Float64ConstPtr& msg){
+  actuateTorque(msg->data);
+}
+
+
+void MarchHardwareInterface::actuateTorque(const float torque)
+{
+  float time_to_sleep = 1;
+  for (size_t i = 0; i < num_joints_; i++)
+  {
+    march::Joint& joint = march_robot_->getJoint(i);
+    joint.actuateTorque(torque);
+
+    ros::Duration(time_to_sleep).sleep();
+
+    joint.actuateTorque(0);
+  }
+}
+
 bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot_hw_nh */)
 {
   // Initialize realtime publisher for the motor controller states
@@ -43,6 +66,8 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   this->after_limit_joint_command_pub_ =
       std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand>>(
           nh, "/march/controller/after_limit_joint_command/", 4);
+
+  sub_ = nh.subscribe<std_msgs::Float64>("/march/motoco_test/actuate_torque", 1, &MarchHardwareInterface::callback, this);
 
   this->uploadJointNames(nh);
 
@@ -277,7 +302,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
       }
       else if (joint.getActuationMode() == march::ActuationMode::torque)
       {
-        joint.actuateTorque(joint_effort_command_[i]);
+//        joint.actuateTorque(joint_effort_command_[i]);
       }
     }
   }

@@ -23,6 +23,7 @@
 #include <march_shared_resources/AfterLimitJointCommand.h>
 #include <march_shared_resources/MotorControllerState.h>
 
+#include <std_msgs/Float64.h>
 template <typename T>
 using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
 
@@ -73,7 +74,13 @@ public:
    */
   void waitForUpdate();
 
+
+  void callback(const std_msgs::Float64ConstPtr& msg);
+  void actuateTorque(const float torque);
+
 private:
+  ros::Subscriber sub_;
+
   void uploadJointNames(ros::NodeHandle& nh) const;
   /**
    * Uses the num_joints_ member to resize all vectors

@@ -10,6 +10,9 @@
 #include <march_hardware/error/hardware_exception.h>
 #include <march_hardware_builder/hardware_builder.h>
 
+
+#include <std_msgs/Float64.h>
+
 std::unique_ptr<march::MarchRobot> build(AllowedRobot robot);
 
 int main(int argc, char** argv)
@@ -52,6 +55,9 @@ int main(int argc, char** argv)
 
   controller_manager::ControllerManager controller_manager(&march, nh);
   ros::Time last_update_time = ros::Time::now();
+
+
+//  ros::Subscriber sub = nh.subscribe<std_msgs::Float64>("/actuate_torque", 1, &MarchHardwareInterface::callback, march);
 
   while (ros::ok())
   {

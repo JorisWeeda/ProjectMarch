@@ -32,6 +32,6 @@
   {
     "name": "axis0.motor.config.torque_constant",
     "type": "float",
-    "value": 0.05513333
+    "value": 0.05513333333
   }
 ]

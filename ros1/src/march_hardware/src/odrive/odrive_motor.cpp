@@ -111,6 +111,8 @@ void OdriveMotor::actuateTorque(double target_torque_ampere)
 {
   float target_torque_ampere_float = (float)target_torque_ampere;
 
+  ROS_INFO("Torque sent: %f", target_torque_ampere_float);
+
   std::string command_name_ = this->create_command(O_PM_INPUT_TORQUE);
   if (this->write(command_name_, target_torque_ampere_float) == 1)
   {
