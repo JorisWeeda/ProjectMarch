@@ -9,7 +9,6 @@
 #include "odrive_enums.h"
 #include <march_hardware/motor_controller/actuation_mode.h>
 
-#define GEAR_RATIO 101
 
 static constexpr double MOTOR_KV = 100;
 static constexpr double CURRENT_TO_TORQUE_CONVERSION = 8.27;

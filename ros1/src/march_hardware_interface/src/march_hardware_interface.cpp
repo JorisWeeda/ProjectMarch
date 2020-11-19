@@ -47,12 +47,15 @@ void MarchHardwareInterface::actuateTorque(const float torque)
   float time_to_sleep = 1;
   for (size_t i = 0; i < num_joints_; i++)
   {
-    march::Joint& joint = march_robot_->getJoint(i);
-    joint.actuateTorque(torque);
+    //march::Joint& joint = march_robot_->getJoint(i);
+    //joint.actuateTorque(torque);
+    joint_effort_command_[i] = torque;
 
     ros::Duration(time_to_sleep).sleep();
 
-    joint.actuateTorque(0);
+    //joint.actuateTorque(0);
+    joint_effort_command_[i] = 0;
+
   }
 }
 

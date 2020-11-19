@@ -209,7 +209,7 @@ int OdriveMotor::getAngleCountsAbsolute()
 
 double OdriveMotor::getAngleRadAbsolute()
 {
-  double angle_rad = this->getAngleCountsAbsolute() * PI_2 / (std::pow(2, 12) * 101);
+  double angle_rad = this->getAngleCountsAbsolute() * PI_2 / GEAR_RATIO;
   return angle_rad;
 }
 

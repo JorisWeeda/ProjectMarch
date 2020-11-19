@@ -521,7 +521,7 @@ double Odrive::readVelocityRadIncremental()
     return ODRIVE_ERROR
   }
 
-  double angle_rad = iu_velocity * PI_2 / (std::pow(2, 12) * 101);
+  double angle_rad = iu_velocity * PI_2 / GEAR_RATIO;
   return angle_rad;
 }
 

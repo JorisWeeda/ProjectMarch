@@ -1,7 +1,7 @@
 description: ''
 duration:
   nsecs: 0
-  secs: 30
+  secs: 10
 gait_type: ''
 joints:
   rotational_joint:
@@ -10,110 +10,15 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -0.4597
+  - position: -0.5
     time_from_start:
-      nsecs: 428600000
-      secs: 1
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 857100000
-      secs: 2
-    velocity: 0.0
-  - position: -0.4597
-    time_from_start:
-      nsecs: 285700000
-      secs: 4
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 714299999
+      nsecs: 0
       secs: 5
-    velocity: 0.0
-  - position: -0.4597
-    time_from_start:
-      nsecs: 142900000
-      secs: 7
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 571400000
-      secs: 8
-    velocity: 0.0
-  - position: -0.4597
-    time_from_start:
-      nsecs: 0
-      secs: 10
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 428599999
-      secs: 11
-    velocity: 0.0
-  - position: -0.4597
-    time_from_start:
-      nsecs: 857100000
-      secs: 12
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 285700000
-      secs: 14
-    velocity: 0.0
-  - position: -0.4597
-    time_from_start:
-      nsecs: 714299999
-      secs: 15
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 142900000
-      secs: 17
-    velocity: 0.0
-  - position: -0.4597
-    time_from_start:
-      nsecs: 571400000
-      secs: 18
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 0
-      secs: 20
-    velocity: 0.0
-  - position: -0.4597
-    time_from_start:
-      nsecs: 428599999
-      secs: 21
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 857099999
-      secs: 22
-    velocity: 0.0
-  - position: -0.4597
-    time_from_start:
-      nsecs: 285699999
-      secs: 24
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 714300000
-      secs: 25
-    velocity: 0.0
-  - position: -0.4597
-    time_from_start:
-      nsecs: 142900000
-      secs: 27
-    velocity: 0.0
-  - position: 0.4597
-    time_from_start:
-      nsecs: 571400000
-      secs: 28
     velocity: 0.0
   - position: 0.0
     time_from_start:
       nsecs: 0
-      secs: 30
+      secs: 10
     velocity: 0.0
 name: perform_test
 version: version_0

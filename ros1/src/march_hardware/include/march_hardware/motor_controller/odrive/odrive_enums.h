@@ -16,6 +16,8 @@
 #define O_PM_AXIS_ENCODER_ERROR ".encoder.error"
 #define O_PM_AXIS_CONTROLLER_ERROR ".controller.error"
 
+#define GEAR_RATIO 101;
+
 #define ERROR_NONE 0x00
 
 // axis states
