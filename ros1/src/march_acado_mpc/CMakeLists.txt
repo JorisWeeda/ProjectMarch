@@ -3,17 +3,15 @@ PROJECT(march_acado_mpc)
 
 
 find_package(catkin REQUIRED COMPONENTS
-        march_shared_resources
-        roscpp
-        std_msgs)
+        controller_interface
+        pluginlib
+        roscpp)
 
 catkin_package(
         INCLUDE_DIRS include
         LIBRARIES ${PROJECT_NAME}
         CATKIN_DEPENDS
-        std_msgs
-        roscpp
-)
+        roscpp)
 
 include_directories(
         include/${PROJECT_NAME}
@@ -25,10 +23,7 @@ include_directories(
         # only be correct if the qpoases directory was also located in generated_src
         lib/qpoases
         lib/qpoases/INCLUDE
-        lib/qpoases/SRC
-
-
-)
+        lib/qpoases/SRC)
 
 # Create an object that contains all ACADO sources
 #set(ACADO_SRCS
@@ -41,8 +36,7 @@ include_directories(
 # A recursive way of including all files above
 file(GLOB ACADO_SRCS
         generated_src/*.c
-        generated_src/*.cpp
-        )
+        generated_src/*.cpp)
 
 # Create an object that contains all qpOASES sources
 #set(QPOASES_SRCS
@@ -69,14 +63,12 @@ file(GLOB ACADO_SRCS
 
 # A recursive way of including all files above
 file(GLOB_RECURSE QPOASES_SRCS
-        lib/qpoases/SRC/*.cpp
-        )
+        lib/qpoases/SRC/*.cpp)
 
 add_library(${PROJECT_NAME}
         src/acado_mpc.cpp
         ${ACADO_SRCS}
-        ${QPOASES_SRCS}
-        )
+        ${QPOASES_SRCS})
 
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
@@ -86,11 +78,10 @@ add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 install(DIRECTORY include/${PROJECT_NAME}
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        )
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+
 install(TARGETS ${PROJECT_NAME}
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        )
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+
 install(TARGETS ${PROJECT_NAME}_node
-        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-        )
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
