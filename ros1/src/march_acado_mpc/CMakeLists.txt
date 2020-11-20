@@ -11,6 +11,8 @@ catkin_package(
         INCLUDE_DIRS include
         LIBRARIES ${PROJECT_NAME}
         CATKIN_DEPENDS
+        controller_interface
+        pluginlib
         roscpp)
 
 include_directories(
@@ -66,22 +68,26 @@ file(GLOB_RECURSE QPOASES_SRCS
         lib/qpoases/SRC/*.cpp)
 
 add_library(${PROJECT_NAME}
+        include/${PROJECT_NAME}/acado_mpc.h
+        include/${PROJECT_NAME}//model_predictive_controller.h
         src/acado_mpc.cpp
+        src/march_acado_mpc_node.cpp
         ${ACADO_SRCS}
         ${QPOASES_SRCS})
 
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
-add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node)
-add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+#add_executable(model_predictive_controller src/model_predictive_controller.cpp)
+#add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
-install(DIRECTORY include/${PROJECT_NAME}
+install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
 install(TARGETS ${PROJECT_NAME}
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
-install(TARGETS ${PROJECT_NAME}_node
-        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(FILES controller_plugins.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

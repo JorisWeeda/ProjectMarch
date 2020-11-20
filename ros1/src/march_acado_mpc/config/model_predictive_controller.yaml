@@ -1,0 +1,3 @@
+model_predictive_controller:
+  type: model_predictive_controller/ModelPredictiveController
+  joint_name: left_hip_fe
