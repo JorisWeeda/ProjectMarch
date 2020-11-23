@@ -30,7 +30,7 @@ def data_files():
 setup(
     name=package_name,
     version='0.0.0',
-    packages=['scripts'],
+    packages=[package_name],
     data_files=data_files(),
     install_requires=['setuptools'],
     zip_safe=True,
@@ -40,7 +40,7 @@ setup(
     license='TODO: License declaration',
     entry_points={
         'console_scripts': [
-            'to_world_transform = scripts.to_world_transform:main'
+            'to_world_transform = march_simulation.to_world_transform:main'
         ],
     },
 )
