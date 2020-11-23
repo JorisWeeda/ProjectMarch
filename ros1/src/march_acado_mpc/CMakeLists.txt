@@ -3,17 +3,31 @@ PROJECT(march_acado_mpc)
 
 
 find_package(catkin REQUIRED COMPONENTS
+        actionlib
+        actionlib_msgs
+        control_msgs
         controller_interface
+        controller_manager
+        joint_state_controller
+        joint_trajectory_controller
+        march_hardware
+        march_shared_resources
         pluginlib
-        roscpp)
+        realtime_tools
+        roscpp
+        std_msgs
+        urdf)
 
 catkin_package(
         INCLUDE_DIRS include
         LIBRARIES ${PROJECT_NAME}
         CATKIN_DEPENDS
+        actionlib_msgs
+        control_msgs
         controller_interface
         pluginlib
-        roscpp)
+        roscpp
+        std_msgs)
 
 include_directories(
         include/${PROJECT_NAME}
@@ -70,7 +84,8 @@ file(GLOB_RECURSE QPOASES_SRCS
 add_library(${PROJECT_NAME}
 #        include/${PROJECT_NAME}/acado_mpc.h
 #        include/${PROJECT_NAME}/model_predictive_controller.h
-        src/model_predictive_controller.cpp
+#        src/model_predictive_controller.cpp
+        src/trajectory_mpc.cpp
 #        src/acado_mpc.cpp
 #        src/march_acado_mpc_node.cpp
 #        ${ACADO_SRCS}
