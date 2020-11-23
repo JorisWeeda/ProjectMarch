@@ -40,8 +40,7 @@ setup(
     license='TODO: License declaration',
     entry_points={
         'console_scripts': [
-            'upload_joint_names = scripts.upload_joint_names:main'
-            'to_world_transform = scripts.to_world_transform'
+            'to_world_transform = scripts.to_world_transform:main'
         ],
     },
 )

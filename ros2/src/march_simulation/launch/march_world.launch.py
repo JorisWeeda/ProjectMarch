@@ -7,7 +7,7 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 
 
 def generate_launch_description():
@@ -15,6 +15,7 @@ def generate_launch_description():
     robot = LaunchConfiguration('robot')
     ground_gait = LaunchConfiguration('ground_gait')
     gazebo_ui = LaunchConfiguration('gazebo_ui')
+    fixed = LaunchConfiguration('fixed')
 
     xacro_path = os.path.join(get_package_share_directory('march_description'), 'urdf', 'march4.xacro')
         # PathJoinSubstitution(
@@ -86,6 +87,13 @@ def generate_launch_description():
                 'use_sim_time': use_sim_time,
                 'robot_description': robot_description
             }]),
+        Node(
+            package='march_simulation',
+            executable='to_world_transform',
+            name='world_transformer',
+            output='screen',
+            condition=UnlessCondition(fixed)
+        ),
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_simulation'),
                          'launch', 'gazebo_launch.launch.py')),
