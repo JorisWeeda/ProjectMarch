@@ -94,6 +94,14 @@ def generate_launch_description():
             output='screen',
             condition=UnlessCondition(fixed)
         ),
+        Node(
+            package='gazebo_ros',
+            executable='spawn_entity.py',
+            name='urdf_spawner',
+            arguments=['-topic', 'robot_description',
+                       '-entity', 'march'],
+            output='screen'
+        ),
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_simulation'),
                          'launch', 'gazebo_launch.launch.py')),

@@ -4,6 +4,7 @@
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
       <robotNamespace>/march</robotNamespace>
       <robotSimType>gazebo_ros2_control/DefaultRobotHWSim</robotSimType>
+      <parameters>$(find march_simulation)/config/effort_control/march4.yaml</parameters>
     </plugin>
   </gazebo>
 </robot>

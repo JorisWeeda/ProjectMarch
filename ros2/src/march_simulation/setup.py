@@ -1,14 +1,22 @@
 import os
 from glob import glob
 from setuptools import setup
+import xacro
 
 package_name = 'march_simulation'
+ros1_source = os.path.join('..', '..', '..', 'ros1', 'src', 'march_simulation')
+
+# def convert_xacro_files():
+#     urdf_files = []
+#     urdf_path = os.path.join('..', '..', '..', 'ros1', 'install', 'march_simulation', 'share', 'march_simulation')
+#     for file in glob(ros1_source + '/obstacles/*.xacro'):
+#         urdf_files.append(file)
+#     return urdf_files
 
 
 def data_files():
     """ Generates the list of data files necessary for gait selection, the gait and subgait files
     required for testing are taken from the ros1 directory to decrease duplication. """
-    ros1_source = os.path.join('..', '..', '..', 'ros1', 'src', 'march_simulation')
     data = [
         (os.path.join('share', 'ament_index', 'resource_index', 'packages'),
          [os.path.join('resource', package_name)]),
@@ -16,7 +24,7 @@ def data_files():
         (os.path.join('share', package_name, 'launch'),
          glob('launch/*.launch.py')),
         (os.path.join('share', package_name, 'config', 'effort_control'),
-         glob(ros1_source + '/config/effort_control/*.yaml')),
+         glob('config/effort_control/*.yaml')),
         (os.path.join('share', package_name, 'config', 'inertia_control'),
          glob(ros1_source + '/config/inertia_control/*.yaml')),
         (os.path.join('share', package_name, 'obstacles'),
@@ -25,7 +33,6 @@ def data_files():
          glob(ros1_source + '/worlds/*.world')),
     ]
     return data
-
 
 setup(
     name=package_name,
@@ -40,7 +47,8 @@ setup(
     license='TODO: License declaration',
     entry_points={
         'console_scripts': [
-            'to_world_transform = march_simulation.to_world_transform:main'
+            'to_world_transform = march_simulation.to_world_transform:main',
+            'spawn_obstacle = march_simulation.spawn_obstacle:main'
         ],
     },
 )
