@@ -17,18 +17,26 @@ def generate_launch_description():
     gazebo_ui = LaunchConfiguration('gazebo_ui')
     fixed = LaunchConfiguration('fixed')
 
-    xacro_path = os.path.join(get_package_share_directory('march_description'), 'urdf', 'march4.xacro')
-        # PathJoinSubstitution(
-        # [get_package_share_directory('march_description'),
-        #  'urdf',
-        #  robot])
-    xacro_args = """k_velocity_value_hfe:=60.0 k_velocity_value_kfe:=60.0
-    k_velocity_value_haa:=60.0 k_velocity_value_adpf:=15.0
-    k_position_value_hfe:=5000.0 k_position_value_kfe:=5000.0
-    k_position_value_haa:=5000.0 k_position_value_adpf:=5000.0
-    max_effort_rotary:=200.0 max_effort_linear:=200.0
-    ground_gait:="""
-    robot_description = Command(['xacro', ' ', xacro_path])
+
+    xacro_path = PathJoinSubstitution([
+        get_package_share_directory('march_description'), 'urdf', robot])
+
+    # Override effort values as Gazebo uses different units than the actual IMC.
+    # In theory, if the controller is properly tuned, these values can be arbitrarily large.
+    # However, to limit the safety controller, we need to limit them.
+    xacro_args = [" k_velocity_value_hfe:=", "60.0",
+                  " k_velocity_value_kfe:=", "60.0",
+                  " k_velocity_value_haa:=", "60.0 ",
+                  " k_velocity_value_adpf:=", "15.0",
+                  " k_position_value_hfe:=", "5000.0 ",
+                  " k_position_value_kfe:=", "5000.0",
+                  " k_position_value_haa:=", "5000.0 ",
+                  " k_position_value_adpf:=", "5000.0",
+                  " max_effort_rotary:=", "200.0 ",
+                  " max_effort_linear:=", "200.0",
+                  " ground_gait:=", ground_gait]
+    robot_description = Command(['xacro', ' ', xacro_path, '.xacro'] +
+                                xacro_args)
     #, ' ', xacro_args, ground_gait])
 
 
@@ -102,10 +110,10 @@ def generate_launch_description():
                        '-entity', 'march'],
             output='screen'
         ),
-        IncludeLaunchDescription(PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('march_simulation'),
-                         'launch', 'gazebo_launch.launch.py')),
-            launch_arguments=[('use_sim_time', use_sim_time),
-                              ('gazebo_ui', gazebo_ui)]
-        )
+        # IncludeLaunchDescription(PythonLaunchDescriptionSource(
+        #     os.path.join(get_package_share_directory('march_simulation'),
+        #                  'launch', 'gazebo_launch.launch.py')),
+        #     launch_arguments=[('use_sim_time', use_sim_time),
+        #                       ('gazebo_ui', gazebo_ui)]
+        # )
     ])
