@@ -32,11 +32,11 @@
   {
     "name": "axis0.motor.config.torque_constant",
     "type": "float",
-    "value": 1
+    "value": 0.05513333333
   },
   {
     "name": "axis0.controller.config.vel_limit",
     "type": "float",
-    "value": 54
+    "value": 10
   }
 ]

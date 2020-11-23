@@ -3,6 +3,8 @@
 
 #include <utility>
 
+#define TORQUE_CONSTANT 8.27/150
+
 namespace march
 {
 OdriveMotor::OdriveMotor(const std::string& axisNumber, std::shared_ptr<OdriveEndpoint> odriveEndpoint,
@@ -109,9 +111,9 @@ void OdriveMotor::actuateRad(double target_rad)
 
 void OdriveMotor::actuateTorque(double target_torque_ampere)
 {
-  float target_torque_ampere_float = (float)target_torque_ampere;
+  float target_torque_ampere_float = (float)target_torque_ampere * (TORQUE_CONSTANT);
 
-  ROS_INFO("Torque sent: %f", target_torque_ampere_float);
+//  ROS_INFO("Torque sent: %f", target_torque_ampere_float);
 
   std::string command_name_ = this->create_command(O_PM_INPUT_TORQUE);
   if (this->write(command_name_, target_torque_ampere_float) == 1)
@@ -210,6 +212,7 @@ int OdriveMotor::getAngleCountsAbsolute()
 double OdriveMotor::getAngleRadAbsolute()
 {
   double angle_rad = this->getAngleCountsAbsolute() * PI_2 / GEAR_RATIO;
+
   return angle_rad;
 }
 
@@ -225,12 +228,14 @@ bool OdriveMotor::getIncrementalMorePrecise() const
 
 int OdriveMotor::getAngleCountsIncremental()
 {
+//  ROS_INFO("Angle counts: %f ", this->angle_counts_incremental);
   return this->angle_counts_incremental;
 }
 
 double OdriveMotor::getAngleRadIncremental()
 {
   double angle_rad = this->getAngleCountsIncremental() * PI_2 /  GEAR_RATIO;
+//  ROS_INFO("Angle rad: %f ", angle_rad);
   return angle_rad;
 }
 
