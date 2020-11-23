@@ -1,3 +1,9 @@
-model_predictive_controller:
-  type: model_predictive_controller/ModelPredictiveController
-  joint_name: left_hip_fe
+march:
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  controller:
+    trajectory:
+      type: model_predictive_controller/ModelPredictiveController
+      joint: rotational_joint

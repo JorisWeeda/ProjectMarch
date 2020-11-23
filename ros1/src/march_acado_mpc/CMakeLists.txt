@@ -68,12 +68,14 @@ file(GLOB_RECURSE QPOASES_SRCS
         lib/qpoases/SRC/*.cpp)
 
 add_library(${PROJECT_NAME}
-        include/${PROJECT_NAME}/acado_mpc.h
-        include/${PROJECT_NAME}//model_predictive_controller.h
-        src/acado_mpc.cpp
-        src/march_acado_mpc_node.cpp
-        ${ACADO_SRCS}
-        ${QPOASES_SRCS})
+#        include/${PROJECT_NAME}/acado_mpc.h
+#        include/${PROJECT_NAME}/model_predictive_controller.h
+        src/model_predictive_controller.cpp
+#        src/acado_mpc.cpp
+#        src/march_acado_mpc_node.cpp
+#        ${ACADO_SRCS}
+#        ${QPOASES_SRCS}
+        )
 
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
