@@ -76,5 +76,5 @@ joints:
   - position: 0.0
     time_from_start: {nsecs: 500000000, secs: 1}
     velocity: 0.0
-name: !!python/unicode 'right_close'
+name: right_close
 version: MV_RD_slopeup_rightclose_steep_v1
