@@ -1,5 +1,5 @@
 #this file represents the controller being used
-march:
+march_controller:
   ros__parameters:
     type: joint_trajectory_controller/JointTrajectoryController
     joints:
