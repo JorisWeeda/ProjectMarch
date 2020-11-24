@@ -11,6 +11,7 @@ def generate_launch_description():
     # General arguments
     node_prefix = LaunchConfiguration('node_prefix')
     use_sim_time = LaunchConfiguration('use_sim_time')
+    robot = LaunchConfiguration('robot')
     # Input device arguments
     rqt_input = LaunchConfiguration('rqt_input')
     ping_safety_node = LaunchConfiguration('ping_safety_node')
@@ -21,6 +22,12 @@ def generate_launch_description():
     gait_selection = LaunchConfiguration('gait_selection')
     gait_package = LaunchConfiguration('gait_package')
     gait_directory = LaunchConfiguration('gait_directory')
+    # Simulation arguments
+    gazebo_ui = LaunchConfiguration('gazebo_ui')
+    fixed = LaunchConfiguration('fixed')
+    ground_gait = LaunchConfiguration('ground_gait')
+    obstacle = LaunchConfiguration('obstacle')
+    controller = LaunchConfiguration('controller')
 
     return launch.LaunchDescription([
         # GENERAL ARGUMENTS
@@ -29,6 +36,10 @@ def generate_launch_description():
             default_value='True',
             description='Whether to use simulation time as published on the '
                         '/clock topic by gazebo instead of system time.'),
+        DeclareLaunchArgument(
+            name='robot',
+            default_value='march4',
+            description='Robot to use.'),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
             name='rqt_input',
@@ -68,6 +79,33 @@ def generate_launch_description():
             default_value='training-v',
             description='The directory in which the gait files to use are located, '
                         'relative to the gait_package.'),
+        # SIMULATION ARGUMENT
+        DeclareLaunchArgument(
+            name='gazebo_ui',
+            default_value='true',
+            description='Launches the Gazebo UI.'
+        ),
+        DeclareLaunchArgument(
+            name='fixed',
+            default_value='true',
+            description='Fixes the exoskeleton in the world'
+        ),
+        DeclareLaunchArgument(
+            name='ground_gait',
+            default_value='false',
+            description='Exoskeleton will ground gait if true.'
+        ),
+        DeclareLaunchArgument(
+            name='obstacle',
+            default_value='none',
+            description='Obstacle to load in the simulation.'
+        ),
+        DeclareLaunchArgument(
+            name='controller',
+            default_value='effort_control',
+            description='Changes the controller used by simulation.'
+        ),
+
         # Launch rqt input device if not rqt_input:=false
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_rqt_input_device'), 'launch', 'input_device.launch.py')),
@@ -86,5 +124,17 @@ def generate_launch_description():
             launch_arguments=[('gait_directory', gait_directory),
                               ('use_sim_time', use_sim_time),
                               ('gait_package', gait_package)],
+            condition=IfCondition(gait_selection)),
+        # Launch simulation
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('march_simulation'),
+                         'launch', 'march_world.launch.py')),
+            launch_arguments=[('gazebo_ui', gazebo_ui),
+                              ('use_sim_time', use_sim_time),
+                              ('fixed', fixed),
+                              ('ground_gait', ground_gait),
+                              ('obstacle', obstacle),
+                              ('controller', controller),
+                              ('robot', robot)],
             condition=IfCondition(gait_selection))
     ])
