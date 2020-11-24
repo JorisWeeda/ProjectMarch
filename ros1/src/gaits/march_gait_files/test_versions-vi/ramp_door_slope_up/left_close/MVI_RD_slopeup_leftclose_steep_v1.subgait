@@ -7,7 +7,7 @@ joints:
     time_from_start: {nsecs: 0, secs: 0}
     velocity: -0.3491
   - position: -0.1222
-    time_from_start: {nsecs: 191100000, secs: 0}
+    time_from_start: {nsecs: 318500000, secs: 0}
     velocity: 0.0
   - position: 0.0824
     time_from_start: {nsecs: 949400000, secs: 0}
@@ -26,11 +26,11 @@ joints:
     time_from_start: {nsecs: 500000000, secs: 1}
     velocity: 0.0
   left_hip_fe:
-  - position: -0.0524
+  - position: -0.1833
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 0.9599
-    time_from_start: {nsecs: 750000000, secs: 0}
+  - position: 0.4373
+    time_from_start: {nsecs: 931100000, secs: 0}
     velocity: -0.5818
   - position: -0.0873
     time_from_start: {nsecs: 500000000, secs: 1}
@@ -70,11 +70,11 @@ joints:
     time_from_start: {nsecs: 500000000, secs: 1}
     velocity: 0.0
   right_knee:
-  - position: 0.6981
+  - position: 0.9599
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
   - position: 0.0
     time_from_start: {nsecs: 500000000, secs: 1}
     velocity: 0.0
 name: left_close
-version: MV_RD_slopeup_leftclose_steep_v1
+version: MVI_RD_slopeup_leftclose_steep_v1
