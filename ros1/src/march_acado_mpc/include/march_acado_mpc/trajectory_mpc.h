@@ -18,6 +18,8 @@
 #include "std_msgs/Float64.h"
 #include <trajectory_interface/quintic_spline_segment.h>
 
+#include <iostream>
+
 template <typename T>
 using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
 
@@ -82,7 +84,7 @@ public:
         // Update effort command
         for (unsigned int i = 0; i < num_joints_; ++i)
         {
-            const double command = 0.0;
+            const double command = state_error.position[i]*1000;
             (*joint_handles_ptr_)[i].setCommand(command);
         }
 
