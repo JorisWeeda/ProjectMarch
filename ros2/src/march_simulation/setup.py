@@ -24,9 +24,11 @@ def data_files():
         (os.path.join('share', package_name, 'launch'),
          glob('launch/*.launch.py')),
         (os.path.join('share', package_name, 'config', 'effort_control'),
-         glob('config/effort_control/*.yaml')),
+         glob(ros1_source + '/config/effort_control/*.yaml')),
         (os.path.join('share', package_name, 'config', 'inertia_control'),
          glob(ros1_source + '/config/inertia_control/*.yaml')),
+        (os.path.join('share', package_name, 'config', 'position_control'),
+         glob('config/position_control/*.yaml')),
         (os.path.join('share', package_name, 'obstacles'),
          glob(ros1_source + '/obstacles/*.xacro')),
         (os.path.join('share', package_name, 'worlds'),
@@ -48,7 +50,8 @@ setup(
     entry_points={
         'console_scripts': [
             'to_world_transform = march_simulation.to_world_transform:main',
-            'spawn_obstacle = march_simulation.spawn_obstacle:main'
+            'spawn_obstacle = march_simulation.spawn_obstacle:main',
+            'example = march_simulation.example_joint_trajectory:main'
         ],
     },
 )

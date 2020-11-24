@@ -1,7 +1,7 @@
 #this file represents the controller being used
-march_controller:
-  ros__paramaters:
-    type: effort_controllers/JointTrajectoryController
+march:
+  ros__parameters:
+    type: joint_trajectory_controller/JointTrajectoryController
     joints:
       - left_ankle
       - left_hip_aa
