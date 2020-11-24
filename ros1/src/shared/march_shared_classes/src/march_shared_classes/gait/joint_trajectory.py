@@ -4,6 +4,7 @@ from scipy.interpolate import BPoly
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 
 from .setpoint import Setpoint
+from .utilities import weighted_average
 
 
 class JointTrajectory(object):
@@ -142,8 +143,8 @@ class JointTrajectory(object):
     def __len__(self):
         return len(self.setpoints)
 
-    @classmethod
-    def interpolate_joint_trajectories(cls, base_trajectory, other_trajectory, parameter):
+    @staticmethod
+    def interpolate_joint_trajectories(base_trajectory, other_trajectory, parameter):
         """Linearly interpolate two joint trajectories with the parameter.
 
         :param base_trajectory:
@@ -157,13 +158,57 @@ class JointTrajectory(object):
             The interpolated trajectory
         """
         if base_trajectory.limits != other_trajectory.limits:
-            raise SubgaitInterpolationError('Not able to safely interpolate because limits are not equal for joint {0}'.
-                                            format(base_trajectory.name))
+            raise SubgaitInterpolationError('Not able to safely interpolate because limits are not equal for joints '
+                                            '{0} and {1}'.format(base_trajectory.name, other_trajectory.name))
         if len(base_trajectory.setpoints) != len(other_trajectory.setpoints):
             raise SubgaitInterpolationError('The amount of setpoints do not match for joint {0}'.
                                             format(base_trajectory.name))
         setpoints = []
         for base_setpoint, other_setpoint in zip(base_trajectory.setpoints, other_trajectory.setpoints):
-            setpoints.append(cls.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter))
+            setpoints.append(JointTrajectory.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint,
+                                                                                  parameter))
         duration = parameter * base_trajectory.duration + (1 - parameter) * other_trajectory.duration
         return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
+
+    @staticmethod
+    def interpolate_joint_trajectories_foot_position(base_subgait, other_subgait, parameter):
+        """Linearly interpolate the foot trajectory corresponding to the joint trajectories of two subgaits.
+
+        This function goes over each joint to get needed setpoints (all first setpoints, all second setpoints..).
+        These are needed as calcuating the foot position requires the position of all joints at a certain time.
+
+        :param base_trajectory:
+            base trajectory, return value if parameter is equal to zero
+        :param other_trajectory:
+            other trajectory, return value if parameter is equal to one
+        :param parameter:
+            The parameter to use for interpolation. Should be 0 <= parameter <= 1.
+
+        :return:
+            The interpolated trajectory
+        """
+        joints = []
+        new_setpoints = {joint.name: [] for joint in base_subgait.joints}
+        for current_setpoints_index in range(0, len(base_subgait.joints[0].setpoints)):
+            base_setpoints_to_interpolate = {}
+            other_setpoints_to_interpolate = {}
+            for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
+                                               sorted(other_subgait.joints, key=lambda joint: joint.name)):
+                if base_joint.limits != other_joint.limits:
+                    raise SubgaitInterpolationError(
+                        'Not able to safely interpolate because limits are not equal for joints '
+                        '{0} and {1}'.format(base_joint.name, other_joint.name))
+                base_setpoints_to_interpolate[base_joint.name] = base_joint.setpoints[current_setpoints_index]
+                other_setpoints_to_interpolate[other_joint.name] = other_joint.setpoints[current_setpoints_index]
+            interpolated_setpoints = Setpoint.create_position_interpolated_setpoints(base_setpoints_to_interpolate,
+                                                                                     other_setpoints_to_interpolate,
+                                                                                     parameter)
+            # with interpolated setpoints, create a dictionary of joint names with a list of their setpoints
+            for base_joint in base_subgait.joints:
+                new_setpoints[base_joint.name].append(interpolated_setpoints[base_joint.name])
+
+        duration = weighted_average(base_subgait.duration, other_subgait.duration, parameter)
+        for base_joint in base_subgait.joints:
+            joints.append(JointTrajectory(base_joint.name, base_joint.limits, new_setpoints[base_joint.name],
+                                          duration))
+        return joints
