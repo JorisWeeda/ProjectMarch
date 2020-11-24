@@ -17,7 +17,6 @@ def generate_launch_description():
     gazebo_ui = LaunchConfiguration('gazebo_ui')
     fixed = LaunchConfiguration('fixed')
 
-
     xacro_path = PathJoinSubstitution([
         get_package_share_directory('march_description'), 'urdf', robot])
 
@@ -37,8 +36,6 @@ def generate_launch_description():
                   " ground_gait:=", ground_gait]
     robot_description = Command(['xacro', ' ', xacro_path, '.xacro'] +
                                 xacro_args)
-    #, ' ', xacro_args, ground_gait])
-
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -110,10 +107,10 @@ def generate_launch_description():
                        '-entity', 'march'],
             output='screen'
         ),
-        # IncludeLaunchDescription(PythonLaunchDescriptionSource(
-        #     os.path.join(get_package_share_directory('march_simulation'),
-        #                  'launch', 'gazebo_launch.launch.py')),
-        #     launch_arguments=[('use_sim_time', use_sim_time),
-        #                       ('gazebo_ui', gazebo_ui)]
-        # )
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('march_simulation'),
+                         'launch', 'gazebo_launch.launch.py')),
+            launch_arguments=[('use_sim_time', use_sim_time),
+                              ('gazebo_ui', gazebo_ui)]
+        )
     ])
