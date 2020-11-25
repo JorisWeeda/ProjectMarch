@@ -167,21 +167,24 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
     goal_position_x = stable_foot_pose.X();
   }
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
-
-  // Start goal position a quarter step size behind the stable foot
-  // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
-  if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
+  if (subgait_name_.substr(0, 7) != "dynamic")
   {
-    goal_position_x += -0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+    // Start goal position a quarter step size behind the stable foot
+    // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
+    if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
+    {
+      goal_position_x += -0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+    }
+    else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing")
+    {
+      goal_position_x += 0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
+    }
+    else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
+    {
+      goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+    }
   }
-  else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing")
-  {
-    goal_position_x += 0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
-  }
-  else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
-  {
-    goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
-  }
+  ROS_INFO_STREAM("gooal position x: " << goal_postion_x)
 }
 
 }  // namespace gazebo
