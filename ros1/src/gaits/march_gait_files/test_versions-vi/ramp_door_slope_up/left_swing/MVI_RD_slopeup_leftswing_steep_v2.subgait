@@ -74,8 +74,8 @@ joints:
   - position: 0.9599
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 1.3614
-    time_from_start: {nsecs: 300000000, secs: 0}
+  - position: 1.1519
+    time_from_start: {nsecs: 325400000, secs: 0}
     velocity: -0.3832
   - position: 0.1396
     time_from_start: {nsecs: 500000000, secs: 1}
