@@ -5,5 +5,5 @@ march:
 
   controller:
     trajectory:
-      type: model_predictive_controller/ModelPredictiveController
+      type: model_predictive_trajectory_controller/JointTrajectoryController
       joint: rotational_joint

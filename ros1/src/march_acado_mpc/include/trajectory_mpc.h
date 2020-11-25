@@ -19,6 +19,8 @@
 #include <trajectory_interface/quintic_spline_segment.h>
 
 #include <iostream>
+#include <vector>
+#include "acado_mpc.h"
 
 template <typename T>
 using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
@@ -44,6 +46,15 @@ public:
         joint_handles_ptr_ = &joint_handles;
         num_joints_ = joint_handles_ptr_->size();
         pub_.resize(num_joints_);
+
+        std::cout << num_joints_ << std::endl;
+        int fuck = 3;
+        // do something I guess
+        model_predictive_controllers_.resize(num_joints_);
+        for (unsigned int i = 0; i < num_joints_; i++)
+        {
+            model_predictive_controllers_[i].init();
+        }
 
         return true;
     }
@@ -85,7 +96,7 @@ public:
         for (unsigned int i = 0; i < num_joints_; ++i)
         {
             const double command = state_error.position[i]*1000;
-            (*joint_handles_ptr_)[i].setCommand(command);
+            (*joint_handles_ptr_)[i].setCommand(10);
         }
 
     }
@@ -102,6 +113,8 @@ private:
 
     std::vector<RtPublisherPtr<std_msgs::Float64>> pub_;
     std_msgs::Float64 msg_;
+
+    std::vector<ModelPredictiveController> model_predictive_controllers_;
 };
 
 #endif  // MARCH_HARDWARE_TRAJECTORY_MPC_H
