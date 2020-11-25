@@ -36,8 +36,11 @@ def main():
     # make limits x times stricter than defined by the urdf
     limits_factor = 0.95
 
+    # Overriding urdf limits here
+    limits = [-0.5, 0.5]
+
     subgait_generator = SubGaitGenerator(gait_name, subgait_name, version, duration,
-                                         num_setpoints, method, limits_factor)
+                                         num_setpoints, method, limits=limits)
     subgait_generator.generate_subgait()
     subgait_generator.write_to_file(file_path_src)
     subgait_generator.write_to_file(file_path_install)
@@ -45,11 +48,28 @@ def main():
     print('Generated yaml:\n')
     print(subgait_generator.subgait.to_yaml())
 
+
 class SubGaitGenerator:
     def __init__(self, gait_name, subgait_name, version, duration,
-                 num_setpoints, method, limits_factor=1, description='',
-                 urdf_file='test_joint_rotational',
+                 num_setpoints, method, limits_factor=1, limits=None,
+                 description='', urdf_file='test_joint_rotational',
                  joint_name='rotational_joint'):
+        """
+        Initialize the subgait generator
+
+        :param gait_name Name of the gait
+        :param subgait_name Name of the subgait
+        :param version Version of the gait
+        :param duration Duration of the subgait in seconds
+        :param num_setpoints Number of setpoints, all setpoint will be equal amount
+               of time apart
+        :param method Method used to generate the setpoints, either 'random' or 'limits'
+        :param limits_factor Make limits x times stricter than defined by the urdf
+        :param limits Optional parameter to override position limits of urdf
+        :param description Description of the subgait
+        :param urdf_file File to retrieve urdf from
+        :param joint_name Name of the joint
+        """
         self.gait_name = gait_name
         self.subgait_name = subgait_name
         self.version = version
@@ -66,6 +86,9 @@ class SubGaitGenerator:
         urdf_joint = JointTrajectory.get_joint_from_urdf(robot=robot,
                                                          joint_name=self.joint_name)
         self.limits = Limits.from_urdf_joint(urdf_joint)
+        if limits is not None:
+            self.limits.lower = limits[0]
+            self.limits.upper = limits[1]
         self.limits.lower *= limits_factor
         self.limits.upper *= limits_factor
 
