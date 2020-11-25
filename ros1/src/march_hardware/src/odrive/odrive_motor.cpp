@@ -25,6 +25,19 @@ bool OdriveMotor::initialize(int cycle_time)
   return cycle_time;
 }
 
+int OdriveMotor::enableAnticogging()
+{
+    std::string command_name_ = this->create_command(".controller.config.anticogging.anticogging_enabled");
+    bool state = true;
+    if (this->write(command_name_, state) == 1)
+    {
+        ROS_ERROR("Could net set state; %i to the axis", state);
+        return ODRIVE_ERROR;
+    }
+    return ODRIVE_OK
+}
+
+
 void OdriveMotor::prepareActuation()
 {
   this->importOdriveJson();
@@ -43,6 +56,12 @@ void OdriveMotor::prepareActuation()
   }
 
   this->waitForIdleState();
+
+  if (this->enableAnticogging() == 1)
+  {
+      ROS_FATAL("Unable to enable anti cogging");
+      return;
+  }
 
   if (this->setState(States::AXIS_STATE_CLOSED_LOOP_CONTROL) == 1)
   {
@@ -109,7 +128,9 @@ void OdriveMotor::actuateRad(double target_rad)
 
 void OdriveMotor::actuateTorque(double target_torque_ampere)
 {
-  float target_torque_ampere_float = (float)target_torque_ampere;
+  float scalar = 1;
+  //float scalar = 8.27/150;
+  float target_torque_ampere_float = (float)target_torque_ampere * scalar;
 
   ROS_INFO("Torque sent: %f", target_torque_ampere_float);
 

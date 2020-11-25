@@ -24,7 +24,7 @@ public:
 
   bool initialize(int cycle_time) override;
   void prepareActuation() override;
-  bool waitForIdleState(float timout = 15.0);
+  bool waitForIdleState(float timout = 30.0);
 
   void reset() override;
 
@@ -62,6 +62,8 @@ public:
 private:
   int setState(int32_t state);
   int32_t getState();
+
+  int enableAnticogging();
 
   int getAngleCountsAbsolute();
   int getAngleCountsIncremental();
