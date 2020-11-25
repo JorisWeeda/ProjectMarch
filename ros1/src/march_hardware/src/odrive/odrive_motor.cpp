@@ -37,6 +37,17 @@ int OdriveMotor::enableAnticogging()
     return ODRIVE_OK
 }
 
+int OdriveMotor::setControlModeTorque()
+{
+    std::string command_name_ = this->create_command(".controller.config.control_mode");
+    int32_t state = 1;
+    if (this->write(command_name_, state) == 1)
+    {
+        ROS_ERROR("Could net set state; %i to the axis", state);
+        return ODRIVE_ERROR;
+    }
+    return ODRIVE_OK
+}
 
 void OdriveMotor::prepareActuation()
 {
@@ -62,6 +73,12 @@ void OdriveMotor::prepareActuation()
       ROS_FATAL("Unable to enable anti cogging");
       return;
   }
+
+    if (this->setControlModeTorque() == 1)
+    {
+        ROS_FATAL("Unable to set control mode");
+        return;
+    }
 
   if (this->setState(States::AXIS_STATE_CLOSED_LOOP_CONTROL) == 1)
   {
@@ -128,8 +145,8 @@ void OdriveMotor::actuateRad(double target_rad)
 
 void OdriveMotor::actuateTorque(double target_torque_ampere)
 {
-  float scalar = 1;
-  //float scalar = 8.27/150;
+//  float scalar = 1;
+  float scalar = 8.27/150;
   float target_torque_ampere_float = (float)target_torque_ampere * scalar;
 
   ROS_INFO("Torque sent: %f", target_torque_ampere_float);
@@ -252,6 +269,9 @@ int OdriveMotor::getAngleCountsIncremental()
 double OdriveMotor::getAngleRadIncremental()
 {
   double angle_rad = this->getAngleCountsIncremental() * PI_2 /  GEAR_RATIO;
+
+  ROS_INFO("Angle rad: %f", angle_rad);
+
   return angle_rad;
 }
 
@@ -282,6 +302,8 @@ int32_t OdriveMotor::getState()
     return ODRIVE_ERROR;
   }
 
+
+//  ROS_INFO("State: %d", axis_state);
   return axis_state;
 }
 

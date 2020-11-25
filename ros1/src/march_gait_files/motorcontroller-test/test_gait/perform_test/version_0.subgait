@@ -1,7 +1,7 @@
 description: ''
 duration:
   nsecs: 0
-  secs: 10
+  secs: 4
 gait_type: ''
 joints:
   rotational_joint:
@@ -13,12 +13,12 @@ joints:
   - position: -0.5
     time_from_start:
       nsecs: 0
-      secs: 5
+      secs: 2
     velocity: 0.0
   - position: 0.0
     time_from_start:
       nsecs: 0
-      secs: 10
+      secs: 4
     velocity: 0.0
 name: perform_test
 version: version_0

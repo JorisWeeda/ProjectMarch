@@ -64,6 +64,7 @@ private:
   int32_t getState();
 
   int enableAnticogging();
+  int setControlModeTorque();
 
   int getAngleCountsAbsolute();
   int getAngleCountsIncremental();
