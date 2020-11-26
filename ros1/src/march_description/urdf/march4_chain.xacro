@@ -87,7 +87,7 @@
          the URDF y axis and the Catia y axis is the negative URDF x axis. The given CoM are for the right leg,
          the y coordinate will be inverted for the left leg. -->
     <xacro:property name="hip_base_com_x" value="${-hip_aa_frame_width + 0.147989}"/>
-    <xacro:property name="hip_base_com_y" value="0.016341"/>
+    <xacro:property name="hip_base_com_y" value="${hip_base_height/2 + 0.016341}"/>
     <xacro:property name="hip_base_com_z" value="0.147761"/>
 
     <xacro:property name="hip_aa_com_x" value="${-hip_aa_frame_width + 0.108094}"/>
@@ -218,7 +218,7 @@
 
     <link name="foot_left">
         <inertial>
-            <origin xyz="${foot_com_x} ${-foot_com_y} ${foot_com_z}" rpy="0 0 0"/>
+            <origin xyz="${foot_com_x} ${-foot_com_y} ${foot_com_z + ankle_plate_height/2}" rpy="0 0 0"/>
             <mass value="${foot_mass}"/>
             <inertia
                     ixx="${foot_Ixx}"
@@ -290,7 +290,7 @@
         </visual>
 
         <inertial>
-            <origin xyz="${lower_leg_com_x} ${-lower_leg_com_y} ${lower_leg_com_z}" rpy="0 0 0"/>
+            <origin xyz="${lower_leg_com_x} ${-lower_leg_com_y} ${lower_leg_com_z + lower_leg_height}" rpy="0 0 0"/>
             <mass value="${lower_leg_mass}"/>
             <inertia
                     ixx="${lower_leg_Ixx}"
@@ -319,7 +319,7 @@
         </visual>
 
         <inertial>
-            <origin xyz="${upper_leg_com_x} ${-upper_leg_com_y} ${upper_leg_com_z}" rpy="0 0 0"/>
+            <origin xyz="${upper_leg_com_x} ${-upper_leg_com_y} ${upper_leg_com_z + upper_leg_height}" rpy="0 0 0"/>
             <mass value="${upper_leg_mass}"/>
             <inertia
                     ixx="${upper_leg_Ixx}"
@@ -340,7 +340,7 @@
 
     <link name="hip_aa_frame_left_front">
         <inertial>
-            <origin xyz="${hip_aa_com_x} ${-hip_aa_com_y} ${hip_aa_com_z}" rpy="0 0 0"/>
+            <origin xyz="${hip_aa_com_x + hip_aa_frame_width} ${-hip_aa_com_y} ${hip_aa_com_z}" rpy="0 0 0"/>
             <mass value="${hip_aa_mass}"/>
             <inertia
                     ixx="${hip_aa_Ixx}"
@@ -568,6 +568,7 @@
     <joint name = "foot_to_world" type="fixed">
         <parent link="${parent_name}"/>
         <child link="foot_left"/>
+        <origin xyz="0 0 ${width/2}" rpy="0 0 0"/>
     </joint>
 
     <joint name="left_foot_angle" type="fixed">
