@@ -29,6 +29,8 @@ public:
   virtual float getMotorControllerVoltage() = 0;
   virtual float getMotorVoltage() = 0;
 
+  virtual float getInputTorque() = 0;
+
   /**
    * Get whether the incremental encoder is more precise than the absolute encoder
    * @return true if the incremental encoder has a higher resolution than the absolute encoder, false otherwise

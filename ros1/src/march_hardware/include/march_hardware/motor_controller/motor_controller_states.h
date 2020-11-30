@@ -14,10 +14,12 @@ public:
   float motorCurrent;
   float controllerVoltage;
   float motorVoltage;
+  float input_torque;
   int absoluteEncoderValue;
   int incrementalEncoderValue;
   double absoluteVelocity;
   double incrementalVelocity;
+
 
   /**
    * Check whether the motor controller is in an error state

@@ -38,6 +38,8 @@ public:
   float getMotorVoltage() override;
   double getTorque() override;
 
+  float getInputTorque() override;
+
   int32_t getAxisError();
   int32_t getAxisMotorError();
   int32_t getAxisEncoderError();
@@ -82,6 +84,8 @@ private:
   float motor_controller_voltage;
   float motor_current;
   float motor_voltage;
+
+  float input_torque;
 
   double angle_counts_absolute;
   double velocity_rad_absolute;

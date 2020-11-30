@@ -477,7 +477,7 @@ float Odrive::readMotorCurrent()
 float Odrive::readMotorVoltage()
 {
   float motor_voltage;
-  std::string command_name_ = this->create_command(O_PM_ACTUAL_MOTOR_VOLTAGE_D);
+  std::string command_name_ = this->create_command(O_PM_ACTUAL_MOTOR_VOLTAGE_Q);
   if (this->read(command_name_, motor_voltage) == 1)
   {
     ROS_ERROR("Could not retrieve motor voltage");
@@ -485,6 +485,19 @@ float Odrive::readMotorVoltage()
   }
 
   return motor_voltage;
+}
+
+float Odrive::readInputTorque()
+{
+  float input_torque;
+  std::string command_name_ = this->create_command(O_PM_INPUT_TORQUE);
+  if (this->read(command_name_, input_torque) == 1)
+  {
+    ROS_ERROR("Could not retrieve motor voltage");
+    return ODRIVE_ERROR;
+  }
+
+  return input_torque;
 }
 
 int Odrive::readAngleCountsAbsolute()

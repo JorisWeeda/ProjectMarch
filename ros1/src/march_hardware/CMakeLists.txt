@@ -42,11 +42,11 @@ include_directories(
 set(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
 
-if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
-    find_package(code_coverage REQUIRED)
-    # Add compiler flags for coverage instrumentation before defining any targets
-    append_coverage_compiler_flags()
-endif()
+#if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
+#    find_package(code_coverage REQUIRED)
+#    # Add compiler flags for coverage instrumentation before defining any targets
+#    append_coverage_compiler_flags()
+#endif()
 
 add_library(${PROJECT_NAME}
         include/${PROJECT_NAME}/encoder/absolute_encoder.h
@@ -135,42 +135,42 @@ install(DIRECTORY launch config
         )
 
 ## Add gtest based cpp test target and link libraries
-if(CATKIN_ENABLE_TESTING)
-    catkin_add_gmock(${PROJECT_NAME}_test
-            test/encoder/absolute_encoder_test.cpp
-            test/encoder/encoder_test.cpp
-            test/encoder/incremental_encoder_test.cpp
-            test/error/hardware_exception_test.cpp
-            test/error/motion_error_test.cpp
-            test/ethercat/pdo_map_test.cpp
-            test/ethercat/slave_test.cpp
-            test/imotioncube/imotioncube_test.cpp
-            test/joint_test.cpp
-            test/mocks/mock_absolute_encoder.h
-            test/mocks/mock_encoder.h
-            test/mocks/mock_motor_controller.h
-            test/mocks/mock_incremental_encoder.h
-            test/mocks/mock_joint.h
-            test/mocks/mock_pdo_interface.h
-            test/mocks/mock_sdo_interface.h
-            test/mocks/mock_slave.h
-            test/mocks/mock_temperature_ges.h
-            test/power/boot_shutdown_offsets_test.cpp
-            test/power/high_voltage_test.cpp
-            test/power/low_voltage_test.cpp
-            test/power/net_driver_offsets_test.cpp
-            test/power/net_monitor_offsets_test.cpp
-            test/power/power_distribution_board_test.cpp
-            test/temperature/temperature_ges_test.cpp
-            test/test_runner.cpp
-            )
-    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
-
-    if(ENABLE_COVERAGE_TESTING)
-        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/check/*")
-        add_code_coverage(
-                NAME coverage_report
-                DEPENDENCIES ${PROJECT_NAME}_test
-        )
-    endif()
-endif()
+#if(CATKIN_ENABLE_TESTING)
+#    catkin_add_gmock(${PROJECT_NAME}_test
+#            test/encoder/absolute_encoder_test.cpp
+#            test/encoder/encoder_test.cpp
+#            test/encoder/incremental_encoder_test.cpp
+#            test/error/hardware_exception_test.cpp
+#            test/error/motion_error_test.cpp
+#            test/ethercat/pdo_map_test.cpp
+#            test/ethercat/slave_test.cpp
+#            test/imotioncube/imotioncube_test.cpp
+#            test/joint_test.cpp
+#            test/mocks/mock_absolute_encoder.h
+#            test/mocks/mock_encoder.h
+#            test/mocks/mock_motor_controller.h
+#            test/mocks/mock_incremental_encoder.h
+#            test/mocks/mock_joint.h
+#            test/mocks/mock_pdo_interface.h
+#            test/mocks/mock_sdo_interface.h
+#            test/mocks/mock_slave.h
+#            test/mocks/mock_temperature_ges.h
+#            test/power/boot_shutdown_offsets_test.cpp
+#            test/power/high_voltage_test.cpp
+#            test/power/low_voltage_test.cpp
+#            test/power/net_driver_offsets_test.cpp
+#            test/power/net_monitor_offsets_test.cpp
+#            test/power/power_distribution_board_test.cpp
+#            test/temperature/temperature_ges_test.cpp
+#            test/test_runner.cpp
+#            )
+#    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
+#
+#    if(ENABLE_COVERAGE_TESTING)
+#        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/check/*")
+#        add_code_coverage(
+#                NAME coverage_report
+#                DEPENDENCIES ${PROJECT_NAME}_test
+#        )
+#    endif()
+#endif()

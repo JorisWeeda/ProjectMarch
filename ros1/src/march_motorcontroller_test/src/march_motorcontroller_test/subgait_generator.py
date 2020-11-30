@@ -17,7 +17,7 @@ def main():
 
     gait_name = 'test_gait'
     subgait_name = 'perform_test'
-    version = 'version_0'
+    version = 'version_velocity_125'
 
     gait_file_dir = 'motorcontroller-test'
 
@@ -29,8 +29,8 @@ def main():
         rospkg.RosPack().get_path('march_gait_files'), gait_file_dir,
         gait_name, subgait_name, version + '.subgait')
 
-    duration = 30
-    num_setpoints = 20
+    duration = 5*60
+    num_setpoints = 12.5*60
     method = 'limits'
 
     # make limits x times stricter than defined by the urdf
@@ -55,7 +55,7 @@ class SubGaitGenerator:
         self.version = version
         self.urdf_file = urdf_file
         self.duration = float(duration)
-        self.num_setpoints = num_setpoints
+        self.num_setpoints = int(num_setpoints)
         self.method = method
         self.description = description
         self.joint_name = joint_name

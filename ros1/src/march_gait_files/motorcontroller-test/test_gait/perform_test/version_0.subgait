@@ -1,7 +1,7 @@
 description: ''
 duration:
   nsecs: 0
-  secs: 4
+  secs: 300
 gait_type: ''
 joints:
   rotational_joint:
@@ -10,15 +10,610 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -0.5
+  - position: -0.4597
     time_from_start:
-      nsecs: 0
+      nsecs: 479299999
       secs: 2
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 958700000
+      secs: 4
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 437999999
+      secs: 7
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 917400000
+      secs: 9
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 396699999
+      secs: 12
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 875999999
+      secs: 14
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 355399999
+      secs: 17
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 834700000
+      secs: 19
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 314000000
+      secs: 22
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 793399999
+      secs: 24
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 272700000
+      secs: 27
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 752099999
+      secs: 29
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 231400000
+      secs: 32
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 710700000
+      secs: 34
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 190100000
+      secs: 37
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 669400000
+      secs: 39
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 148800000
+      secs: 42
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 628100000
+      secs: 44
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 107399999
+      secs: 47
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 586799999
+      secs: 49
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 66099999
+      secs: 52
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 545499999
+      secs: 54
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 24799999
+      secs: 57
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 504100000
+      secs: 59
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 983499999
+      secs: 61
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 462800000
+      secs: 64
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 942099999
+      secs: 66
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 421499999
+      secs: 69
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 900800000
+      secs: 71
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 380200000
+      secs: 74
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 859499999
+      secs: 76
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 338800000
+      secs: 79
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 818200000
+      secs: 81
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 297499999
+      secs: 84
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 776899999
+      secs: 86
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 256200000
+      secs: 89
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 735500000
+      secs: 91
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 214900000
+      secs: 94
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 694199999
+      secs: 96
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 173599999
+      secs: 99
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 652900000
+      secs: 101
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 132199999
+      secs: 104
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 611599999
+      secs: 106
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 90900000
+      secs: 109
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 570199999
+      secs: 111
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 49599999
+      secs: 114
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 528899999
+      secs: 116
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 8300000
+      secs: 119
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 487600000
+      secs: 121
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 966899999
+      secs: 123
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 446299999
+      secs: 126
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 925600000
+      secs: 128
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 405000000
+      secs: 131
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 884299999
+      secs: 133
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 363599999
+      secs: 136
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 842999999
+      secs: 138
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 322300000
+      secs: 141
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 801700000
+      secs: 143
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 281000000
+      secs: 146
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 760300000
+      secs: 148
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 239699999
+      secs: 151
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 718999999
+      secs: 153
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 198299999
+      secs: 156
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 677699999
+      secs: 158
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 157000000
+      secs: 161
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 636400000
+      secs: 163
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 115700000
+      secs: 166
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 594999999
+      secs: 168
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 74399999
+      secs: 171
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 553699999
+      secs: 173
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 33099999
+      secs: 176
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 512400000
+      secs: 178
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 991700000
+      secs: 180
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 471100000
+      secs: 183
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 950400000
+      secs: 185
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 429800000
+      secs: 188
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 909099999
+      secs: 190
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 388399999
+      secs: 193
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 867799999
+      secs: 195
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 347100000
+      secs: 198
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 826400000
+      secs: 200
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 305800000
+      secs: 203
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 785099999
+      secs: 205
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 264499999
+      secs: 208
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 743799999
+      secs: 210
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 223099999
+      secs: 213
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 702499999
+      secs: 215
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 181800000
+      secs: 218
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 661200000
+      secs: 220
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 140500000
+      secs: 223
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 619799999
+      secs: 225
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 99199999
+      secs: 228
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 578499999
+      secs: 230
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 57899999
+      secs: 233
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 537200000
+      secs: 235
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 16500000
+      secs: 238
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 495900000
+      secs: 240
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 975200000
+      secs: 242
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 454499999
+      secs: 245
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 933899999
+      secs: 247
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 413199999
+      secs: 250
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 892599999
+      secs: 252
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 371900000
+      secs: 255
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 851200000
+      secs: 257
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 330600000
+      secs: 260
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 809900000
+      secs: 262
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 289300000
+      secs: 265
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 768599999
+      secs: 267
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 247900000
+      secs: 270
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 727300000
+      secs: 272
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 206599999
+      secs: 275
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 685999999
+      secs: 277
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 165300000
+      secs: 280
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 644600000
+      secs: 282
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 124000000
+      secs: 285
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 603299999
+      secs: 287
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 82600000
+      secs: 290
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 562000000
+      secs: 292
+    velocity: 0.0
+  - position: -0.4597
+    time_from_start:
+      nsecs: 41299999
+      secs: 295
+    velocity: 0.0
+  - position: 0.4597
+    time_from_start:
+      nsecs: 520699999
+      secs: 297
     velocity: 0.0
   - position: 0.0
     time_from_start:
       nsecs: 0
-      secs: 4
+      secs: 300
     velocity: 0.0
 name: perform_test
 version: version_0

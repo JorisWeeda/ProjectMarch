@@ -81,7 +81,7 @@ public:
 
   /**
    * \brief Fill the rolling buffers with corresponding values.
-   */browser
+   */
   void fillBuffers(double velocity, double effort, const ros::Duration& period);
 
   /**

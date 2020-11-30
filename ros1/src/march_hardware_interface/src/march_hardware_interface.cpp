@@ -477,6 +477,8 @@ void MarchHardwareInterface::updateMotorControllerStates()
     motor_controller_state_pub_->msg_.absolute_velocity[i] = motor_controller_state.absoluteVelocity;
     motor_controller_state_pub_->msg_.incremental_velocity[i] = motor_controller_state.incrementalVelocity;
     motor_controller_state_pub_->msg_.error_status[i] = motor_controller_state.getErrorStatus();
+
+//    motor_controller_state_pub_->msg_.input_torque[i] = motor_controller_state.input_torque;
   }
 
   motor_controller_state_pub_->unlockAndPublish();

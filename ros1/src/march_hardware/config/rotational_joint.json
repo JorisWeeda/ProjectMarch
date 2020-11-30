@@ -32,7 +32,17 @@
   {
     "name": "axis0.controller.config.vel_limit",
     "type": "float",
-    "value": 10
+    "value": 15
+  },
+  {
+    "name": "axis0.controller.config.enable_current_mode_vel_limit",
+    "type": "bool",
+    "value": 1
+  },
+  {
+    "name": "axis0.controller.config.enable_overspeed_error",
+    "type": "bool",
+    "value": 1
   }
 
 ]

@@ -83,6 +83,7 @@ protected:
   float readMotorControllerVoltage();
   float readMotorCurrent();
   float readMotorVoltage();
+  float readInputTorque();
 
   int32_t readAxisError();
   int32_t readAxisMotorError();

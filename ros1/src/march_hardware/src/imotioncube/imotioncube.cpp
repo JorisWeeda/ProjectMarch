@@ -450,6 +450,10 @@ void IMotionCube::reset()
   return this->Slave::reset();
 }
 
+float IMotionCube::getInputTorque()
+{
+ return 0;
+}
 uint16_t IMotionCube::computeSWCheckSum(uint16_t& start_address, uint16_t& end_address)
 {
   size_t pos = 0;

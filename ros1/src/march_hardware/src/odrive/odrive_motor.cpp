@@ -167,6 +167,7 @@ MotorControllerStates& OdriveMotor::getStates()
   states.motorCurrent = this->getMotorCurrent();
   states.controllerVoltage = this->getMotorControllerVoltage();
   states.motorVoltage = this->getMotorVoltage();
+  states.input_torque = this->getInputTorque();
 
   states.absoluteEncoderValue = this->getAngleCountsAbsolute();
   states.incrementalEncoderValue = this->getAngleCountsIncremental();
@@ -193,6 +194,7 @@ void OdriveMotor::readValues()
   this->motor_controller_voltage = this->readMotorControllerVoltage();
   this->motor_current = this->readMotorCurrent();
   this->motor_voltage = this->readMotorVoltage();
+  this->input_torque = this->readInputTorque();
 
   this->angle_counts_absolute = this->readAngleCountsAbsolute();
   this->velocity_rad_absolute = this->readVelocityRadAbsolute();
@@ -240,6 +242,11 @@ double OdriveMotor::getTorque()
   return this->getMotorCurrent();
 }
 
+float OdriveMotor::getInputTorque()
+{
+  return this->input_torque;
+}
+
 int OdriveMotor::getAngleCountsAbsolute()
 {
   return this->angle_counts_absolute;
@@ -270,7 +277,7 @@ double OdriveMotor::getAngleRadIncremental()
 {
   double angle_rad = this->getAngleCountsIncremental() * PI_2 /  GEAR_RATIO;
 
-  ROS_INFO("Angle rad: %f", angle_rad);
+//  ROS_INFO("Angle rad: %f", angle_rad);
 
   return angle_rad;
 }

@@ -8,3 +8,4 @@ int32[] incremental_encoder_value
 float32[] absolute_velocity
 float32[] incremental_velocity
 string[] error_status
+#float32[] input_torque

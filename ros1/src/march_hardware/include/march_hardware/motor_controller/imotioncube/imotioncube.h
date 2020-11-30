@@ -66,6 +66,7 @@ public:
   virtual float getMotorCurrent() override;
   virtual float getMotorControllerVoltage() override;
   virtual float getMotorVoltage() override;
+  virtual float getInputTorque() override;
 
   MotorControllerStates& getStates() override;
 
