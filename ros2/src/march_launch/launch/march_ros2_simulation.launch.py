@@ -28,6 +28,7 @@ def generate_launch_description():
     ground_gait = LaunchConfiguration('ground_gait')
     obstacle = LaunchConfiguration('obstacle')
     controller = LaunchConfiguration('controller')
+    simulation = LaunchConfiguration('simulation')
 
     return launch.LaunchDescription([
         # GENERAL ARGUMENTS
@@ -105,6 +106,11 @@ def generate_launch_description():
             default_value='effort_control',
             description='Changes the controller used by simulation.'
         ),
+        DeclareLaunchArgument(
+            name='simulation',
+            default_value='false',
+            description='Whether to launch the simulation'
+        ),
 
         # Launch rqt input device if not rqt_input:=false
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
@@ -136,5 +142,5 @@ def generate_launch_description():
                               ('obstacle', obstacle),
                               ('controller', controller),
                               ('robot', robot)],
-            condition=IfCondition(gait_selection))
+            condition=IfCondition(simulation))
     ])

@@ -20,6 +20,10 @@ def generate_launch_description():
     obstacle = LaunchConfiguration('obstacle')
     robot = LaunchConfiguration('robot')
     controller = LaunchConfiguration('controller')
+    rviz = LaunchConfiguration('rviz')
+    rviz_config = os.path.join(get_package_share_directory('march_simulation'),
+                               'rviz', 'robotmodel.rviz')
+    print(rviz_config)
 
     xacro_path = PathJoinSubstitution([
         get_package_share_directory('march_description'), 'urdf', robot])
@@ -57,7 +61,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             name='gazebo_ui',
-            default_value='true',
+            default_value='false',
             description='Launches the Gazebo UI.'
         ),
         DeclareLaunchArgument(
@@ -89,6 +93,11 @@ def generate_launch_description():
             name='controller',
             default_value='effort_control',
             description='Changes the controller used by simulation.'
+        ),
+        DeclareLaunchArgument(
+            name='rviz',
+            default_value='true',
+            description='Whether to launch rviz'
         ),
         Node(
             package='robot_state_publisher',
@@ -139,6 +148,13 @@ def generate_launch_description():
                               ('gdb', debug)],
             condition=IfCondition(gazebo_ui)
         ),
+        # Launch rviz if rviz arg is true
+        Node(
+            name='rviz',
+            package='rviz2',
+            executable='rviz2',
+            condition=IfCondition(rviz)
+        ),
         # Spawn obstacle
         Node(
             package='march_simulation',
@@ -147,4 +163,5 @@ def generate_launch_description():
             output='screen',
             condition=obstacle_not_none
         )
+
     ])

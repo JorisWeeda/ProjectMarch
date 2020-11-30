@@ -2,6 +2,7 @@ import os
 from glob import glob
 from setuptools import setup
 import xacro
+import shutil
 
 package_name = 'march_simulation'
 ros1_source = os.path.join('..', '..', '..', '..', 'ros1', 'src', 'simulation',
@@ -11,6 +12,7 @@ ros1_source = os.path.join('..', '..', '..', '..', 'ros1', 'src', 'simulation',
 def data_files():
     """ Generates the list of data files necessary for gait selection, the gait and subgait files
     required for testing are taken from the ros1 directory to decrease duplication. """
+    set_robotmodel()
     data = [
         (os.path.join('share', 'ament_index', 'resource_index', 'packages'),
          [os.path.join('resource', package_name)]),
@@ -27,8 +29,24 @@ def data_files():
          glob(ros1_source + '/obstacles/*.xacro')),
         (os.path.join('share', package_name, 'worlds'),
          glob(ros1_source + '/worlds/*.world')),
+        (os.path.join('share', package_name, 'rviz'),
+         [os.path.join('rviz', 'default.rviz')]),
     ]
     return data
+
+
+def set_robotmodel():
+    """ This function sets the default.rviz file in the /home/$USER/.rviz2/
+    directory. RVIZ2 automatically uses this directory  for the configuration
+    when launching."""
+    dir_name = os.path.dirname(os.path.realpath(__file__))
+    rviz_config = os.path.join(dir_name, 'rviz', 'default.rviz')
+    rviz2_dir_name = os.path.join('/home', os.getenv('USER'), '.rviz2')
+
+    if not os.path.isdir(rviz2_dir_name):
+        os.mkdir(rviz2_dir_name)
+
+    shutil.copy(rviz_config, rviz2_dir_name)
 
 setup(
     name=package_name,

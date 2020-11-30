@@ -33,6 +33,7 @@ class ExampleJointTrajectory(Node):
 
         rclpy.spin(self)
 
+
     def fb_callback(self, msg):
         self.get_logger().info(f'feedback: {msg.feedback}')
 
