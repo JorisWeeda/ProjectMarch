@@ -28,7 +28,7 @@ def data_files():
         (os.path.join('share', package_name, 'obstacles'),
          glob(ros1_source + '/obstacles/*.xacro')),
         (os.path.join('share', package_name, 'worlds'),
-         glob(ros1_source + '/worlds/*.world')),
+         glob('worlds/*.world')),
         (os.path.join('share', package_name, 'rviz'),
          [os.path.join('rviz', 'default.rviz')]),
     ]

@@ -20,10 +20,7 @@ def generate_launch_description():
     obstacle = LaunchConfiguration('obstacle')
     robot = LaunchConfiguration('robot')
     controller = LaunchConfiguration('controller')
-    rviz = LaunchConfiguration('rviz')
-    rviz_config = os.path.join(get_package_share_directory('march_simulation'),
-                               'rviz', 'robotmodel.rviz')
-    print(rviz_config)
+    rviz = LaunchConfiguration('rviz')  
 
     xacro_path = PathJoinSubstitution([
         get_package_share_directory('march_description'), 'urdf', robot])
