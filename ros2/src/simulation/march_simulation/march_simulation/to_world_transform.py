@@ -7,6 +7,8 @@ import tf2_ros
 from geometry_msgs.msg import TransformStamped, Vector3
 from gazebo_msgs.srv import GetEntityState, GetModelList
 
+from march_simulation.util import get_model_list
+
 NODE_NAME = 'to_world_transform'
 MODEL_NAME = 'march'
 SERVICE_TIMEOUT = 2
@@ -36,7 +38,7 @@ class WorldTransformer(Node):
         while not self.get_model_list_client.wait_for_service(SERVICE_TIMEOUT):
             self.get_logger().info('Waiting for /get_model_list to come online')
 
-        while rclpy.ok() and MODEL_NAME not in self.get_model_list():
+        while rclpy.ok() and MODEL_NAME not in get_model_list(self, self.get_model_list_client):
             self.get_logger().info(f'Waiting for model {MODEL_NAME} to appear in model list')
 
         while not self.get_entity_state_client.wait_for_service(SERVICE_TIMEOUT):
@@ -60,7 +62,6 @@ class WorldTransformer(Node):
 
         result = future.result()
         if result.success:
-            self.get_logger().error(str(result.model_names))
             return result.model_names
         return []
 

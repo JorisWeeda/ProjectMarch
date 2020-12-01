@@ -159,6 +159,10 @@ def generate_launch_description():
             parameters=[{'obstacle': obstacle}],
             output='screen',
             condition=obstacle_not_none
+        ),
+        Node(
+            name="set_obstacle_node",
+            package="march_simulation",
+            executable="set_obstacle_dimensions"
         )
-
     ])

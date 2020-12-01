@@ -63,7 +63,7 @@ setup(
         'console_scripts': [
             'to_world_transform = march_simulation.to_world_transform:main',
             'spawn_obstacle = march_simulation.spawn_obstacle:main',
-            'example = march_simulation.example_joint_trajectory:main'
+            'set_obstacle_dimensions = march_simulation.set_obstacle_dimensions:main'
         ],
     },
 )
