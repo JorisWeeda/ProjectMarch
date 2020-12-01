@@ -161,13 +161,12 @@ void ObstacleController::getGoalPosition(double time_since_start)
     swing_foot_pose = foot_left_->WorldCoGPose().Pos();
   }
   // Goal position is determined from the location of the stable foot
-  if (subgait_name_.substr(0, 7) != "dynamic")
+  goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
+
+  //Don't change the goal position in x location, if the gait is frozen
+  if (subgait_name_.substr(0, 6) != "freeze")
   {
     goal_position_x = stable_foot_pose.X();
-  }
-  goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
-  if (subgait_name_.substr(0, 7) != "dynamic")
-  {
     // Start goal position a quarter step size behind the stable foot
     // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
     if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
@@ -183,7 +182,6 @@ void ObstacleController::getGoalPosition(double time_since_start)
       goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
     }
   }
-  ROS_INFO_STREAM(subgait_name_ << ": " << goal_position_x);
 }
 
 }  // namespace gazebo
