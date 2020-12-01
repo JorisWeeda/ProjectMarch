@@ -4,12 +4,11 @@ from typing import Tuple
 
 import rclpy
 import yaml
-from rclpy.node import Node
 from ament_index_python import get_package_share_directory
 from march_shared_classes.gait.joint_trajectory import JointTrajectory
 from march_shared_classes.gait.limits import Limits
 from march_shared_classes.gait.subgait import Subgait
-import numpy as np
+from rclpy.node import Node
 from urdf_parser_py import urdf
 
 gait_files_package = 'march_gait_files'
@@ -20,7 +19,8 @@ gait_files_ros1_src_path = os.path.join(get_package_share_directory(gait_files_p
                                         'src', 'gaits', gait_files_package)
 gait_files_ros1_install_path = os.path.join(get_package_share_directory(gait_files_package),
                                             '..', '..', '..', '..', '..', 'ros1',
-                                            'install', gait_files_package)
+                                            'install', gait_files_package,
+                                            'share', gait_files_package)
 
 # Add gait files ros2 source path after the migration is complete
 gait_files_install_path = get_package_share_directory(gait_files_package)

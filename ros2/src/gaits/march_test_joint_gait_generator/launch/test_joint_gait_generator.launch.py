@@ -31,7 +31,7 @@ def generate_launch_description():
             description='Name of the single subgait in the gait'),
         DeclareLaunchArgument(
             name='version',
-            default_value='version_0',
+            default_value='example',
             description='Version of the single test_joint subgait'),
         DeclareLaunchArgument(
             name='description',
