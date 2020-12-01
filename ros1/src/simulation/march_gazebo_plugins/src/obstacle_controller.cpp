@@ -6,7 +6,9 @@ namespace gazebo
 {
 ObstacleController::ObstacleController(physics::ModelPtr model)
   : model_(std::move(model))
-  , subgait_name_("home_stand")
+  , HOME_STAND("home_stand")
+  , STAND_IDLE("idle_stand")
+  , SIT_IDLE("idle_sit")
   , subgait_start_time_(0)
   , subgait_duration_(0)
   , subgait_changed_(true)
@@ -33,8 +35,9 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   foot_left_ = model_->GetLink("ankle_plate_left");
   foot_right_ = model_->GetLink("ankle_plate_right");
   ros::param::get("balance", balance_);
-
-  subgait_name_ = "home_stand";
+  // As long as no sitting gait is executed, the default to use when no subgait is idle_stand
+  subgait_name_ = HOME_STAND;
+  default_subgait_name_ = STAND_IDLE;
   subgait_changed_ = true;
 
   mass = 0.0;
@@ -54,11 +57,11 @@ void ObstacleController::newSubgait(const march_shared_resources::CurrentGaitCon
                                                                            foot_left_->WorldPose().Pos().X());
   }
 
-  if (subgait_name_ == "home_stand" and msg->subgait.substr(0, 4) == "left")
+  if (subgait_name_ == HOME_STAND and msg->subgait.substr(0, 4) == "left")
   {
     ROS_WARN("Gait starts with left. CoM controller plugin might not work properly.");
   }
-  subgait_name_ = msg->subgait.empty() ? "home_stand" : msg->subgait;
+  subgait_name_ = msg->subgait.empty() ? default_subgait_name_ : msg->subgait;
   subgait_duration_ = msg->duration.toSec();
   subgait_start_time_ = model_->GetWorld()->SimTime().Double();
   subgait_changed_ = true;
@@ -84,8 +87,11 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
   double time_since_start = model_->GetWorld()->SimTime().Double() - subgait_start_time_;
   if (time_since_start > 1.05 * subgait_duration_)
   {
-    subgait_name_ = "home_stand";
-    subgait_changed_ = true;
+    if (subgait_name_ != default_subgait_name_ and subgait_name_ != HOME_STAND)
+    {
+        subgait_changed_ = true;
+    }
+    subgait_name_ = default_subgait_name_;
   }
 
   auto model_com = GetCom();
@@ -109,7 +115,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
   // roll, pitch and yaw are defined in
   // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#torque-application
   // turn (bodge) off plug-in at right time when balance is set to true
-  if (balance_ == true && subgait_name_ != "home_stand" && subgait_name_ != "idle_state")
+  if (balance_ == true && subgait_name_ != HOME_STAND && subgait_name_ != "idle_state")
   {
     p_pitch_actual = p_pitch_off_;
     p_roll_actual = p_roll_off_;
@@ -163,10 +169,43 @@ void ObstacleController::getGoalPosition(double time_since_start)
   // Goal position is determined from the location of the stable foot
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
 
-  //Don't change the goal position in x location, if the gait is frozen
+  // Don't change the goal position in x location, if the gait is frozen
   if (subgait_name_.substr(0, 6) != "freeze")
+    goal_position_x = stable_foot_pose.X();
+  // If the exoskeleton is in an idle sit position, put the CoM a bit behind the stable foot
+  if (subgait_name_ == SIT_IDLE)
+  {
+    goal_position_x = stable_foot_pose.X() + 0.2 * swing_step_size_;
+  }  // If the exoskeleton is in an idle stand position, put the CoM on the stable foot
+  else if (subgait_name_ == STAND_IDLE)
   {
     goal_position_x = stable_foot_pose.X();
+  }  // Change the default that is used without a subgait to idle_sit after sitting
+     // During the sitting down the CoM will be controlled between the stable foot and the final sit
+  else if (subgait_name_.find("sit") != std::string::npos)
+  {
+    default_subgait_name_ = SIT_IDLE;
+    goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
+  }  // Change the default that is used without a subgait to idle_stand after standing up
+     // During the standing the CoM will be controlled between the stable foot and the final sit
+  else if (subgait_name_.find("stand") != std::string::npos)
+  {
+    default_subgait_name_ = STAND_IDLE;
+    goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
+  }
+
+  // Start goal position a quarter step size behind the stable foot
+  // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
+  if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
+  {
+    goal_position_x += -0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+  }
+  else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing")
+  {
+    goal_position_x += 0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
+  }
+  else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
+  {
     // Start goal position a quarter step size behind the stable foot
     // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
     if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
