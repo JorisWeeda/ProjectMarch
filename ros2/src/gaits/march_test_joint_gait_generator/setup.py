@@ -2,7 +2,7 @@ import os
 from glob import glob
 from setuptools import setup
 
-package_name = 'march_testjoint_generator'
+package_name = 'march_test_joint_gait_generator'
 
 
 def data_files():
@@ -24,12 +24,12 @@ setup(
     zip_safe=True,
     maintainer='Project March',
     maintainer_email='software@projectmarch.nl',
-    description='Gait generator for the testjoint',
+    description='Gait generator for the test_joint',
     license='TODO: License declaration',
     tests_require=['pytest', 'urfdom_py', 'unittest', 'parameterized'],
     entry_points={
         'console_scripts': [
-            f'generate_testjoint_gait = {package_name}.testjoint_gait_generator:main'
+            f'generate_test_joint_gait = {package_name}.test_joint_gait_generator:main'
         ],
     },
 )
