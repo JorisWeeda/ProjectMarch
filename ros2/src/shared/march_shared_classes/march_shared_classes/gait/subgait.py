@@ -308,19 +308,19 @@ class Subgait(object):
 
     def to_yaml(self):
         """Returns a YAML string representation of the subgait."""
-        duration = Duration(seconds=self.duration)
+        duration = Duration(seconds=self.duration).to_msg()
         output = {
             'description': self.description,
             'duration': {
-                'nsecs': duration.nanoseconds,
-                'secs': duration.nanoseconds,
+                'nsecs': duration.nanosec,
+                'secs': duration.sec,
             },
             'gait_type': self.gait_type,
             'joints': dict([(joint.name, [{
                 'position': setpoint.position,
                 'time_from_start': {
-                    'nsecs': Duration(seconds=setpoint.time).nanoseconds,
-                    'secs': int(setpoint.time),
+                    'nsecs': Duration(seconds=setpoint.time).to_msg().nanosec,
+                    'secs': Duration(seconds=setpoint.time).to_msg().sec,
                 },
                 'velocity': setpoint.velocity}
                 for setpoint in joint.setpoints]) for joint in self.joints]),
