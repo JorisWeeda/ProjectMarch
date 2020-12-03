@@ -8,6 +8,7 @@ from ament_index_python import get_package_share_directory
 from march_shared_classes.gait.joint_trajectory import JointTrajectory
 from march_shared_classes.gait.limits import Limits
 from march_shared_classes.gait.subgait import Subgait
+from rclpy.parameter import Parameter
 from rclpy.node import Node
 from urdf_parser_py import urdf
 
@@ -39,7 +40,13 @@ class TestJointGaitGenerator(Node):
         self.subgait_name = self.get_parameter('subgait_name').get_parameter_value().string_value
         self.version = self.get_parameter('version').get_parameter_value().string_value
 
-        self.duration = self.get_parameter('duration').get_parameter_value().double_value
+        # Convert parameter value from double to integer if necessary
+        duration_parameter = self.get_parameter('duration')
+        if duration_parameter.type_ == Parameter.Type.DOUBLE:
+            self.duration = duration_parameter.get_parameter_value().double_value
+        else:
+            self.duration = float(duration_parameter.get_parameter_value().integer_value)
+
         self.num_setpoints = self.get_parameter('num_setpoints').get_parameter_value().integer_value
 
         self.description = self.get_parameter('description').get_parameter_value().string_value
@@ -55,7 +62,15 @@ class TestJointGaitGenerator(Node):
         self.robot = urdf.Robot.from_xml_file(self.urdf_file)
         self.joint = JointTrajectory.get_joint_from_urdf(robot=self.robot,
                                                          joint_name=self.joint_name)
+
         self.limits = Limits.from_urdf_joint(self.joint)
+        if not self.get_parameter('use_urdf_limits'):
+            self.limits.lower = self.get_parameter('lower_limit').get_parameter_value().double_value
+            self.limits.upper = self.get_parameter('upper_limit').get_parameter_value().double_value
+
+        limits_factor = self.get_parameter('limits_factor').get_parameter_value().double_value
+        self.limits.lower *= limits_factor
+        self.limits.upper *= limits_factor
 
         self.directories = DIRECTORIES
 

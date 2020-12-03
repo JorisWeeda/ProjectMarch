@@ -1,0 +1,14 @@
+test_joint_gait_generator:
+  ros__parameters:
+    gait_directory: 'test_joint_gaits'
+    gait_name: 'test_joint_gait'
+    subgait_name: 'perform_test'
+    version: 'example'
+    num_setpoints: 2
+    duration: 5.0
+    robot: 'test_joint_rotational'
+    joint_name: 'rotational_joint'
+    description: ''
+    start_position: 0.0
+    use_urdf_limits: 'true'
+    limits_factor: 0.95

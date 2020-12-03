@@ -1,4 +1,4 @@
-import launch
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -15,8 +15,12 @@ def generate_launch_description():
     joint_name = LaunchConfiguration('joint_name')
     description = LaunchConfiguration('description')
     start_position = LaunchConfiguration('start_position')
+    use_urdf_limits = LaunchConfiguration('use_urdf_limits')
+    limits_factor = LaunchConfiguration('limits_factor')
+    lower_limit = LaunchConfiguration('lower_limit')
+    upper_limit = LaunchConfiguration('upper_limit')
 
-    return launch.LaunchDescription([
+    return LaunchDescription([
         DeclareLaunchArgument(
             name='gait_directory',
             default_value='test_joint_gaits',
@@ -41,15 +45,36 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             name='num_setpoints',
-            default_value='1',
+            default_value='2',
             description='Number of setpoints in the gait. '
                         '1 setpoint means the gait moves to one end and back to the middle'
                         '2 setpoints means the gait moves to both ends and then to the middle etc. etc.'
         ),
         DeclareLaunchArgument(
             name='duration',
-            default_value='2.0',
+            default_value='6.0',
             description='Duration of the test_joint gait in seconds'),
+        DeclareLaunchArgument(
+            name='use_urdf_limits',
+            default_value='true',
+            description='Whether to use the urdf limits.'
+        ),
+        DeclareLaunchArgument(
+            name='limits_factor',
+            default_value='0.95',
+            description='Move joint from begin position to limit * limits_factor,'
+                        'This should has to be between 0 and 1.'
+        ),
+        DeclareLaunchArgument(
+            name='lower_limit',
+            default_value='0.0',
+            description='Lower limit of the joint. Only used if use_urdf_limits is false.'
+        ),
+        DeclareLaunchArgument(
+            name='upper_limit',
+            default_value='0.0',
+            description='Upper limit of the joint. Only used if use_urdf_limits is false.'
+        ),
         DeclareLaunchArgument(
             name='robot',
             default_value='test_joint_rotational',
@@ -78,6 +103,10 @@ def generate_launch_description():
                         {'robot': robot},
                         {'joint_name': joint_name},
                         {'start_position': start_position},
-                        {'description': description}]
+                        {'description': description},
+                        {'use_urdf_limits': use_urdf_limits},
+                        {'limits_factor': limits_factor},
+                        {'lower_limit': lower_limit},
+                        {'upper_limit': upper_limit}]
         )
     ])
