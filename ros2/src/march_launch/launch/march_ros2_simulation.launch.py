@@ -14,6 +14,7 @@ def generate_launch_description():
     # Input device arguments
     rqt_input = LaunchConfiguration('rqt_input')
     ping_safety_node = LaunchConfiguration('ping_safety_node')
+    button_layout_file = LaunchConfiguration('button_layout_file')
     # Robot state publisher arguments
     robot_state_publisher = LaunchConfiguration('robot_state_publisher')
     xacro_path = LaunchConfiguration('xacro_path')
@@ -40,6 +41,11 @@ def generate_launch_description():
             default_value='True',
             description='Whether the input device should ping the safety node'
                         'with an alive message every 0.2 seconds'),
+        DeclareLaunchArgument(
+            name='button_layout_file',
+            default_value='layout',
+            description='Layout file to load.'
+        ),
         # ROBOT STATE PUBLISHER ARGUMENTS
         DeclareLaunchArgument(
             name='robot_state_publisher',
@@ -72,7 +78,8 @@ def generate_launch_description():
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_rqt_input_device'), 'launch', 'input_device.launch.py')),
             launch_arguments=[('ping_safety_node', ping_safety_node),
-                              ('use_sim_time', use_sim_time)],
+                              ('use_sim_time', use_sim_time),
+                              ('button_layout_file', button_layout_file)],
             condition=IfCondition(rqt_input)),
         # Launch robot state publisher (from march_description) if not robot_state_publisher:=false
         IncludeLaunchDescription(PythonLaunchDescriptionSource(

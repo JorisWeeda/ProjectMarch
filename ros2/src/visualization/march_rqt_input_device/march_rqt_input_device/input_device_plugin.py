@@ -5,6 +5,7 @@ from ament_index_python.packages import get_package_share_directory
 from rqt_gui.main import Main
 import sys
 import rclpy
+from rclpy.node import Node
 from rclpy.parameter import Parameter
 from .input_device_controller import InputDeviceController
 from .input_device_view import InputDeviceView
@@ -38,15 +39,18 @@ class InputDevicePlugin(Plugin):
 
         ui_file = os.path.join(get_package_share_directory('march_rqt_input_device'), 'input_device.ui')
 
-        self._node = context.node
+        self._node: Node = context.node
 
         parser = argparse.ArgumentParser(prog='rqt_plot', add_help=False)
         InputDevicePlugin.add_arguments(parser)
         args = parser.parse_args(context.argv())
 
+        self._node.declare_parameter('button_layout_file')
+        button_layout_file = self._node.get_parameter('button_layout_file').get_parameter_value().string_value
+
         self._node.set_parameters([Parameter('use_sim_time', value=bool(args.use_sim_time))])
         self._controller = InputDeviceController(self._node, bool(args.ping_safety_node))
-        self._widget = InputDeviceView(ui_file, self._controller)
+        self._widget = InputDeviceView(ui_file, button_layout_file, self._controller)
         context.add_widget(self._widget)
 
         # Show _widget.windowTitle on left-top of each plugin (when it's set in _widget). (useful for multiple windows)

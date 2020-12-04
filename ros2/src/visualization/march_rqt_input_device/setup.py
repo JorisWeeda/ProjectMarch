@@ -4,6 +4,8 @@ import os
 
 package_name = 'march_rqt_input_device'
 
+ros1_source = os.path.join('..', '..', '..', '..', 'ros1', 'src', 'visualization', package_name)
+
 setup(
     name=package_name,
     version='0.0.0',
@@ -14,9 +16,10 @@ setup(
         (os.path.join('share', package_name), ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch')),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
-        (os.path.join('share', package_name), ['plugin.xml']),
-        (os.path.join('share', package_name), [os.path.join('resource', 'input_device.ui')]),
-        (os.path.join('share', package_name, 'resource', 'img'), glob('resource/img/*.png'))
+        (os.path.join('share', package_name), [os.path.join(ros1_source, 'plugin.xml')]),
+        (os.path.join('share', package_name), [os.path.join(ros1_source, 'resource', 'input_device.ui')]),
+        (os.path.join('share', package_name, 'resource', 'img'), glob('resource/img/*.png')),
+        (os.path.join('share', package_name, 'config'), glob('config/**'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,

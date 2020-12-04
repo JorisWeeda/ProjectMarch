@@ -1,12 +1,15 @@
+import ast
 import getpass
 import socket
 
+import rclpy
 from rclpy import Future
 from std_msgs.msg import Header, String
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
 from march_shared_msgs.srv import PossibleGaits
 from rclpy.node import Node
+from std_srvs.srv import Trigger
 
 
 class InputDeviceController(object):
@@ -42,6 +45,11 @@ class InputDeviceController(object):
         self._possible_gait_client = self._node.create_client(srv_type=PossibleGaits,
                                                               srv_name='/march/gait_selection/get_possible_gaits')
 
+        self._get_version_map_client = self._node.create_client(srv_type=Trigger,
+                                                                srv_name='/march/gait_selection/get_version_map')
+        self._gait_version_map = None
+        self.load_all_gaits()
+
         self.accepted_cb = None
         self.finished_cb = None
         self.rejected_cb = None
@@ -69,6 +77,15 @@ class InputDeviceController(object):
             self._alive_timer.shutdown()
             self._alive_timer.join()
             self._alive_pub.unregister()
+
+    def load_all_gaits(self):
+        while not self._get_version_map_client.wait_for_service(timeout_sec=1):
+            self._node.get_logger().info('Waiting for get version map service to come available')
+
+        future = self._get_version_map_client.call_async(Trigger.Request())
+        rclpy.spin_until_future_complete(self._node, future)
+
+        self._gait_version_map = ast.literal_eval(future.result().message)
 
     def _response_callback(self, msg: GaitInstructionResponse) -> None:
         """
@@ -108,11 +125,10 @@ class InputDeviceController(object):
         """
         Send out an asynchronous request to get the possible gaits and stores response in gait_future
         """
-        if self._possible_gait_client.service_is_ready():
-            self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
-        else:
-            while not self._possible_gait_client.wait_for_service(timeout_sec=1):
-                self._node.get_logger().warn('Failed to contact possible gaits service')
+        while not self._possible_gait_client.wait_for_service(timeout_sec=1):
+            self._node.get_logger().info('Waiting for possible gait service to come available')
+
+        self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
 
     def get_possible_gaits(self) -> Future:
         """
