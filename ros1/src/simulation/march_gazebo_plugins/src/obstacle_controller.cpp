@@ -116,7 +116,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
   // roll, pitch and yaw are defined in
   // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#torque-application
   // turn (bodge) off plug-in at right time when balance is set to true
-  if (balance_ == true && subgait_name_ != HOME_STAND && subgait_name_ != "idle_state")
+  if (balance_ == true && subgait_name_ != HOME_STAND && subgait_name_ != STAND_IDLE)
   {
     p_pitch_actual = p_pitch_off_;
     p_roll_actual = p_roll_off_;
