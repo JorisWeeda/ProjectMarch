@@ -27,8 +27,9 @@ def generate_launch_description():
     fixed = LaunchConfiguration('fixed')
     ground_gait = LaunchConfiguration('ground_gait')
     obstacle = LaunchConfiguration('obstacle')
-    controller = LaunchConfiguration('controller')
+    controller_type = LaunchConfiguration('controller_type')
     simulation = LaunchConfiguration('simulation')
+    rviz = LaunchConfiguration('rviz')
 
     return launch.LaunchDescription([
         # GENERAL ARGUMENTS
@@ -80,11 +81,16 @@ def generate_launch_description():
             default_value='training-v',
             description='The directory in which the gait files to use are located, '
                         'relative to the gait_package.'),
-        # SIMULATION ARGUMENT
+        # SIMULATION ARGUMENTS
         DeclareLaunchArgument(
             name='gazebo_ui',
             default_value='true',
             description='Launches the Gazebo UI.'
+        ),
+        DeclareLaunchArgument(
+            name='rviz',
+            default_value='false',
+            description='Launches the RVIZ UI.'
         ),
         DeclareLaunchArgument(
             name='fixed',
@@ -102,9 +108,10 @@ def generate_launch_description():
             description='Obstacle to load in the simulation.'
         ),
         DeclareLaunchArgument(
-            name='controller',
+            name='controller_type',
             default_value='effort_control',
-            description='Changes the controller used by simulation.'
+            description='Which type of controller to use.'
+                        'For simulation this can be either effort_control or inertia_control'
         ),
         DeclareLaunchArgument(
             name='simulation',
@@ -140,7 +147,8 @@ def generate_launch_description():
                               ('fixed', fixed),
                               ('ground_gait', ground_gait),
                               ('obstacle', obstacle),
-                              ('controller', controller),
-                              ('robot', robot)],
+                              ('controller_type', controller_type),
+                              ('robot', robot),
+                              ('rviz', rviz)],
             condition=IfCondition(simulation))
     ])

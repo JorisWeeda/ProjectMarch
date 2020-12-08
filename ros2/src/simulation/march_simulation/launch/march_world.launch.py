@@ -19,7 +19,7 @@ def generate_launch_description():
     ground_gait = LaunchConfiguration('ground_gait')
     obstacle = LaunchConfiguration('obstacle')
     robot = LaunchConfiguration('robot')
-    controller = LaunchConfiguration('controller')
+    controller_type = LaunchConfiguration('controller_type')
     rviz = LaunchConfiguration('rviz')  
 
     xacro_path = PathJoinSubstitution([
@@ -58,7 +58,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             name='gazebo_ui',
-            default_value='false',
+            default_value='true',
             description='Launches the Gazebo UI.'
         ),
         DeclareLaunchArgument(
@@ -93,7 +93,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             name='rviz',
-            default_value='true',
+            default_value='false',
             description='Whether to launch rviz'
         ),
         Node(
