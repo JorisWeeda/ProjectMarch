@@ -1,14 +1,24 @@
 <?xml version="1.0"?>
 <!-- Revolute-Revolute Manipulator -->
 <robot name="march" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <!-- An argument that makes sure the march.gazebo is loaded only when launching the simulation and not during build,
-            because during build the march_description package can not be found-->
-    <xacro:arg name="build" default="false"/>
     <!-- Switch between airgaiting or standing on the ground-->
     <!-- Value set to: 'world' fixes the robot to the world-->
     <!-- Value set to: 'base_link' makes the robot stand on the ground also set launch parameter fixed to false and set
     the hover_height to 0.0. Set ground_gait to true to ground gait in simulation.-->
     <xacro:arg name="ground_gait" default="false"/>
+
+    <!-- The meshes have to be loaded differently for rviz than for gazebo_ui-->
+    <!-- This argument is used to set the 'base_path' of the meshes-->
+    <xacro:arg name="gazebo_ui" default="true"/>
+    
+    <xacro:if value="$(arg gazebo_ui)">
+        <xacro:property name="mesh_basepath" value="$(find march_description)"/>
+    </xacro:if>
+    <xacro:unless value="$(arg gazebo_ui)">
+        <xacro:property name="mesh_basepath" value="package://march_description"/>
+    </xacro:unless>
+    
+                        
 
     <xacro:unless value="$(arg ground_gait)">
         <xacro:property name="parent_name" value="world"/>
@@ -206,15 +216,13 @@
 
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-    <xacro:unless value="$(arg build)">
-        <gazebo>
-            <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
-                <robotNamespace>/march</robotNamespace>
-                <robotSimType>gazebo_ros2_control/DefaultRobotHWSim</robotSimType>
-                <parameters>$(find march_simulation)/config/position_control/march4.yaml</parameters>
-            </plugin>
-        </gazebo>
-    </xacro:unless>
+    <gazebo>
+        <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+            <robotNamespace>/march</robotNamespace>
+            <robotSimType>gazebo_ros2_control/DefaultRobotHWSim</robotSimType>
+            <parameters>$(find march_simulation)/config/position_control/march4.yaml</parameters>
+        </plugin>
+    </gazebo>
 
     <material name="blue">
         <color rgba="0 0 0.6 1"/>
@@ -230,7 +238,7 @@
         <visual>
             <origin xyz="${-hip_aa_frame_width} 0 0" rpy="0 0 ${pi}"/>
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/HipBase.stl" scale="1 1 1"/>
+                <mesh filename="${mesh_basepath}/urdf/stl-files/HipBase.stl" scale="1 1 1"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -264,7 +272,7 @@
         <visual>
             <origin xyz="${-hip_aa_frame_width} ${hip_base_height/2} 0" rpy="0 0 ${pi}"/>
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/LeftHAA.stl" scale="1 1 1"/>
+                <mesh filename="${mesh_basepath}/urdf/stl-files/LeftHAA.stl" scale="1 1 1"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -303,7 +311,7 @@
         <visual>
             <origin xyz="0 ${hip_base_height/2 + hip_aa_frame_height - upper_leg_offset} 0" rpy="0 0 ${pi}"/>
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/UpperLeftLeg.stl" scale="1 1 1"/>
+                <mesh filename="${mesh_basepath}/urdf/stl-files/UpperLeftLeg.stl" scale="1 1 1"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -336,7 +344,7 @@
                 rpy="0 0 ${pi}"
             />
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/LowerLeftLeg.stl" scale="1 1 1"/>
+                <mesh filename="${mesh_basepath}/urdf/stl-files/LowerLeftLeg.stl" scale="1 1 1"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -371,7 +379,7 @@
                 rpy="0 0 ${pi}"
             />
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/LeftFoot.stl" scale="1 1 ${foot_scale}"/>
+                <mesh filename="${mesh_basepath}/urdf/stl-files/LeftFoot.stl" scale="1 1 ${foot_scale}"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -416,7 +424,7 @@
         <visual>
             <origin xyz="${-hip_aa_frame_width} ${-hip_base_height/2} 0" rpy="0 0 ${pi}"/>
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/RightHAA.stl" scale="1 1 1"/>
+                <mesh filename="${mesh_basepath}/urdf/stl-files/RightHAA.stl" scale="1 1 1"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -455,7 +463,7 @@
         <visual>
             <origin xyz="0 ${-hip_base_height/2 - hip_aa_frame_height + upper_leg_offset} 0" rpy="0 0 ${pi}"/>
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/UpperRightLeg.stl" scale="1 1 1"/>
+                <mesh filename="${mesh_basepath}/urdf/stl-files/UpperRightLeg.stl" scale="1 1 1"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -489,7 +497,7 @@
                 rpy="0 0 ${pi}"
             />
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/LowerRightLeg.stl" scale="1 1 1"/>
+                <mesh filename="${mesh_basepath}/urdf/stl-files/LowerRightLeg.stl" scale="1 1 1"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -524,7 +532,7 @@
                 rpy="0 0 ${pi}"/>
             />
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/RightFoot.stl" scale="1 1 ${foot_scale}"/>
+                <mesh filename="${mesh_basepath}/urdf/stl-files/RightFoot.stl" scale="1 1 ${foot_scale}"/>
             </geometry>
             <material name="blue"/>
         </visual>

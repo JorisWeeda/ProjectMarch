@@ -38,7 +38,8 @@ def generate_launch_description():
                   " k_position_value_adpf:=", "5000.0",
                   " max_effort_rotary:=", "200.0",
                   " max_effort_linear:=", "200.0",
-                  " ground_gait:=", ground_gait]
+                  " ground_gait:=", ground_gait,
+                  " gazebo_ui:=", gazebo_ui]
     robot_description = Command(['xacro', ' ', xacro_path, '.xacro'] +
                                 xacro_args)
 
