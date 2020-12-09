@@ -1,0 +1,3 @@
+<launch>
+    <node name="inertia_estimator_node" pkg="march_joint_inertia_controller" type="inertia_estimator_node" output="screen"/>
+</launch>

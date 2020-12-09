@@ -140,6 +140,7 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
 
   joint_.setCommand(commanded_effort);
 }
+
 void InertiaController::stopping(const ros::Time& /* time */)
 {
 }
