@@ -41,11 +41,8 @@ class TestJointGaitGenerator(Node):
         self.version = self.get_parameter('version').get_parameter_value().string_value
 
         # Convert parameter value from double to integer if necessary
-        duration_parameter = self.get_parameter('duration')
-        if duration_parameter.type_ == Parameter.Type.DOUBLE:
-            self.duration = duration_parameter.get_parameter_value().double_value
-        else:
-            self.duration = float(duration_parameter.get_parameter_value().integer_value)
+        self.duration = self.get_float_parameter('duration')
+        self.start_position = self.get_float_parameter('start_position')
 
         self.num_setpoints = self.get_parameter('num_setpoints').get_parameter_value().integer_value
 
@@ -53,7 +50,6 @@ class TestJointGaitGenerator(Node):
         if self.description == '':
             self.description = self.generate_description()
 
-        self.start_position = self.get_parameter('start_position').get_parameter_value().double_value
         self.robot_name = self.get_parameter('robot').get_parameter_value().string_value
         self.urdf_file = os.path.join(get_package_share_directory('march_description'),
                                       'urdf', f'{self.robot_name}.urdf')
@@ -64,11 +60,11 @@ class TestJointGaitGenerator(Node):
                                                          joint_name=self.joint_name)
 
         self.limits = Limits.from_urdf_joint(self.joint)
-        if not self.get_parameter('use_urdf_limits'):
-            self.limits.lower = self.get_parameter('lower_limit').get_parameter_value().double_value
-            self.limits.upper = self.get_parameter('upper_limit').get_parameter_value().double_value
+        if not self.get_parameter('use_urdf_limits').get_parameter_value().bool_value:
+            self.limits.lower = self.get_float_parameter('lower_limit')
+            self.limits.upper = self.get_float_parameter('upper_limit')
 
-        limits_factor = self.get_parameter('limits_factor').get_parameter_value().double_value
+        limits_factor = self.get_float_parameter('limits_factor')
         self.limits.lower *= limits_factor
         self.limits.upper *= limits_factor
 
@@ -217,6 +213,13 @@ class TestJointGaitGenerator(Node):
         seconds_floored = int(math.floor(seconds))
         nanoseconds = int((seconds - seconds_floored) * NANOSECONDS_PER_SECOND)
         return seconds_floored, nanoseconds
+
+    def get_float_parameter(self, name: str) -> float:
+        parameter = self.get_parameter(name)
+        if parameter.type_ == Parameter.Type.DOUBLE:
+            return parameter.get_parameter_value().double_value
+        else:
+            return float(parameter.get_parameter_value().integer_value)
 
 def main():
     rclpy.init()
