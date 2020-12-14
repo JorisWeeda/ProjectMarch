@@ -1,4 +1,5 @@
 <launch>
+    <arg name="realsense" default="false" doc="Whether to add the realsense camera to the xacro file"/>
     <arg name="gain_scheduling" default="false" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
     <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
     <arg name="sounds" default="false" doc="Whether to use sounds."/>
@@ -89,13 +90,13 @@
                     k_position_value_hfe:=5000.0 k_position_value_kfe:=5000.0
                     k_position_value_haa:=5000.0 k_position_value_adpf:=5000.0
                     max_effort_rotary:=200.0 max_effort_linear:=200.0
-                    ground_gait:=$(arg ground_gait)" />
+                    ground_gait:=$(arg ground_gait) realsense:=$(arg realsense)" />
 
     <!-- Upload the controller configuration -->
     <rosparam file="$(find march_simulation)/config/$(arg controller)/$(arg robot).yaml" command="load"/>
 
     <group ns="march">
-        <node name="controller_spawner" pkg="controller_manager" type="controller_manager"
+        <node name="controller_spawner" pkg="controller_manager" type="controller_zmanager"
               respawn="false" output="screen"
               args="spawn controller/trajectory joint_state_controller"/>
 

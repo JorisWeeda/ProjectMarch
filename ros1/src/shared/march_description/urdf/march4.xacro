@@ -6,6 +6,7 @@
     <!-- Value set to: 'base_link' makes the robot stand on the ground also set launch parameter fixed to false and set
     the hover_height to 0.0. Set ground_gait to true to ground gait in simulation.-->
     <xacro:arg name="ground_gait" default="false"/>
+    <xacro:arg name="realsense" default="false"/>
 
     <xacro:unless value="$(arg ground_gait)">
         <xacro:property name="parent_name" value="world"/>
@@ -761,11 +762,12 @@
         <origin xyz="0 0 ${-ankle_plate_height}" rpy="0 0 0"/>
     </joint>
 
-    <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" />
-    <xacro:sensor_d435 parent="upper_leg_left">
-        <origin xyz="0 0 0" rpy="0 0 3.1416"/>
-    </xacro:sensor_d435>
-
+    <xacro:if value="$(arg realsense)">
+        <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" />
+        <xacro:sensor_d435 parent="upper_leg_left">
+            <origin xyz="0 0 0" rpy="0 0 3.1416"/>
+        </xacro:sensor_d435>
+    </xacro:if>
 
     <!-- ROS Control plugin for Gazebo -->
     <transmission name="left_hip_aa">
