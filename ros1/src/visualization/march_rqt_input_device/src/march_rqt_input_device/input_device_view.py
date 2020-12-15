@@ -308,7 +308,7 @@ class InputDeviceView(QWidget):
 
             [curb_sdg],
 
-            [home_test_gait_button, testjoint_gait_button]
+            [home_test_gait_button, testjoint_gait_button],
         ]
 
         # Create the qt_layout from the button layout.
