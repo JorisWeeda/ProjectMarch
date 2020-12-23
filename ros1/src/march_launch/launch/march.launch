@@ -36,8 +36,11 @@
     <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
 
-
-    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot).xacro"/>
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param name="robot_description"
+           command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
+                    configuration:=$(arg configuration)
+                    ground_gait:=$(arg ground_gait)" />
 
     <node
             if="$(arg rosbag)"
