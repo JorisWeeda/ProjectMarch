@@ -154,7 +154,7 @@ def generate_launch_description():
                               ('controller_type', controller_type),
                               ('robot', robot),
                               ('rviz', rviz)],
-            condition=IfCondition(simulation))
+            condition=IfCondition(simulation)),
         # Fake sensor data
         DeclareLaunchArgument(
             name='fake_sensor_data',
