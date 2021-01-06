@@ -15,16 +15,16 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   , balance_(false)
   , p_yaw_(0)
   , d_yaw_(0)
-  , p_yaw_off_(0)
-  , d_yaw_off_(0)
+  , p_yaw_balance_(0)
+  , d_yaw_balance_(0)
   , p_pitch_(0)
   , d_pitch_(0)
-  , p_pitch_off_(0)
-  , d_pitch_off_(0)
+  , p_pitch_balance_(0)
+  , d_pitch_balance_(0)
   , p_roll_(0)
   , d_roll_(0)
-  , p_roll_off_(0)
-  , d_roll_off_(0)
+  , p_roll_balance_(0)
+  , d_roll_balance_(0)
   , error_x_last_timestep_(0)
   , error_y_last_timestep_(0)
   , error_yaw_last_timestep_(0)
@@ -114,15 +114,15 @@ void ObstacleController::update(ignition::math::v6::Vector3<double>& torque_left
 
   // roll, pitch and yaw are defined in
   // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#torque-application
-  // turn (bodge) off plug-in at right time when balance is set to true
+  // turn (bodge) balance plug-in at right time when balance is set to true
   if (balance_ == true && subgait_name_ != HOME_STAND && subgait_name_ != "idle_state")
   {
-    p_pitch_actual = p_pitch_off_;
-    p_roll_actual = p_roll_off_;
-    p_yaw_actual = p_yaw_off_;
-    d_pitch_actual = d_pitch_off_;
-    d_roll_actual = d_roll_off_;
-    d_yaw_actual = d_yaw_off_;
+    p_pitch_actual = p_pitch_balance_;
+    p_roll_actual = p_roll_balance_;
+    p_yaw_actual = p_yaw_balance_;
+    d_pitch_actual = d_pitch_balance_;
+    d_roll_actual = d_roll_balance_;
+    d_yaw_actual = d_yaw_balance_;
   }
   else
   {
