@@ -8,22 +8,21 @@
     <license>TODO</license>
 
     <exec_depend>controller_manager</exec_depend>
-
     <exec_depend>gazebo_msgs</exec_depend>
     <exec_depend>gazebo_ros</exec_depend>
-    <exec_depend>gazebo_ros2_control</exec_depend>
+<!-- Commented out until it becomes available through rosdep-->
+<!--    <exec_depend>gazebo_ros2_control</exec_depend>-->
     <exec_depend>geometry_msgs</exec_depend>
     <exec_depend>joint_state_controller</exec_depend>
     <exec_depend>joint_trajectory_controller</exec_depend>
 
-<!--    <exec_depend>march_fake_sensor_data</exec_depend>-->
+<!--    Commented out until the ROS2 version becomes available-->
 <!--    <exec_depend>march_gazebo_plugins</exec_depend>-->
     <exec_depend>robot_state_publisher</exec_depend>
     <exec_depend>rclpy</exec_depend>
     <exec_depend>tf2_ros</exec_depend>
     <exec_depend>urdfdom_py</exec_depend>
     <exec_depend>xacro</exec_depend>
-    <build_depend>xacro</build_depend>
 
     <exec_depend>march_description</exec_depend>
 
