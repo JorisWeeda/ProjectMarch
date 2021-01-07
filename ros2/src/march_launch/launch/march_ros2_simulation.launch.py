@@ -17,15 +17,15 @@ def generate_launch_description():
     ping_safety_node = LaunchConfiguration('ping_safety_node')
     # Robot state publisher arguments
     robot_state_publisher = LaunchConfiguration('robot_state_publisher')
-    xacro_path = [PathJoinSubstitution([
-        get_package_share_directory('march_description'),
-        'urdf', 
-        robot]),
-        '.xacro']
+    robot_description = LaunchConfiguration('robot_description')
     # Gait selection arguments
     gait_selection = LaunchConfiguration('gait_selection')
     gait_package = LaunchConfiguration('gait_package')
     gait_directory = LaunchConfiguration('gait_directory')
+    # Fake sensor data
+    fake_sensor_data = LaunchConfiguration('fake_sensor_data')
+    minimum_fake_temperature = LaunchConfiguration('minimum_fake_temperature')
+    maximum_fake_temperature = LaunchConfiguration('maximum_fake_temperature')
 
     return launch.LaunchDescription([
         # GENERAL ARGUMENTS
@@ -37,7 +37,8 @@ def generate_launch_description():
         DeclareLaunchArgument(
             name='robot',
             default_value='march4',
-            description='Robot to use.'),
+            description="Robot to use."
+        ),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
             name='rqt_input',
@@ -45,7 +46,7 @@ def generate_launch_description():
             description='If this argument is false, the rqt input device will'
                         'not be launched.'),
         DeclareLaunchArgument(
-            'ping_safety_node',
+            name='ping_safety_node',
             default_value='True',
             description='Whether the input device should ping the safety node'
                         'with an alive message every 0.2 seconds'),
@@ -57,6 +58,12 @@ def generate_launch_description():
                         'this allows nodes to get the urdf and to subscribe to'
                         'potential urdf updates. This is necesary for gait selection'
                         'to be able to launch'),
+        DeclareLaunchArgument(
+            name='robot_description',
+            default_value=robot,
+            description="Which <robot_description>.xacro file to use. "
+                        "This file must be available in the march_desrciption/urdf/ folder"
+        ),
         # GAIT SELECTION ARGUMENTS
         DeclareLaunchArgument(
             name='gait_selection',
@@ -80,9 +87,8 @@ def generate_launch_description():
         # Launch robot state publisher (from march_description) if not robot_state_publisher:=false
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_description'), 'launch', 'march_description.launch.py')),
-            launch_arguments=[('xacro_path', xacro_path),
-                              ('use_sim_time', use_sim_time),
-                              ('robot', robot)],
+            launch_arguments=[('robot_description', robot_description),
+                              ('use_sim_time', use_sim_time)],
             condition=IfCondition(robot_state_publisher)),
         # Launch march gait selection if not gait_selection:=false
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
@@ -90,5 +96,24 @@ def generate_launch_description():
             launch_arguments=[('gait_directory', gait_directory),
                               ('use_sim_time', use_sim_time),
                               ('gait_package', gait_package)],
-            condition=IfCondition(gait_selection))
+            condition=IfCondition(gait_selection)),
+
+        # Fake sensor data
+        DeclareLaunchArgument(
+            name='fake_sensor_data',
+            default_value='False',
+            description='Whether to launch the fake sensor data node.'),
+        DeclareLaunchArgument(
+            'minimum_fake_temperature',
+            default_value='10',
+            description='Lower bound to generate fake temperatures from'),
+        DeclareLaunchArgument(
+            'maximum_fake_temperature',
+            default_value='30',
+            description='Upper bound to generate fake temperatures from'),
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('march_fake_sensor_data'), 'launch', 'march_fake_sensor_data.launch.py')),
+            launch_arguments=[('minimum_fake_temperature', minimum_fake_temperature),
+                              ('maximum_fake_temperature', maximum_fake_temperature)],
+            condition=IfCondition(fake_sensor_data))
     ])

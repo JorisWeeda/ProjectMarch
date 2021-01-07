@@ -14,19 +14,12 @@ from urdf_parser_py import urdf
 
 gait_files_package = 'march_gait_files'
 
-# Also put the gait files in the ROS1 folder as a temporary measure
-gait_files_ros1_src_path = os.path.join(get_package_share_directory(gait_files_package),
-                                        '..', '..', '..', '..', '..', 'ros1',
+gait_files_src_path = os.path.join(get_package_share_directory(gait_files_package),
+                                        '..', '..', '..', '..',
                                         'src', 'gaits', gait_files_package)
-gait_files_ros1_install_path = os.path.join(get_package_share_directory(gait_files_package),
-                                            '..', '..', '..', '..', '..', 'ros1',
-                                            'install', gait_files_package,
-                                            'share', gait_files_package)
-
-# Add gait files ros2 source path after the migration is complete
 gait_files_install_path = get_package_share_directory(gait_files_package)
 
-DIRECTORIES = [gait_files_ros1_src_path, gait_files_ros1_install_path, gait_files_install_path]
+DIRECTORIES = [gait_files_src_path, gait_files_install_path]
 
 NANOSECONDS_PER_SECOND = 1e9
 

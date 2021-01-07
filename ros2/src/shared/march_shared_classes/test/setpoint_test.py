@@ -5,7 +5,13 @@ from march_shared_classes.gait.setpoint import Setpoint
 
 class SetpointTest(unittest.TestCase):
     def setUp(self):
-        self.setpoint = Setpoint(1.123412541, 0.0343412512, 123.162084)
+        self.setpoint = Setpoint(1.123412541, 0.0343412512, 123.162084)  # 0.0343412512 123.162084
+        self.setpoint_dict = {'left_hip_aa': self.setpoint,
+                              'left_hip_fe': self.setpoint,
+                              'left_knee': self.setpoint,
+                              'right_hip_aa': self.setpoint,
+                              'right_hip_fe': self.setpoint,
+                              'right_knee': self.setpoint}
 
     def test_time_rounding(self):
         self.assertEqual(self.setpoint.time, 1.1234)
@@ -42,7 +48,7 @@ class SetpointTest(unittest.TestCase):
     def test_interpolation_correct(self):
         parameter = 0.3
         other_setpoint = Setpoint(1, 1, 1)
-        expected_result = Setpoint(self.setpoint.time * parameter + (1 - parameter) * 1,
-                                   self.setpoint.position * parameter + (1 - parameter) * 1,
-                                   self.setpoint.velocity * parameter + (1 - parameter) * 1)
+        expected_result = Setpoint(self.setpoint.time * parameter + (1 - parameter) * other_setpoint.time,
+                                   self.setpoint.position * parameter + (1 - parameter) * other_setpoint.position,
+                                   self.setpoint.velocity * parameter + (1 - parameter) * other_setpoint.velocity)
         self.assertEqual(expected_result, Setpoint.interpolate_setpoints(self.setpoint, other_setpoint, parameter))
