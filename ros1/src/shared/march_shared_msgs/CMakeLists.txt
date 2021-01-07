@@ -29,12 +29,14 @@ add_message_files(
 add_service_files(
     FILES
     CapturePointPose.srv
+    ChangeComLevel.srv
     ContainsGait.srv
     GetParamBool.srv
     GetParamFloat.srv
     GetParamInt.srv
     GetParamString.srv
     GetParamStringList.srv
+    GetPossibleComLevels.srv
     PossibleGaits.srv
     SetGaitVersion.srv
     SetObstacleSize.srv

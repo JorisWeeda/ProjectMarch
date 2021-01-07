@@ -4,6 +4,8 @@
 
 #include <march_shared_msgs/CurrentGait.h>
 #include <gazebo/physics/physics.hh>
+#include "yaml-cpp/yaml.h"
+
 
 namespace gazebo
 {
@@ -16,6 +18,10 @@ public:
   ignition::math::v6::Vector3<double> GetCom();
   void update(ignition::math::v6::Vector3<double>& torque_all, ignition::math::v6::Vector3<double>& torque_stable);
   void getGoalPosition(double time_since_start);
+  bool changeComLevel(std::string);
+
+  std::vector<std::string> com_levels;
+  YAML::Node com_levels_tree;
 
 protected:
   physics::ModelPtr model_;
@@ -57,6 +63,7 @@ protected:
 
   double goal_position_x;
   double goal_position_y;
+
 };
 }  // namespace gazebo
 
