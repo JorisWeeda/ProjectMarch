@@ -34,6 +34,11 @@ class GaitInterface(object):
         """Returns the position of all the joints after the gait has ended."""
         return None
 
+    @property
+    def can_freeze(self):
+        """Returns whether the gait has the ability to freeze."""
+        return False
+
     def start(self):
         """Called when the gait has been selected for execution and returns an optional starting trajectory."""
         return None
@@ -61,6 +66,9 @@ class GaitInterface(object):
 
         :returns True when the stop action has been accepted, False otherwise.
         """
+        return False
+
+    def freeze(self):
         return False
 
     def end(self):

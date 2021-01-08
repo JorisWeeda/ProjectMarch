@@ -27,9 +27,9 @@ class InputDeviceController(object):
     # Format of the identifier for the alive message
     ID_FORMAT = 'rqt@{machine}@{user}ros2'
 
-    def __init__(self, node, ping):
+    def __init__(self, node):
         self._node = node
-        self._ping = ping
+        self._ping = node.get_parameter('ping_safety_node').get_parameter_value().bool_value
 
         self._instruction_gait_pub = self._node.create_publisher(msg_type=GaitInstruction,
                                                                  topic='/march/input_device/instruction',
@@ -45,6 +45,7 @@ class InputDeviceController(object):
         self._possible_gait_client = self._node.create_client(srv_type=PossibleGaits,
                                                               srv_name='/march/gait_selection/get_possible_gaits')
 
+
         self._get_version_map_client = self._node.create_client(srv_type=Trigger,
                                                                 srv_name='/march/gait_selection/get_version_map')
         self._gait_version_map = None
@@ -54,7 +55,7 @@ class InputDeviceController(object):
         self.finished_cb = None
         self.rejected_cb = None
         self.current_gait_cb = None
-
+        self._possible_gaits = []
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(),
                                          user=getpass.getuser())
 
@@ -132,8 +133,8 @@ class InputDeviceController(object):
 
     def get_possible_gaits(self) -> Future:
         """
-        Returns the future for the list of names of possible gaits.
-        :return: List of possible gaits
+        Returns the future for the names of possible gaits.
+        :return: Future for the possible gaits
         """
         return self.gait_future
 

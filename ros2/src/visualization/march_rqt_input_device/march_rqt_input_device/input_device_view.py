@@ -29,6 +29,7 @@ BUTTONS_ALWAYS_AVAILABLE = [{'name': 'stop',
                             {'name': 'rocker_switch_down',
                              'cb': 'publish_decrement_step_size'}]
 
+
 class InputDeviceView(QWidget):
     """
     The View of the input device, inialized based on a ui file and a controller.
@@ -57,7 +58,7 @@ class InputDeviceView(QWidget):
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
-        self.refresh_button.clicked.connect(self._update_possible_gaits)
+        self.refresh_button.clicked.connect(self._controller.update_possible_gaits)
 
         self._available_images = []
         self._load_available_images()

@@ -2,6 +2,7 @@
 import unittest
 import rclpy
 from ament_index_python import get_package_share_directory, PackageNotFoundError
+from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import SemiDynamicSetpointsGait
 from march_shared_msgs.srv import ContainsGait
 from urdf_parser_py import urdf
 from march_gait_selection.gait_selection import GaitSelection
@@ -60,15 +61,22 @@ class TestGaitSelection(unittest.TestCase):
 
     def test_contains_gait_true(self):
         request = ContainsGait.Request(gait='walk', subgaits=['right_open'])
-        response = self.gait_selection.contains_gait_cb(request)
+        response = ContainsGait.Response(contains=False)
+        response = self.gait_selection.contains_gait_cb(request, response)
         self.assertTrue(response.contains)
 
     def test_contains_gait_wrong_subgait(self):
         request = ContainsGait.Request(gait='walk', subgaits=['non_existing_subgait'])
-        response = self.gait_selection.contains_gait_cb(request)
+        response = ContainsGait.Response(contains=True)
+        response = self.gait_selection.contains_gait_cb(request, response)
         self.assertFalse(response.contains)
 
     def test_contains_gait_wrong_gait(self):
         request = ContainsGait.Request(gait='non_existing_gait', subgaits=['right_open'])
-        response = self.gait_selection.contains_gait_cb(request)
+        response = ContainsGait.Response(contains=True)
+        response = self.gait_selection.contains_gait_cb(request, response)
         self.assertFalse(response.contains)
+
+    def test_dynamic_gait_loaded(self):
+        self.assertIsInstance(self.gait_selection['dynamic_stairs_up'],
+                              SemiDynamicSetpointsGait)

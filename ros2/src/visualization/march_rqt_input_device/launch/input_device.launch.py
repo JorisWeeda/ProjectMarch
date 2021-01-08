@@ -20,15 +20,15 @@ def generate_launch_description() -> LaunchDescription:
 
     return LaunchDescription([
         DeclareLaunchArgument(
-            'node_prefix',
+            name='node_prefix',
             default_value=[EnvironmentVariable('USER'), '_'],
             description='Prefix for node names'),
         DeclareLaunchArgument(
-            'ping_safety_node',
+            name='ping_safety_node',
             default_value='True',
             description='Whether to ping the safety node'),
         DeclareLaunchArgument(
-            'use_sim_time',
+            name='use_sim_time',
             default_value='True',
             description='Whether to use simulation time'),
         DeclareLaunchArgument(
@@ -41,8 +41,11 @@ def generate_launch_description() -> LaunchDescription:
             executable='input_device',
             output='screen',
             name='input_device',
-            arguments=[LaunchConfiguration('ping_safety_node'),
-                       LaunchConfiguration('use_sim_time')],
-            parameters=[{'button_layout_file': button_layout_file}]
+            namespace='march',
+            parameters=[
+                {'use_sim_time': LaunchConfiguration('use_sim_time')},
+                {'ping_safety_node': LaunchConfiguration('ping_safety_node')},
+                {'button_layout_file': button_layout_file}
+            ]
         )
     ])
