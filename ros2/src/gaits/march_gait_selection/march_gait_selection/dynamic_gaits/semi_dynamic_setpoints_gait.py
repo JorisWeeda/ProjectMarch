@@ -144,14 +144,15 @@ class SemiDynamicSetpointsGait(SetpointsGait):
                 for joint in self._current_subgait.joints
             },
         }
-        freeze_subgait = Subgait.from_dict(
+
+        # freeze subgait
+        return Subgait.from_dict(
             robot=self._current_subgait.robot,
             subgait_dict=new_dict,
             gait_name=self.gait_name,
             subgait_name="freeze",
             version="Only version, generated from code",
         )
-        return freeze_subgait
 
     def _position_after_time(self, elapsed_time):
         """

@@ -204,7 +204,7 @@ class GaitSelection(Node):
             response.success = True
             response.message = ""
             return response
-        except Exception as e:
+        except Exception as e:  # noqa: PIE786
             response.success = False
             response.message = str(e)
             return response
