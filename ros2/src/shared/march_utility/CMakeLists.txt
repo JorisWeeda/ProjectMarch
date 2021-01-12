@@ -24,7 +24,7 @@ find_package(march_shared_msgs REQUIRED)
 
 # Install cpp libraries
 add_library(${PROJECT_NAME}
-        src/march_util.cpp
+        src/node_utils.cpp
         )
 ament_target_dependencies(${PROJECT_NAME} march_shared_msgs rclcpp)
 target_include_directories(${PROJECT_NAME} PUBLIC
