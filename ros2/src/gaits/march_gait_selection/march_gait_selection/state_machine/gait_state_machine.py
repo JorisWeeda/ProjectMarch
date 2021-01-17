@@ -67,6 +67,8 @@ class GaitStateMachine(object):
 
         self._right_foot_on_ground = True
         self._left_foot_on_ground = True
+        self._force_right_foot = 0
+        self._force_left_foot = 0
         self._right_pressure_sub = self._gait_selection.create_subscription(
             msg_type=ContactsState, topic='/march/sensor/right_pressure_sole',
             callback=lambda msg: self._update_foot_on_ground_cb(Side.right, msg),
@@ -116,6 +118,11 @@ class GaitStateMachine(object):
                 elif not self._left_foot_on_ground and side is Side.left:
                     self._left_foot_on_ground = True
                     self._freeze()
+            if side is Side.right:
+                self._force_right_foot = force
+            elif side is Side.left:
+                self._force_left_foot = force
+
         # If there are no contacts, change foot on ground to False
         elif len(msg.states) == 0:
             if side is Side.right:
@@ -233,21 +240,25 @@ class GaitStateMachine(object):
         if not self._is_idle:
             self._should_stop = True
 
-    def check_foot_pressure(self, gait_name):
+    def check_foot_pressure(self):
         """Check if the pressure is placed on the right foot when starting a gait from idle."""
 
-        # Get subgait name from current gait
-        subgait_name = "right_open"
+        self._gait_selection.get_logger().debug(
+            'Force right: {0}, Left: {1}'.format(self._force_right_foot, self._force_left_foot))
 
         # Check if the pressure is placed on the correct foot
         # Pressure always has to be placed on the foot opposite to the starting foot
-        pressure_right_foot = False
-        if "right" in subgait_name and pressure_right_foot:
+
+        if "right" in self._current_gait.subgait_name and self._force_right_foot > self._force_left_foot:
+            self._gait_selection.get_logger().warn(
+                'Incorrect foot pressure, place pressure on left foot')
             return 0
-        elif "left" in subgait_name and not pressure_right_foot:
+        elif "left" in self._current_gait.subgait_name and self._force_left_foot > self._force_right_foot:
+            self._gait_selection.get_logger().warn(
+                'Incorrect foot pressure, place pressure on right foot')
             return 0
-        else:
-            return 1
+
+        return 1
 
     def _process_idle_state(self):
         """ If the current state is idle, this function processes input for
@@ -256,8 +267,7 @@ class GaitStateMachine(object):
             gait_name = self._input.gait_name()
             self._gait_selection.get_logger().info(
                 'Requested gait `{0}`'.format(gait_name))
-            correct_pressure_placement = self.check_foot_pressure(gait_name)
-            if gait_name in self._idle_transitions[self._current_state] and correct_pressure_placement:
+            if gait_name in self._idle_transitions[self._current_state]:
                 self._current_state = gait_name
                 self._is_idle = False
                 self._should_stop = False
@@ -270,8 +280,6 @@ class GaitStateMachine(object):
                 self._gait_selection.get_logger().info(
                     'Cannot execute gait `{0}` from idle state `{1}`'.format(
                         gait_name, self._current_state))
-                if not correct_pressure_placement:
-                    self._gait_selection.get_logger().warn('Pressure should be placed on {0} foot'.format(gait_name))
 
         elif self._input.unknown_requested():
             self._input.gait_accepted()
@@ -291,10 +299,11 @@ class GaitStateMachine(object):
 
             self._gait_selection.get_logger().info(
                 'Executing gait `{0}`'.format(self._current_gait.name))
+
             trajectory = self._current_gait.start()
             if trajectory is not None:
+                self.check_foot_pressure()
                 self._call_gait_callbacks()
-                # self.check_foot_pressure()
                 self._gait_selection.get_logger().info(
                     'Scheduling {subgait}'.format(
                         subgait=self._current_gait.subgait_name))
@@ -315,6 +324,7 @@ class GaitStateMachine(object):
         trajectory, should_stop = self._current_gait.update(elapsed_time)
         # schedule trajectory if any
         if trajectory is not None:
+            self.check_foot_pressure()
             self._call_gait_callbacks()
             self._gait_selection.get_logger().info(
                 'Scheduling {subgait}'.format(
