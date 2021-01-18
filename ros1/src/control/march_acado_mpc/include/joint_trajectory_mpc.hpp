@@ -8,9 +8,22 @@
 #include <joint_trajectory_controller/joint_trajectory_controller.h>
 #include <trajectory_interface/quintic_spline_segment.h>
 
+//Inertia estimator
+#include "march_joint_inertia_controller/inertia_estimator.h"
+
 // Other includes
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
+#include <realtime_tools/realtime_publisher.h>
+#include <ros/node_handle.h>
+#include <ros/time.h>
+#include "std_msgs/Float64.h"
+#include <memory>
+
+
+
+
+
 
 
 // Create a State alias
