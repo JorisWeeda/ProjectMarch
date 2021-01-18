@@ -79,7 +79,10 @@ class TestJointGaitGenerator(Node):
         )
 
         self.limits = Limits.from_urdf_joint(self.joint)
-        if not self.get_parameter("use_urdf_limits").get_parameter_value().string_value == 'true':
+        if (
+            not self.get_parameter("use_urdf_limits").get_parameter_value().string_value
+            == "true"
+        ):
             self.limits.lower = self.get_float_parameter("lower_limit")
             self.limits.upper = self.get_float_parameter("upper_limit")
 
