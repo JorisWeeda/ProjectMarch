@@ -400,10 +400,13 @@ class InputDeviceView(QWidget):
         )
 
         # Testjoint gaits
-        home_test_gait_button = self.create_button('home_setup',
-                                                  callback=lambda: self._controller.publish_gait('home_setup'))
-        testjoint_gait_button = self.create_button('test_joint_gait',
-                                                  callback=lambda: self._controller.publish_gait('test_joint_gait'))
+        home_test_gait_button = self.create_button(
+            "home_setup", callback=lambda: self._controller.publish_gait("home_setup")
+        )
+        testjoint_gait_button = self.create_button(
+            "test_joint_gait",
+            callback=lambda: self._controller.publish_gait("test_joint_gait"),
+        )
 
         # The button layout.
         # Position in the array determines position on screen.
@@ -483,7 +486,7 @@ class InputDeviceView(QWidget):
                 gait_tilted_path_second_end,
             ],
             [ik_test, gait_curb],
-            [home_test_gait_button, testjoint_gait_button]
+            [home_test_gait_button, testjoint_gait_button],
         ]
 
         # Create the qt_layout from the button layout.

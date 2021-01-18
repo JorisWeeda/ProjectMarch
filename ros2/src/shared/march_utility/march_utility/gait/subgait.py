@@ -451,12 +451,12 @@ class Subgait(object):
                             {
                                 "position": setpoint.position,
                                 "time_from_start": {
-                                    "nsecs": Duration(
-                                        seconds=setpoint.time
-                                    ).to_msg().nanosec,
-                                    "secs": Duration(
-                                        seconds=setpoint.time
-                                    ).to_msg().sec,
+                                    "nsecs": Duration(seconds=setpoint.time)
+                                    .to_msg()
+                                    .nanosec,
+                                    "secs": Duration(seconds=setpoint.time)
+                                    .to_msg()
+                                    .sec,
                                 },
                                 "velocity": setpoint.velocity,
                             }
