@@ -14,6 +14,7 @@
 #include <march_hardware/error/error_type.h>
 #include <march_hardware/ethercat/pdo_interface.h>
 #include <march_hardware/ethercat/sdo_interface.h>
+#include "march_hardware/ethercat/ethercat_master.h"
 #include <march_hardware/error/hardware_exception.h>
 
 // clang-format off
@@ -26,6 +27,10 @@ const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS =
     {
         "slaveIndex", "incrementalEncoder", "absoluteEncoder"
     };
+const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS =
+        {
+                "serial_number", "axis", "incrementalEncoder", "absoluteEncoder"
+        };
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
 const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS =
     {
@@ -55,30 +60,45 @@ HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf)
 std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 {
   this->initUrdf();
-  auto pdo_interface = march::PdoInterfaceImpl::create();
-  auto sdo_interface = march::SdoInterfaceImpl::create();
 
   const auto robot_name = this->robot_config_.begin()->first.as<std::string>();
   ROS_DEBUG_STREAM("Starting creation of robot " << robot_name);
 
   // Remove top level robot name key
   YAML::Node config = this->robot_config_[robot_name];
-  const auto if_name = config["ifName"].as<std::string>();
-  const auto cycle_time = config["ecatCycleTime"].as<int>();
-  const auto slave_timeout = config["ecatSlaveTimeout"].as<int>();
+  const auto cycle_time = config["cycleTime"].as<int>();
+  const auto slave_timeout = config["slaveTimeout"].as<int>();
 
-  std::vector<march::Joint> joints = this->createJoints(config["joints"], pdo_interface, sdo_interface);
+  auto pdo_interface = march::PdoInterfaceImpl::create();
+  auto sdo_interface = march::SdoInterfaceImpl::create();
+
+  march::UsbMaster usb_master = march::UsbMaster();
+
+  std::vector<march::Joint> joints = this->createJoints(config["joints"], pdo_interface, sdo_interface, usb_master);
 
   ROS_INFO_STREAM("Robot config:\n" << config);
   YAML::Node pdb_config = config["powerDistributionBoard"];
   auto pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config, pdo_interface, sdo_interface);
-  return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, std::move(pdb), if_name, cycle_time,
-                                             slave_timeout);
+
+  if (config["ifName"])
+  {
+    const auto if_name = config["ifName"].as<std::string>();
+    auto ethercat_master =
+        std::make_unique<march::EthercatMaster>(if_name, getMaxSlaveIndex(joints), cycle_time, slave_timeout);
+
+    return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, std::move(pdb),
+                                               std::move(ethercat_master));
+  }
+  else
+  {
+    return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, std::move(pdb));
+  }
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const std::string& joint_name,
                                           const urdf::JointConstSharedPtr& urdf_joint,
-                                          march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
+                                          march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface,
+                                          march::UsbMaster& usb_master)
 {
   ROS_DEBUG("Starting creation of joint %s", joint_name.c_str());
   if (!urdf_joint)
@@ -106,11 +126,19 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
     mode = march::ActuationMode(joint_config["actuationMode"].as<std::string>());
   }
 
-  auto imc =
-      HardwareBuilder::createIMotionCube(joint_config["imotioncube"], mode, urdf_joint, pdo_interface, sdo_interface);
-  if (!imc)
+  std::unique_ptr<march::MotorController> controller;
+  if (joint_config["imotioncube"])
   {
-    ROS_WARN("Joint %s does not have a configuration for an IMotionCube", joint_name.c_str());
+    controller =
+        HardwareBuilder::createIMotionCube(joint_config["imotioncube"], mode, urdf_joint, pdo_interface, sdo_interface);
+  }
+  if (joint_config["odrive"])
+  {
+    controller = HardwareBuilder::createOdrive(joint_config["odrive"], mode, urdf_joint, usb_master);
+  }
+  if (!controller)
+  {
+    ROS_FATAL("Joint %s does not have a configuration for a motor controller", joint_name.c_str());
   }
 
   auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"], pdo_interface, sdo_interface);
@@ -118,7 +146,44 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
   {
     ROS_WARN("Joint %s does not have a configuration for a TemperatureGes", joint_name.c_str());
   }
-  return { joint_name, net_number, allow_actuation, std::move(imc), std::move(ges) };
+  return { joint_name, net_number, allow_actuation, std::move(controller), std::move(ges) };
+}
+
+std::unique_ptr<march::OdriveMotor> HardwareBuilder::createOdrive(const YAML::Node& odrive_config,
+                                                                  march::ActuationMode mode,
+                                                                  const urdf::JointConstSharedPtr& urdf_joint,
+                                                                  march::UsbMaster& usb_master)
+{
+  if (!odrive_config || !urdf_joint)
+  {
+    return nullptr;
+  }
+
+  HardwareBuilder::validateRequiredKeysExist(odrive_config, HardwareBuilder::ODRIVE_REQUIRED_KEYS, "odrive");
+
+  YAML::Node incremental_encoder_config = odrive_config["incrementalEncoder"];
+  YAML::Node absolute_encoder_config = odrive_config["absoluteEncoder"];
+  std::string axis = odrive_config["axis"].as<std::string>();
+  std::string serial_number = odrive_config["serial_number"].as<std::string>();
+
+  std::string configuration_path =
+      ros::package::getPath("march_hardware").append("/config/" + urdf_joint->name + ".json");
+
+  std::ifstream file(configuration_path);
+
+  if (file.fail())
+  {
+    throw std::runtime_error("Could not open configuration file for the odrive");
+  }
+
+  if (file.is_open())
+  {
+    file.close();
+  }
+
+  auto odrive_endpoint = usb_master.getSerialConnection(serial_number);
+
+  return std::make_unique<march::OdriveMotor>(axis, odrive_endpoint, mode, configuration_path);
 }
 
 std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAML::Node& imc_config,
@@ -139,7 +204,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   int slave_index = imc_config["slaveIndex"].as<int>();
 
   std::ifstream imc_setup_data;
-  imc_setup_data.open(ros::package::getPath("march_hardware").append("/config/sw_files/" + urdf_joint->name + ".sw"));
+  imc_setup_data.open(ros::package::getPath("march_ems_projects").append("/sw_files/" + urdf_joint->name + ".sw"));
   std::string setup = convertSWFileToString(imc_setup_data);
   return std::make_unique<march::IMotionCube>(
       march::Slave(slave_index, pdo_interface, sdo_interface),
@@ -277,7 +342,8 @@ void HardwareBuilder::initUrdf()
 
 std::vector<march::Joint> HardwareBuilder::createJoints(const YAML::Node& joints_config,
                                                         march::PdoInterfacePtr pdo_interface,
-                                                        march::SdoInterfacePtr sdo_interface) const
+                                                        march::SdoInterfacePtr sdo_interface,
+                                                        march::UsbMaster& usb_master) const
 {
   std::vector<march::Joint> joints;
   for (const YAML::Node& joint_config : joints_config)
@@ -288,8 +354,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(const YAML::Node& joints
     {
       ROS_WARN("Joint %s is fixed in the URDF, but defined in the robot yaml", joint_name.c_str());
     }
-    joints.push_back(
-        HardwareBuilder::createJoint(joint_config[joint_name], joint_name, urdf_joint, pdo_interface, sdo_interface));
+    joints.push_back(HardwareBuilder::createJoint(joint_config[joint_name], joint_name, urdf_joint, pdo_interface,
+                                                  sdo_interface, usb_master));
   }
 
   for (const auto& urdf_joint : this->urdf_.joints_)
@@ -312,4 +378,29 @@ std::vector<march::Joint> HardwareBuilder::createJoints(const YAML::Node& joints
 std::string convertSWFileToString(std::ifstream& sw_file)
 {
   return std::string(std::istreambuf_iterator<char>(sw_file), std::istreambuf_iterator<char>());
+}
+
+/**
+ * Returns the highest slave index of motor controllers and GESs in joints
+ */
+int getMaxSlaveIndex(std::vector<march::Joint>& jointList)
+{
+  int maxSlaveIndex = -1;
+
+  for (march::Joint& joint : jointList)
+  {
+    int temperatureSlaveIndex = joint.getTemperatureGESSlaveIndex();
+    if (temperatureSlaveIndex > maxSlaveIndex)
+    {
+      maxSlaveIndex = temperatureSlaveIndex;
+    }
+
+    int motorControllerSlaveIndex = joint.getMotorControllerSlaveIndex() > -1;
+
+    if (motorControllerSlaveIndex > maxSlaveIndex)
+    {
+      maxSlaveIndex = motorControllerSlaveIndex;
+    }
+  }
+  return maxSlaveIndex;
 }
