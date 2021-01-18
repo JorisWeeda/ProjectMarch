@@ -7,7 +7,7 @@
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO: License declaration</license>
 
-  <exec_depend>march_shared_classes</exec_depend>
+  <exec_depend>march_utility</exec_depend>
   <exec_depend>rclpy</exec_depend>
 
   <export>

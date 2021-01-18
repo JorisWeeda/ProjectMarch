@@ -5,9 +5,9 @@ from typing import Tuple
 import rclpy
 import yaml
 from ament_index_python import get_package_share_directory
-from march_shared_classes.gait.joint_trajectory import JointTrajectory
-from march_shared_classes.gait.limits import Limits
-from march_shared_classes.gait.subgait import Subgait
+from march_utility.gait.joint_trajectory import JointTrajectory
+from march_utility.gait.limits import Limits
+from march_utility.gait.subgait import Subgait
 from rclpy.parameter import Parameter
 from rclpy.node import Node
 from urdf_parser_py import urdf
@@ -79,7 +79,7 @@ class TestJointGaitGenerator(Node):
         )
 
         self.limits = Limits.from_urdf_joint(self.joint)
-        if not self.get_parameter("use_urdf_limits").get_parameter_value().bool_value:
+        if not self.get_parameter("use_urdf_limits").get_parameter_value().string_value == 'true':
             self.limits.lower = self.get_float_parameter("lower_limit")
             self.limits.upper = self.get_float_parameter("upper_limit")
 
@@ -157,7 +157,7 @@ class TestJointGaitGenerator(Node):
             JointTrajectory.from_setpoints(
                 name=self.joint_name,
                 limits=self.limits,
-                setpoints=setpoints,
+                setpoint_dict=setpoints,
                 duration=self.duration,
             )
         ]
@@ -188,7 +188,7 @@ class TestJointGaitGenerator(Node):
         velocities = [0.0] * self.num_setpoints
 
         setpoints = (
-            [self.make_setpoint_dict(self.start_position, 0, 0.0, 0.0)]
+            [self.make_setpoint_dict(0, 0, self.start_position, 0.0)]
             + [
                 self.make_setpoint_dict(
                     setpoint_seconds_nanoseconds[i][0],

@@ -5,7 +5,7 @@ test_joint_gait_generator:
     subgait_name: 'perform_test'
     version: 'example'
     num_setpoints: 2
-    duration: 5.0
+    duration: 6.0
     robot: 'test_joint_rotational'
     joint_name: 'rotational_joint'
     description: ''
