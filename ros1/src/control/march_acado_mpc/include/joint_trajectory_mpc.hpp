@@ -8,8 +8,8 @@
 #include <joint_trajectory_controller/joint_trajectory_controller.h>
 #include <trajectory_interface/quintic_spline_segment.h>
 
-//Inertia estimator
-#include "march_joint_inertia_controller/inertia_estimator.h"
+// Inertia estimator include
+#include <march_joint_inertia_controller/inertia_estimator.h>
 
 // Other includes
 #include <ros/ros.h>
