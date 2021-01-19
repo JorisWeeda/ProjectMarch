@@ -9,8 +9,6 @@ include(FetchContent)
 # Define which packages this package depends on
 find_package(catkin REQUIRED 
         COMPONENTS
-        actionlib
-        actionlib_msgs
         control_msgs
         controller_interface
         controller_manager
@@ -18,11 +16,8 @@ find_package(catkin REQUIRED
         joint_trajectory_controller
         march_shared_msgs
         pluginlib
-        realtime_tools
         roscpp
         std_msgs
-        urdf
-        march_joint_inertia_estimator
 )
 
 catkin_package(
@@ -32,15 +27,12 @@ catkin_package(
     # does "find_package(march_acado_mpc)" these packages will be seen as
     # transitive dependencies.
     CATKIN_DEPENDS
-    actionlib
-    actionlib_msgs
     control_msgs
     controller_interface
     march_shared_msgs
     pluginlib
     roscpp
     std_msgs
-    march_joint_inertia_estimator
 )
 
 ################
@@ -106,7 +98,6 @@ add_library(${PROJECT_NAME}
 #        "${QPOASES_SRCS}"
 #        "${ACADO_SRCS}"
         src/joint_trajectory_mpc.cpp
-
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

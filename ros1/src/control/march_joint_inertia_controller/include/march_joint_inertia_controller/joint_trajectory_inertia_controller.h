@@ -10,7 +10,7 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <joint_trajectory_controller/joint_trajectory_controller.h>
-#include "march_joint_inertia_controller/inertia_estimator.h"
+#include "march_joint_inertia_controller/include/march_joint_inertia_controller/inertia_estimator.h"
 #include <memory>
 #include <pluginlib/class_list_macros.h>
 #include <realtime_tools/realtime_buffer.h>
