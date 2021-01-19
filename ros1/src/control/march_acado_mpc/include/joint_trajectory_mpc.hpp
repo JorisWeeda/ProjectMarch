@@ -20,12 +20,6 @@
 #include "std_msgs/Float64.h"
 #include <memory>
 
-
-
-
-
-
-
 // Create a State alias
 namespace joint_trajectory_controller
 {
