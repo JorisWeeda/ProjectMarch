@@ -37,6 +37,6 @@
   {
     "name": "axis0.controller.config.vel_limit",
     "type": "float",
-    "value": 10
+    "value": 2
   }
 ]

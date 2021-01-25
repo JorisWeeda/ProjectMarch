@@ -11,12 +11,12 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -0.45974312
+  - position: -0.2
     time_from_start:
       nsecs: 0
       secs: 2
     velocity: 0.0
-  - position: 0.45974312
+  - position: 0.2
     time_from_start:
       nsecs: 0
       secs: 4
